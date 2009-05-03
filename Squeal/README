@@ -1,0 +1,37 @@
+Dependencies
+============
+
+On Ubuntu all of these are available from package management:
+
+sudo aptitude install python-nevow python-axiom python-magic python-tagpy
+
+but beware a current bug:
+
+http://divmod.org/trac/attachment/ticket/2770/axiom-indexed.diff
+
+I applied this patch manually to:
+
+	/usr/share/python-support/python-axiom/axiom/_schema.py
+
+Twisted
+-------
+
+Epsilon
+-------
+
+http://divmod.org/trac/wiki/DivmodEpsilon
+
+Nevow
+-----
+
+http://divmod.org/trac/wiki/DivmodNevow
+
+Axiom
+-----
+
+http://divmod.org/trac/wiki/DivmodAxiom
+
+Further Reading
+===============
+
+http://wiki.slimdevices.com/index.php?title=SlimProtoTCPProtocol
