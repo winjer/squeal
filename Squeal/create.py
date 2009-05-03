@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-import wingdbstub
+
+try:
+    import wingdbstub
+except ImportError:
+    pass
+
 from axiom.store import Store
 
 from twisted.application.service import IService

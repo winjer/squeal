@@ -1,35 +1,38 @@
-Dependencies
-============
+Building the dependencies
+=========================
 
-On Ubuntu all of these are available from package management:
+In your checkout run ./depends.sh.  This works on jaunty, I have no idea about anything else.
 
-sudo aptitude install python-nevow python-axiom python-magic python-tagpy
+You'll get a few warnings.
 
-but beware a current bug:
+Using the virtual environment
+=============================
 
-http://divmod.org/trac/attachment/ticket/2770/axiom-indexed.diff
+Then eval `./env.sh`
 
-I applied this patch manually to:
+Creating the base database
+==========================
 
-	/usr/share/python-support/python-axiom/axiom/_schema.py
+./create.py
 
-Twisted
--------
+Adding a music directory
+========================
 
-Epsilon
--------
+./addcoll.py /path/to/music/directory
 
-http://divmod.org/trac/wiki/DivmodEpsilon
+Starting it up
+==============
 
-Nevow
------
+./start-squeal
 
-http://divmod.org/trac/wiki/DivmodNevow
+Then point your browser to http://localhost:9000
 
-Axiom
------
+Connecting your player
+======================
 
-http://divmod.org/trac/wiki/DivmodAxiom
+Tell your player the IP address of your computer as the squeezecenter.  You
+will need to /etc/init.d/apparmor stop probably, since apparmor on jaunty is
+irksome.
 
 Further Reading
 ===============

@@ -1,1 +1,4 @@
-import wingdbstub
+try:
+    import wingdbstub
+except ImportError:
+    pass
