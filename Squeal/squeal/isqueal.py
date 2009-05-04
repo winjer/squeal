@@ -104,3 +104,5 @@ class IPlaylistReorderEvent(IPlaylistEvent):
 
     track = Attribute(""" The updated list of changed playtracks """)
 
+class IManholeService(Interface):
+    """ Provided by the manhole service """

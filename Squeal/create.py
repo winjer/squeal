@@ -15,6 +15,7 @@ from squeal.net.slimproto import SlimService
 from squeal.net.discovery import DiscoveryService
 from squeal.playlist.service import Playlist
 from squeal.event import EventReactor
+from squeal.manhole import ManholeService
 
 from squeal.isqueal import *
 
@@ -32,6 +33,7 @@ services = (
     (SlimService, ISlimPlayerService),
     (DiscoveryService, IDiscoveryService),
     (Playlist, IPlaylist),
+    (ManholeService, IManholeService),
 )
 
 for srv, iface in services:
