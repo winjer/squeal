@@ -14,6 +14,8 @@ from squeal.isqueal import *
 
 class DiscoveryService(Item, service.Service):
 
+    """ http://wiki.slimdevices.com/index.php/SLIMP3ClientProtocol """
+
     implements(IDiscoveryService)
 
     parent = inmemory()
@@ -40,8 +42,14 @@ class Datagram(object):
     def decode(self, data):
         if data[0] == 'd':
             return ClientDiscoveryDatagram(data)
-        else:
-            raise NotImplementedError
+        elif data[0] == 'h':
+            pass # Hello!
+        elif data[0] == 'i':
+            pass # IR
+        elif data[0] == '2':
+            pass # i2c?
+        elif data[0] == 'a':
+            pass # ack!
 
 class ClientDiscoveryDatagram(Datagram):
 

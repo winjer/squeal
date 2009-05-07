@@ -145,7 +145,8 @@ class Player(protocol.Protocol):
 
     def process_HELO(self, data):
         devices = {2: 'squeezebox', 3: 'softsqueeze', 4: 'squeezebox2', 5: 'transporter', 6: 'softsqueeze3'}
-        (devId, rev, mac, wlan, bytes) = struct.unpack('BB6sHL', data[:16])
+        #(devId, rev, mac, wlan, bytes) = struct.unpack('BB6sHL', data[:16])
+        (devId,) = struct.unpack('B', data[:1])
         print "HELO received from a %s" % devices.get(devId, 'unknown device')
         self.initClient()
 
