@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-sudo aptitude install python-crypto python-zopeinterface python-tagpy python-magic python-setuptools realpath python-twisted python-virtualenv
+sudo aptitude install python-crypto python-zopeinterface python-tagpy python-magic python-setuptools realpath python-twisted python-virtualenv python-pysqlite2
 
 virtualenv virtual
 python pip.py install -E virtual -e thirdparty/Nevow
