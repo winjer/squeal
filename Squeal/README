@@ -1,9 +1,10 @@
 Building the dependencies
 =========================
 
-In your checkout run ./depends.sh.  This works on jaunty, I have no idea about anything else.
+In your checkout run ./depends.sh.  This works on jaunty, I have no idea about
+anything else.
 
-You'll get a few warnings.
+You'll get a few warnings, which you can ignore.
 
 Using the virtual environment
 =============================
@@ -27,14 +28,64 @@ Starting it up
 
 Then point your browser to http://localhost:9000
 
-Connecting your player
-======================
+The interface is "limited" at the moment, and is really just a proof of
+concept.
+
+Connecting a SqueezeBox
+=======================
 
 Tell your player the IP address of your computer as the squeezecenter.  You
 will need to /etc/init.d/apparmor stop probably, since apparmor on jaunty is
 irksome.
 
+SoftSqueeze3
+============
+
+This is the software player, which is awesome for testing.
+
+You'll need a jre::
+    
+    sudo aptitude install sun-java6-jre
+
+Make sure you're using the Sun JRE too, with::
+
+    sudo update-alternatives --config java
+
+I had to do some messing about to get actual sound out of this, which I think
+is an ubuntu/jaunty/java issue.  I had to install::
+
+    libcsnd-java
+
+To finally make it work - but before that I'd gone through these instructions:
+
+http://www.ubuntugeek.com/sound-solutions-for-ubuntu-904-jaunty-users.html
+
+Which may have been also required.  Who knows.
+
+Installing SoftSqueeze3
+-----------------------
+
+Download the rpm version without jre here:
+
+http://sourceforge.net/project/showfiles.php?group_id=105169&package_id=113211&release_id=671140
+
+Then convert it to a deb with::
+
+    fakeroot alien softsqueeze_linux_3_8.rpm
+
+This will create a deb which you can install with::
+
+    sudo dpkg -i softsqueeze_3.8-2_i386.deb
+
+This installs in (spit) /opt.  You can run it with::
+
+    /opt/softsqueeze/softsqueeze
+
+It'll spin up, and on first run will ask for your server's IP address.  Just
+give it localhost.
+
 Further Reading
 ===============
 
 http://wiki.slimdevices.com/index.php?title=SlimProtoTCPProtocol
+
