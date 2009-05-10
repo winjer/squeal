@@ -135,7 +135,17 @@ class Collection(Item):
                 if self.last is not None:
                     if os.stat(pathname)[stat.ST_MTIME] < timestamp:
                         continue
-                ftype = self.filetypes.get(m.file(pathname.encode('utf-8')).split()[0].lower(), None)
+                mtype = m.file(pathname.encode('utf-8')).lower()
+                if 'ogg' in mtype:
+                    mtype = 'ogg'
+                elif 'flac' in mtype:
+                    mtype = 'flac'
+                elif 'mp3' in mtype:
+                    mtype = 'mp3'
+                else:
+                    mtype = None
+                print pathname, mtype
+                ftype = self.filetypes.get(mtype, None)
                 details = policy.details(self, pathname)
                 self.update(pathname, ftype, details)
             reactor.callLater(0, _process)
