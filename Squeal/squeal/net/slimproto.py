@@ -76,6 +76,14 @@ class SlimService(Item, service.Service):
 
 class Player(protocol.Protocol):
 
+    # these numbers are also in a dict in Collection.  This should obviously be refactored.
+    typeMap = {
+        0: 'o', # ogg
+        1: 'm', # mp3
+        2: 'f', # flac
+        3: 'p', # pcm
+    }
+
     def __init__(self):
         self.buffer = ''
         self.display = Display()
@@ -133,7 +141,8 @@ class Player(protocol.Protocol):
     def play(self, track):
         command = 's'
         autostart = '1'
-        data = self.packStream(command, autostart=autostart, flags=0x00)
+        formatbyte = self.typeMap[track.type]
+        data = self.packStream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
         request = "GET /play?id=%s HTTP/1.0\r\n\r\n" % (track.storeID,)
         data = data + request
         self.sendFrame('strm', data)
