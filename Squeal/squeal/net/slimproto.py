@@ -81,7 +81,7 @@ class Player(protocol.Protocol):
         0: 'o', # ogg
         1: 'm', # mp3
         2: 'f', # flac
-        3: 'p', # pcm
+        3: 'p', # pcm (wav etc.)
     }
 
     def __init__(self):

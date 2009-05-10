@@ -78,13 +78,12 @@ class StandardNamingPolicy(Item):
         try:
             tagsd = self.detailsFromTags(pathname)
         except ValueError:
-            return None
-        if tagsd is None:
-            # this isn't music
-            return None
+            tagsd = None
         details = {}
         for t in self.tags:
-            if pathd[t] is None:
+            if tagsd is None:
+                details[t] = pathd[t]
+            elif pathd[t] is None:
                 details[t] = tagsd[t]
             elif tagsd[t] is None:
                 details[t] = pathd[t]
@@ -105,7 +104,8 @@ class Collection(Item):
     filetypes = {
         'ogg': 0,
         'mp3': 1,
-        'flac': 2
+        'flac': 2,
+        'wav': 3
     }
 
     def update(self, pathname, ftype, details):
@@ -142,6 +142,8 @@ class Collection(Item):
                     mtype = 'flac'
                 elif 'mp3' in mtype:
                     mtype = 'mp3'
+                elif 'wave' in mtype:
+                    mtype = 'wav'
                 else:
                     mtype = None
                 print pathname, mtype
