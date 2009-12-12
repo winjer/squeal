@@ -22,6 +22,7 @@ from nevow import appserver
 from squeal.library.record import *
 from squeal.isqueal import *
 from squeal.event import EventReactor
+from squeal.streaming.service import SpotifyTransfer
 
 def liveElement(*s):
     """ Save some typing. """
@@ -100,6 +101,11 @@ class Controls(BaseElement):
     def stop(self):
         for p in self.store.powerupsFor(IPlaylist):
             p.stop()
+
+    @athena.expose
+    def spotify(self):
+        for p in self.store.powerupsFor(ISpotify):
+            p.play()
 
 class Status(BaseElement):
     jsClass = u'Squeal.Status'
@@ -199,6 +205,18 @@ class Jukebox(athena.LivePage):
         playlist.setFragmentParent(self)
         return ctx.tag[playlist]
 
+class SpotifyStreamer(rend.Page):
+
+    def __init__(self, original, playlist, track):
+        self.original = original
+        self.playlist = playlist
+        self.track = track
+
+    def renderHTTP(self, ctx):
+        for service in self.original.store.powerupsFor(ISpotify):
+            request = inevow.IRequest(ctx)
+            SpotifyTransfer(self.playlist, self.track, service, request)
+            return request.deferred
 
 class Root(rend.Page):
 
@@ -221,4 +239,12 @@ class Root(rend.Page):
         tid = int(ctx.arg('id'))
         pathname = self.original.store.getItemByID(tid).pathname
         return File(pathname)
+
+    def child_spotify(self, ctx):
+        print ctx.arg
+        playlist = int(ctx.arg('playlist'))
+        track = int(ctx.arg('track'))
+        print "Request received for spotify %s/%s" % (playlist, track)
+        return SpotifyStreamer(self.original, playlist, track)
+
 

@@ -106,3 +106,6 @@ class IPlaylistReorderEvent(IPlaylistEvent):
 
 class IManholeService(Interface):
     """ Provided by the manhole service """
+
+class ISpotify(Interface):
+    pass

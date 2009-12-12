@@ -13,6 +13,10 @@ class PlayTrack(Item):
     track = reference()
     added = timestamp()
 
+    def player_url(self):
+        """ Return the URL of the track on the player """
+        return "/play?id=%s" % self.storeID
+
 class PlayTrackJSON(Adapter):
     implements(IJSON)
 

@@ -57,15 +57,20 @@ Squeal.Controls = Squeal.Widget.subclass('Squeal.Controls');
 Squeal.Controls.methods(
     function __init__(self, widgetNode) {
         Squeal.Playlist.upcall(self, "__init__", widgetNode);
+        self.spotifyButton = new Ext.Button({
+            text: 'Spotify'
+        });
         self.playButton = new Ext.Button({
             text: 'Play'
-        })
+        });
         self.stopButton = new Ext.Button({
             text: 'Stop'
-        })
+        });
+        self.spotifyButton.on('click', self.spotify, self);
         self.playButton.on('click', self.play, self);
         self.stopButton.on('click', self.stop, self);
         var node = self.nodeById('controls');
+        self.spotifyButton.render(node);
         self.playButton.render(node);
         self.stopButton.render(node);
     },
@@ -76,7 +81,12 @@ Squeal.Controls.methods(
 
     function stop(self) {
         self.callRemote("stop");
-    });
+    },
+
+    function spotify(self) {
+        self.callRemote("spotify");
+    }
+);
 
 
 Squeal.Playlist = Squeal.Widget.subclass('Squeal.Playlist');

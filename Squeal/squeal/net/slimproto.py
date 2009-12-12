@@ -125,7 +125,7 @@ class Player(protocol.Protocol):
     def sendVersion(self):
         self.sendFrame('vers', '7.0')
 
-    def packStream(self, command, autostart="1", formatbyte = 'o', pcmargs = '????', threshold = 255, spdif = 0, transDuration = 0, transType = '0', flags = 0x40, outputThreshold = 0, replayGain = 0, serverPort = 9000, serverIp = 0):
+    def packStream(self, command, autostart="1", formatbyte = 'o', pcmargs = '1321', threshold = 255, spdif = 0, transDuration = 0, transType = '0', flags = 0x40, outputThreshold = 0, replayGain = 0, serverPort = 9000, serverIp = 0):
         return struct.pack("!ccc4sBBBcBBBLHL",
                            command, autostart, formatbyte, pcmargs,
                            threshold, spdif, transDuration, transType,
@@ -143,7 +143,7 @@ class Player(protocol.Protocol):
         autostart = '1'
         formatbyte = self.typeMap[track.type]
         data = self.packStream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
-        request = "GET /play?id=%s HTTP/1.0\r\n\r\n" % (track.storeID,)
+        request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_url(),)
         data = data + request
         self.sendFrame('strm', data)
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
