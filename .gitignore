@@ -1,0 +1,6 @@
+thirdparty
+virtual
+squeal.ini
+*.pyc
+db
+tmp

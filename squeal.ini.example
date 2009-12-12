@@ -1,0 +1,18 @@
+[DiscoveryService]
+listen = 3483
+hostname = gouda
+
+[SlimService]
+listen = tcp:3483
+
+[WebService]
+listen = tcp:9000
+
+[ManholeService]
+listen = tcp:2222
+username = username
+password = sekrit
+
+[Spotify]
+username = SPOTIFY_USERNAME
+password = SPOTIFY_PASSWORD
