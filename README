@@ -1,15 +1,22 @@
 Building the dependencies
 =========================
 
-In your checkout run ./depends.sh.  This works on jaunty, I have no idea about
-anything else.
+In your checkout run ./depends.sh.  This works on jaunty and karmic, I have no
+idea about anything else.
 
 You'll get a few warnings, which you can ignore.
 
 Using the virtual environment
 =============================
 
-Then eval `./env.sh`
+Then `source env.sh`
+
+Set up your configuration
+=========================
+
+cp squeal.ini.example squeal.ini
+
+Then edit it and set your spotify username and password.  you'll need a premium account.
 
 Creating the base database
 ==========================

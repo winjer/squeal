@@ -54,6 +54,9 @@ class SpotifyTransfer(object):
     def write(self, data):
         """ Called by spotify to queue data to send to the squeezebox  """
 
+        if not self.request:
+            print "overrun: writing to a closed request"
+            return
         if self.paused:
             self.data.append(data)
         else:
@@ -63,6 +66,8 @@ class SpotifyTransfer(object):
         self.producer = producer
 
     def unregisterProducer(self):
+        self.request.unregisterProducer()
+        self.request.finish()
         self.producer = None
         self.request = None
 
@@ -74,8 +79,35 @@ class SpotifyTrack(object):
     title = 'unknown'
     artist = 'unknown'
 
+    def __init__(self, playlist, track):
+        self.playlist = playlist
+        self.track = track
+
     def player_url(self):
         return "/spotify?playlist=%s&track=%s" % (self.playlist, self.track)
+
+class SpotifyPlaylist(object):
+
+    id = None
+    name = None
+
+    def __init__(self, id, status, name):
+        self.id = id
+        self.status = status
+        self.name = name
+
+class SpotifyPlaylistJSON(Adapter):
+    implements(IJSON)
+
+    def json(self):
+        t = self.original
+        return {
+            u'id': t.id,
+            u'status': unicode(t.status, 'utf-8'),
+            u'name': unicode(t.name, 'utf-8'),
+        }
+
+registerAdapter(SpotifyPlaylistJSON, SpotifyPlaylist, IJSON)
 
 class SpotifyManager(SpotifySessionManager):
 
@@ -102,32 +134,33 @@ class SpotifyManager(SpotifySessionManager):
         self.session.load(self.ctr[playlist][track])
         #print "Loading %s from %s" % (unicode(self.ctr[playlist][track].name(), 'utf-8'), unicode(self.ctr[playlist].name(), 'utf-8'))
 
-    def play(self, consumer):
+    def play(self, consumer=None):
         self.playing = True
         self.session.play(1)
-        self.consumer = consumer
-        consumer.registerProducer(self, True)
+        if consumer is not None:
+            self.consumer = consumer
+            consumer.registerProducer(self, True)
 
     def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
         # copy the frame data out, because it will be free()ed when this function returns
         frames = frames[:]
         reactor.callFromThread(self.consumer.write, frames)
 
+    def end_of_track(self, sess):
+        reactor.callFromThread(self.consumer.unregisterProducer)
+
     def log_message(self, sess, data):
         print data
 
     def stopProducing(self):
         self.playing = False
-        self.session.play(0)
         self.consumer = None
 
     def resumeProducing(self):
         self.playing = True
-        self.session.play(1)
 
     def pauseProducing(self):
         self.playing = False
-        self.session.play(0)
 
 class Spotify(Item, service.Service):
     implements(ISpotify)
@@ -139,23 +172,47 @@ class Spotify(Item, service.Service):
     name = inmemory()
     parent = inmemory()
     mgr = inmemory()
+    playing = inmemory()
 
     def __init__(self, config, store):
         username = unicode(config.get("Spotify", "username"))
         password = unicode(config.get("Spotify", "password"))
         Item.__init__(self, store=store, username=username, password=password)
 
+    @property
+    def evreactor(self):
+        return self.store.findFirst(EventReactor)
+
+    def activate(self):
+        self.playing = None
+        self.evreactor.subscribe(self.playerState, IPlayerStateChange)
+
     def startService(self):
         self.mgr = SpotifyManager(self)
         reactor.callInThread(self.mgr.connect)
         return service.Service.startService(self)
 
-    def play(self):
-        track = SpotifyTrack()
+    def play(self, playlist, track=0):
+        t = SpotifyTrack(playlist=playlist, track=track)
         for p in self.store.powerupsFor(ISlimPlayerService):
-            p.play(track)
+            p.play(t)
 
     def registerConsumer(self, consumer, playlist, track):
+        self.playing = (playlist, track)
         self.mgr.load(playlist, track)
         self.mgr.play(consumer)
 
+    def playlists(self):
+        for id, p in enumerate(self.mgr.ctr):
+            name = p.name() if p.is_loaded() else '-- Loading --'
+            if self.playing and self.playing[0] == id:
+                status = 'Playing'
+            else:
+                status = ''
+            yield SpotifyPlaylist(id, status, name)
+
+    def playerState(self, ev):
+        print "STATE CHANGE EVENT RECEIVED AT SPOTIFY", ev.state
+        if ev.state == ev.State.UNDERRUN:
+            print "Loading", self.playing[0], self.playing[1] + 1
+            self.play(self.playing[0], self.playing[1] + 1)

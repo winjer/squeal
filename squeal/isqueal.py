@@ -104,6 +104,9 @@ class IPlaylistReorderEvent(IPlaylistEvent):
 
     track = Attribute(""" The updated list of changed playtracks """)
 
+class IMetadataChangeEvent(Interface):
+    """ New metadata has been loaded by the spotify manager """
+
 class IManholeService(Interface):
     """ Provided by the manhole service """
 

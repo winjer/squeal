@@ -34,6 +34,7 @@ class StateChanged(object):
         STOPPED = 2
         PAUSED = 3
         PLAYING = 4
+        UNDERRUN = 5
 
     def __init__(self, player, state):
         self.player = player
@@ -223,6 +224,7 @@ class Player(protocol.Protocol):
 
     def stat_STMd(self, data):
         print "Decoder Ready"
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.UNDERRUN))
 
     def stat_STMe(self, data):
         print "Connection established"
@@ -250,6 +252,7 @@ class Player(protocol.Protocol):
 
     def stat_STMt(self, data):
         """ Timer heartbeat """
+        self.last_heartbeat = time.time()
 
     def stat_STMu(self, data):
         print "Underrun"

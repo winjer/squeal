@@ -45,6 +45,7 @@ class EventReactor(Item, service.Service):
     def _fireEvent(self, event, *interfaces):
         """ Fire the specified event. You can optionally provide additional
         interfaces that will be added to the event before firing. """
+        print "Firing event %r for %r" % (event, interfaces)
         if interfaces:
             event = copy.copy(event)
             alsoProvides(event, *interfaces)

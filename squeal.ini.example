@@ -1,6 +1,6 @@
 [DiscoveryService]
 listen = 3483
-hostname = gouda
+hostname = YOUR_HOSTNAME
 
 [SlimService]
 listen = tcp:3483
@@ -10,8 +10,8 @@ listen = tcp:9000
 
 [ManholeService]
 listen = tcp:2222
-username = username
-password = sekrit
+username = CHOOSE_A_USERNAME
+password = CHOOSE_A_PASSWORD
 
 [Spotify]
 username = SPOTIFY_USERNAME

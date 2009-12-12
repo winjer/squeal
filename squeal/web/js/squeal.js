@@ -23,6 +23,61 @@ Squeal.Status.methods(
     }
 );
 
+Squeal.spotifyPlaylistRecord = Ext.data.Record.create([
+    {name: 'id'},
+    {name: 'name'}
+]);
+
+Squeal.SpotifyPlaylists = Squeal.Widget.subclass('Squeal.SpotifyPlaylists');
+
+Squeal.SpotifyPlaylists.methods(
+    function __init__(self, widgetNode) {
+        Squeal.SpotifyPlaylists.upcall(self, "__init__", widgetNode);
+        self.store = new Ext.data.Store({
+            reader: Squeal.spotifyPlaylistReader
+        });
+        self.sm = new Ext.grid.RowSelectionModel({singleSelect: true})
+        self.sm.on('rowselect', function (sm, index, record) {
+            self.queue(record.get('id'));
+        });
+        self.reload();
+        self.grid = new Ext.grid.GridPanel({
+            store: self.store,
+            columns: [
+                {header: 'Status', width: 50, dataIndex: 'status'},
+                {header: 'Name', width: 500, dataIndex: 'name'}
+            ],
+            viewConfig: {
+                forceFit: true
+            },
+            sm: self.sm,
+            width: 500,
+            height: 600,
+            frame: true,
+            title: "Spotify Playlists",
+            iconCls: 'icon-grid'
+        });
+        self.grid.render(self.nodeById('spotify-playlists'));
+    },
+
+    function load(self, data) {
+        console.log(data);
+        self.store.loadData(data);
+    },
+
+    function reload(self) {
+        self.callRemote("reload").addCallback(function (data) {
+            self.load(data);
+        });
+    },
+
+    function queue(self, id) {
+        self.callRemote("queue", id);
+    }
+
+);
+
+
 Squeal.trackRecord = Ext.data.Record.create([
     {name: 'id'},
     {name: 'artist'},
@@ -52,25 +107,27 @@ Squeal.playlistReader = new Ext.data.JsonReader({
     id: 'id'
 }, Squeal.playlistRecord);
 
+
+Squeal.spotifyPlaylistReader = new Ext.data.JsonReader({
+    totalProperty: 'results',
+    root: 'rows',
+    id: 'id'
+}, Squeal.spotifyPlaylistRecord);
+
 Squeal.Controls = Squeal.Widget.subclass('Squeal.Controls');
 
 Squeal.Controls.methods(
     function __init__(self, widgetNode) {
         Squeal.Playlist.upcall(self, "__init__", widgetNode);
-        self.spotifyButton = new Ext.Button({
-            text: 'Spotify'
-        });
         self.playButton = new Ext.Button({
             text: 'Play'
         });
         self.stopButton = new Ext.Button({
             text: 'Stop'
         });
-        self.spotifyButton.on('click', self.spotify, self);
         self.playButton.on('click', self.play, self);
         self.stopButton.on('click', self.stop, self);
         var node = self.nodeById('controls');
-        self.spotifyButton.render(node);
         self.playButton.render(node);
         self.stopButton.render(node);
     },

@@ -177,6 +177,36 @@ class Playlist(BaseElement):
     def addTrack(self, track):
         self.callRemote("addTrack", IJSON(track).json())
 
+class SpotifyPlaylists(BaseElement):
+    jsClass=u'Squeal.SpotifyPlaylists'
+    docFactory = liveElement(T.div(id='spotify-playlists'))
+
+    def subscribe(self):
+        self.evreactor.subscribe(self.changed, IMetadataChangeEvent)
+
+    def changed(self, event):
+        self.callRemote("changed")
+
+    @athena.expose
+    def reload(self):
+        rows = []
+        for p in self.page.original.store.powerupsFor(ISpotify):
+            rows = [IJSON(x).json() for x in p.playlists()]
+        print rows
+        return {
+            u'results': len(rows),
+            u'rows': rows
+        }
+
+    @athena.expose
+    def queue(self, playlist):
+        for p in self.page.original.store.powerupsFor(ISpotify):
+            p.play(playlist)
+
+class SpotifyTracks(BaseElement):
+    jsClass=u'Squeal.SpotifyTracks'
+    docFactory = liveElement(T.div(id='spotify-tracks'))
+
 class Jukebox(athena.LivePage):
 
     docFactory = loaders.xmlfile(os.path.join(templateDir, 'index.html'))
@@ -205,6 +235,34 @@ class Jukebox(athena.LivePage):
         playlist.setFragmentParent(self)
         return ctx.tag[playlist]
 
+class Spotbox(athena.LivePage):
+
+    docFactory = loaders.xmlfile(os.path.join(templateDir, "spotbox.html"))
+
+    def __init__(self, original):
+        super(Spotbox, self).__init__()
+        self.original = original
+
+    def render_controls(self, ctx, data):
+        controls = Controls()
+        controls.setFragmentParent(self)
+        return ctx.tag[controls]
+
+    def render_status(self, ctx, data):
+        status = Status()
+        status.setFragmentParent(self)
+        return ctx.tag[status]
+
+    def render_playlists(self, ctx, data):
+        playlists = SpotifyPlaylists()
+        playlists.setFragmentParent(self)
+        return ctx.tag[playlists]
+
+    def render_tracks(self, ctx, data):
+        tracks = SpotifyTracks()
+        tracks.setFragmentParent(self)
+        return ctx.tag[tracks]
+
 class SpotifyStreamer(rend.Page):
 
     def __init__(self, original, playlist, track):
@@ -226,7 +284,7 @@ class Root(rend.Page):
 
     def renderHTTP(self, ctx):
         request = inevow.IRequest(ctx)
-        request.redirect(request.URLPath().child('jukebox'))
+        request.redirect(request.URLPath().child('spotbox'))
         return ''
 
     def child_static(self, ctx):
@@ -234,6 +292,9 @@ class Root(rend.Page):
 
     def child_jukebox(self, ctx):
         return Jukebox(self.original)
+
+    def child_spotbox(self, ctx):
+        return Spotbox(self.original)
 
     def child_play(self, ctx):
         tid = int(ctx.arg('id'))
