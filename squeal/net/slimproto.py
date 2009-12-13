@@ -35,6 +35,7 @@ class StateChanged(object):
         PAUSED = 3
         PLAYING = 4
         UNDERRUN = 5
+        READY = 6
 
     def __init__(self, player, state):
         self.player = player
@@ -224,7 +225,7 @@ class Player(protocol.Protocol):
 
     def stat_STMd(self, data):
         print "Decoder Ready"
-        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.UNDERRUN))
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.READY))
 
     def stat_STMe(self, data):
         print "Connection established"
@@ -270,7 +271,7 @@ class Player(protocol.Protocol):
         print "META received"
 
     def process_DSCO(self, data):
-        print "DSCO received"
+        print "Data Stream Disconnected"
 
     def process_DBUG(self, data):
         print "DBUG received"

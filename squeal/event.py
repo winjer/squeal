@@ -1,4 +1,53 @@
-from zope.interface import Interface, implements
+# $Id$
+
+"""
+
+Simple event forwarding system. Events are represented with python objects
+that implement interfaces. For example:
+
+> class IFooEvent(Interface): pass
+> class IBarEvent(Interface): pass
+>
+> class MyEvent(object):
+>     implements(IFooEvent, IBarEvent)
+>
+>     def __init__(self, x, y):
+>     self.x = x
+>     self.y = y
+
+The object can provide whatever methods or attributes are required.
+
+Subscribers specify which events they wish to received based on the interfaces
+implemented by the events.
+
+Additional interfaces can be added to an event as needed at the time it is fired.
+
+Sending events
+==============
+
+> event = MyEvent(10, "foo")
+> evr = self.store.findFirst(EventReactor)
+> evr.fireEvent(event, IBazEvent)
+
+Subscribing to and receiving events
+=====================
+
+> class Thing(Item, Service):
+>
+>     def activate(self):
+>         evr = self.store.findFirst(EventReactor)
+>         evr.subscribe(self.handleFooEvent, IFooEvent)
+>
+>     def handleFooEvent(self, ev):
+>         x = ev.x
+
+"""
+
+__author__ = 'Doug Winter <doug.winter@isotoma.com>'
+__docformat__ = 'restructuredtext en'
+__version__ = '$Revision$'[11:-2]
+
+from zope.interface import Interface, implements, alsoProvides
 from twisted.application import service
 from twisted.internet import defer
 from twisted.internet import reactor
@@ -7,9 +56,12 @@ from axiom.attributes import reference, inmemory, text, integer
 
 from squeal.isqueal import *
 
+import copy
+
 class EventSubscription(object):
 
-    """ An event subscription.  By default the handler will be called every time this event is fired """
+    """ An event subscription. By default the handler will be called every
+    time this event is fired """
 
     def __init__(self, evreactor, handler, *ifaces):
         self.evreactor = evreactor
@@ -45,7 +97,6 @@ class EventReactor(Item, service.Service):
     def _fireEvent(self, event, *interfaces):
         """ Fire the specified event. You can optionally provide additional
         interfaces that will be added to the event before firing. """
-        print "Firing event %r for %r" % (event, interfaces)
         if interfaces:
             event = copy.copy(event)
             alsoProvides(event, *interfaces)

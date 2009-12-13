@@ -7,12 +7,64 @@ from twisted.internet.interfaces import *
 from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer, timestamp
 
+import traceback
+
 from squeal.event import EventReactor
 from squeal.isqueal import *
 
 from spotify.manager import SpotifySessionManager
 
+class ISpotifyEvent(Interface):
+    """ Any spotify event """
+
+class ISpotifyLoggedInEvent(ISpotifyEvent):
+    """ We have logged into spotify successfully. """
+
+class ISpotifyLoggedOutEvent(ISpotifyEvent):
+    """ We have been logged out of spotify """
+
+    error = Attribute("""The error that caused us to be logged out. """)
+
+class ISpotifyMetadataUpdatedEvent(ISpotifyEvent):
+    """ Spotify metadata has been updated. """
+
+class ISpotifyConnectionErrorEvent(ISpotifyEvent):
+    """ Connection error """
+
+class ISpotifyMessageToUserEvent(ISpotifyEvent):
+    """ Message specifically to the user (for example, invites available) """
+
+class ISpotifyLogMessageEvent(ISpotifyEvent):
+    """ Log message, for operator consumption not for the user """
+
+class ISpotifyEndOfTrackEvent(ISpotifyEvent):
+    """ The track has been completed.  Will happen long before it finishes playing normally. """
+
+class ISpotifyPlayTokenLostEvent(ISpotifyEvent):
+    """ Play token has been lost """
+
+class SpotifyEvent(object):
+    """ Basic event type """
+    implements(ISpotifyEvent)
+
+class SpotifyEventWithError(object):
+    """ Events that provide an error message """
+    implements(ISpotifyEvent)
+
+    def __init__(self, error):
+        self.error = error
+
+class SpotifyEventWithMessage(object):
+    """ Events that provide a message """
+    implements(ISpotifyEvent)
+
+
+    def __init__(self, message):
+        self.message = message
+
 class SpotifyTransfer(object):
+
+    """ Implements the streaming interface between spotify and a web request. """
 
     implements(IConsumer, IProducer, IPushProducer)
 
@@ -120,19 +172,13 @@ class SpotifyManager(SpotifySessionManager):
         self.playing = False
         print "Connecting as %s" % service.username
 
-    def logged_in(self, session, error):
-        self.session = session
-        try:
-            self.ctr = session.playlist_container()
-            print "Got Container"
-        except:
-            traceback.print_exc()
+    def fireEvent(self, *a, **kw):
+        return self.service.evreactor.fireEvent(*a, **kw)
 
     def load(self, playlist, track):
         if self.playing:
             self.session.play(0)
         self.session.load(self.ctr[playlist][track])
-        #print "Loading %s from %s" % (unicode(self.ctr[playlist][track].name(), 'utf-8'), unicode(self.ctr[playlist].name(), 'utf-8'))
 
     def play(self, consumer=None):
         self.playing = True
@@ -141,16 +187,74 @@ class SpotifyManager(SpotifySessionManager):
             self.consumer = consumer
             consumer.registerProducer(self, True)
 
-    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
-        # copy the frame data out, because it will be free()ed when this function returns
-        frames = frames[:]
-        reactor.callFromThread(self.consumer.write, frames)
+    ### Callbacks from Spotify
 
-    def end_of_track(self, sess):
-        reactor.callFromThread(self.consumer.unregisterProducer)
+    def logged_in(self, session, error):
+        """ We have successfully logged in to spotify. This is the place we
+        generally acquire the container for all the playlists from the
+        session. """
+        try:
+            self.session = session
+            self.ctr = session.playlist_container()
+            reactor.callFromThread(self.fireEvent, SpotifyEventWithError(error), ISpotifyLoggedInEvent)
+        except:
+            traceback.print_exc()
+
+    def logged_out(self, session, error):
+        """ We have been logged out """
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEventWithError(error), ISpotifyLoggedOutEvent)
+        except:
+            traceback.print_exc()
+
+
+    def metadata_updated(self, sess):
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEvent(), ISpotifyMetadataUpdatedEvent)
+        except:
+            traceback.print_exc()
+
+    def connection_error(self, sess, error):
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEventWithError(error), ISpotifyConnectionErrorEvent)
+        except:
+            traceback.print_exc()
+
+
+    def message_to_user(self, sess, message):
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEventWithMessage(message[:]), ISpotifyMessageToUserEvent)
+        except:
+            traceback.print_exc()
+
+
+    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
+        try:
+            frames = frames[:] # copy the frame data out, because it will be free()ed when this function returns
+            reactor.callFromThread(self.consumer.write, frames)
+        except:
+            traceback.print_exc()
+
+    def play_token_lost(self, sess):
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEvent(), ISpotifyPlayTokenLostEvent)
+        except:
+            traceback.print_exc()
 
     def log_message(self, sess, data):
-        print data
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEventWithMessage(data[:]), ISpotifyLogMessageEvent)
+        except:
+            traceback.print_exc()
+
+    def end_of_track(self, sess):
+        try:
+            reactor.callFromThread(self.fireEvent, SpotifyEvent(), ISpotifyEndOfTrackEvent)
+            reactor.callFromThread(self.consumer.unregisterProducer)
+        except:
+            traceback.print_exc()
+
+    ### IProducer interface
 
     def stopProducing(self):
         self.playing = False
@@ -212,7 +316,8 @@ class Spotify(Item, service.Service):
             yield SpotifyPlaylist(id, status, name)
 
     def playerState(self, ev):
-        print "STATE CHANGE EVENT RECEIVED AT SPOTIFY", ev.state
-        if ev.state == ev.State.UNDERRUN:
+        """ We listen for state changes on the player. If it's ready for the
+        next track then we initiate playing. """
+        if ev.state == ev.State.READY:
             print "Loading", self.playing[0], self.playing[1] + 1
             self.play(self.playing[0], self.playing[1] + 1)
