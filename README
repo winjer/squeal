@@ -23,8 +23,8 @@ Creating the base database
 
 ./create.py
 
-Adding a music directory
-========================
+Adding a music directory (optional)
+===================================
 
 ./addcoll.py /path/to/music/directory
 
