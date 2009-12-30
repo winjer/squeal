@@ -1,0 +1,37 @@
+#bd {
+    background: #bbb;
+    border: solid #333 1px;
+    padding: 0.5em;
+}
+
+#music-source,
+#account,
+#search,
+#options,
+#playing,
+#queue,
+#connected {
+    background: #aaa;
+    border: solid #333 1px;
+    padding: 0.1em;
+    margin: 0.1em;
+}
+
+#options,
+#account {
+    text-align: right;
+}
+
+#playing {
+    text-align: center;
+}
+
+
+#queue-items,
+#connected-items {
+    height: 10em;
+    overflow: scroll;
+    border: solid #444 1px;
+    width: 200px;
+    margin: auto;
+}
