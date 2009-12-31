@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:n="http://nevow.com/ns/nevow/0.1">
+<head>
+    <title>Squeal</title>
+    <link rel="stylesheet" href="/static/css/reset-fonts-grids.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/styles.css" type="text/css" />
+    <n:invisible n:render="liveglue" />
+</head>
+<body>
+<div id="doc3" class="yui-t5">
+    <div id="bd">
+        <div id="yui-main">
+            <div class="yui-b">
+                <div class="yui-gc">
+                    <div n:render="source" id="source" class="yui-u first">
+                    </div>
+                    <div n:render="account" id="account" class="yui-u">
+                    </div>
+                </div>
+                <div class="yui-gc">
+                    <div n:render="search" id="search" class="yui-u first">
+                    </div>
+                    <div n:render="options" id="options" class="yui-u">
+                    </div>
+                </div>
+                <div n:render="main" class="yui-g">
+                </div>
+            </div>
+        </div>
+        <div class="yui-b">
+            <div n:render="playing" id="playing" class="yui-u first">
+            </div>
+            <div n:render="queue" id="queue" class="yui-u">
+            </div>
+            <div n:render="connected" id="connected" class="yui-u">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
