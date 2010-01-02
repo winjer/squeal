@@ -14,6 +14,8 @@ import ijukebox
 from squeal.streaming import ispotify
 from squeal import isqueal
 
+from spotify import Link
+
 class BaseContainer(object):
     
     """ Provides a simple method of providing default fragment instantiation """
@@ -73,13 +75,28 @@ class Main(base.BaseElement):
         
     def handle_search_results(self, ev):
         artists = {}
+        albums = {}
+        tracks = {}
         for a in ev.results.artists():
-            k = a.name().decode("utf-8")
+            k = unicode(Link.from_artist(a))
             artists[k] = {
-                u'name': k
+                u'name': a.name().decode("utf-8"),
+                u'link': k,
             }
-        self.callRemote("searchResults", artists)
-    
+        for a in ev.results.albums():
+            k = unicode(Link.from_album(a))
+            albums[k] = {
+                u'name': a.name().decode("utf-8"),
+                u'link': k,
+            }
+        for a in ev.results.tracks():
+            k = unicode(Link.from_track(a, 0))
+            tracks[k] = {
+                u'name': a.name().decode("utf-8"),
+                u'link': k,
+            }
+        self.callRemote("searchResults", artists, albums, tracks)
+
 class Playing(base.BaseElement):
     jsClass = u"Squeal.Playing"
     docFactory = base.xmltemplate("playing.html")

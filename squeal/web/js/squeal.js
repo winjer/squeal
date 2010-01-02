@@ -35,12 +35,17 @@ Squeal.Main.methods(
                         ajax: false});
     },
     
-    function searchResults(self, artists) {
+    function searchResults(self, artists, albums, tracks) {
         var t = $.template('<a href="${url}">${name}</a>, ');
         $.throbberHide();
         $(self.node).html("<h1>Search Results:</h1>");
+        $(self.node).append("<h2>Artists:</h2>")
         for(k in artists) {
-            $(self.node).append(t, {url: '#', name: artists[k]['name']})
+            $(self.node).append(t, {url: artists[k]['link'], name: artists[k]['name']})
+        }
+        $(self.node).append("<h2>Albums:</h2>")
+        for(k in albums) {
+            $(self.node).append(t, {url: albums[k]['link'], name: albums[k]['name']})
         }
     }
     
