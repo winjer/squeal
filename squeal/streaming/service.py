@@ -14,39 +14,12 @@ from squeal.isqueal import *
 
 from spotify.manager import SpotifySessionManager
 
-class ISpotifyEvent(Interface):
-    """ Any spotify event """
-
-class ISpotifyLoggedInEvent(ISpotifyEvent):
-    """ We have logged into spotify successfully. """
-
-class ISpotifyLoggedOutEvent(ISpotifyEvent):
-    """ We have been logged out of spotify """
-
-    error = Attribute("""The error that caused us to be logged out. """)
-
-class ISpotifyMetadataUpdatedEvent(ISpotifyEvent):
-    """ Spotify metadata has been updated. """
-
-class ISpotifyConnectionErrorEvent(ISpotifyEvent):
-    """ Connection error """
-
-class ISpotifyMessageToUserEvent(ISpotifyEvent):
-    """ Message specifically to the user (for example, invites available) """
-
-class ISpotifyLogMessageEvent(ISpotifyEvent):
-    """ Log message, for operator consumption not for the user """
-
-class ISpotifyEndOfTrackEvent(ISpotifyEvent):
-    """ The track has been completed.  Will happen long before it finishes playing normally. """
-
-class ISpotifyPlayTokenLostEvent(ISpotifyEvent):
-    """ Play token has been lost """
+from ispotify import *
 
 class SpotifyEvent(object):
     """ Basic event type """
     implements(ISpotifyEvent)
-
+    
 class SpotifyEventWithError(object):
     """ Events that provide an error message """
     implements(ISpotifyEvent)
@@ -58,9 +31,13 @@ class SpotifyEventWithMessage(object):
     """ Events that provide a message """
     implements(ISpotifyEvent)
 
-
     def __init__(self, message):
         self.message = message
+
+class SpotifySearchResults(object):
+    implements(ISpotifySearchResultsEvent)
+    def __init__(self, results):
+        self.results = results
 
 class SpotifyTransfer(object):
 
@@ -186,6 +163,12 @@ class SpotifyManager(SpotifySessionManager):
         if consumer is not None:
             self.consumer = consumer
             consumer.registerProducer(self, True)
+            
+    def search(self, query,  **kw):
+        def cb(results, userdata):
+            r = SpotifySearchResults(results)
+            reactor.callFromThread(self.fireEvent, r)
+        self.session.search(query.encode("utf-8"), cb, **kw)
 
     ### Callbacks from Spotify
 
@@ -321,3 +304,6 @@ class Spotify(Item, service.Service):
         if ev.state == ev.State.READY:
             print "Loading", self.playing[0], self.playing[1] + 1
             self.play(self.playing[0], self.playing[1] + 1)
+
+    def search(self, query):
+        self.mgr.search(query)

@@ -35,7 +35,7 @@ class BaseElement(athena.LiveElement):
 
     @property
     def store(self):
-        return self.service.store
+        return self.page.service.store
 
     @property
     def service(self):
@@ -43,4 +43,4 @@ class BaseElement(athena.LiveElement):
 
     @property
     def evreactor(self):
-        return self.service.evreactor
+        return self.page.service.evreactor

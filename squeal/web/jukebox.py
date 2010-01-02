@@ -1,4 +1,6 @@
 
+from zope.interface import Interface, implements
+
 from nevow import rend
 from nevow import inevow
 from nevow import loaders
@@ -7,6 +9,10 @@ from nevow import page
 from nevow import athena
 
 import base
+
+import ijukebox
+from squeal.streaming import ispotify
+from squeal import isqueal
 
 class BaseContainer(object):
     
@@ -33,10 +39,21 @@ class Source(base.BaseElement):
 class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
     docFactory = base.xmltemplate("account.html")
+
+class SearchEvent(object):
+    def __init__(self, query):
+        self.query = query
     
 class Search(base.BaseElement):
     jsClass = u"Squeal.Search"
     docFactory = base.xmltemplate("search.html")
+    
+    @athena.expose
+    def search(self, query):
+        e = self.evreactor
+        spotify = self.store.powerupsFor(isqueal.ISpotify).next()
+        e.fireEvent(SearchEvent(query), ijukebox.ISearchStartedEvent)
+        spotify.search(query)
     
 class Options(base.BaseElement):
     jsClass = u"Squeal.Options"
@@ -45,6 +62,23 @@ class Options(base.BaseElement):
 class Main(base.BaseElement):
     jsClass = u"Squeal.Main"
     docFactory = base.xmltemplate("main.html")
+    
+    def subscribe(self):
+        e = self.evreactor
+        e.subscribe(self.handle_search_start, ijukebox.ISearchStartedEvent)
+        e.subscribe(self.handle_search_results, ispotify.ISpotifySearchResultsEvent)
+        
+    def handle_search_start(self, ev):
+        self.callRemote("startThrobber")
+        
+    def handle_search_results(self, ev):
+        artists = {}
+        for a in ev.results.artists():
+            k = a.name().decode("utf-8")
+            artists[k] = {
+                u'name': k
+            }
+        self.callRemote("searchResults", artists)
     
 class Playing(base.BaseElement):
     jsClass = u"Squeal.Playing"
@@ -60,7 +94,6 @@ class Connected(base.BaseElement):
 
 class Jukebox(BaseContainer, athena.LivePage):
  
-    jsClass = u"Squeal.Jukebox"
     docFactory = base.xmltemplate("jukebox.html")
     
     contained = {
@@ -73,3 +106,7 @@ class Jukebox(BaseContainer, athena.LivePage):
         'queue': Queue,
         'connected': Connected,
     }
+    
+    def __init__(self, service):
+        super(Jukebox, self).__init__()
+        self.service = service

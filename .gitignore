@@ -4,3 +4,6 @@ squeal.ini
 *.pyc
 db
 tmp
+Squeal.wpu
+pip-log.txt
+nevow/plugins/dropin.cache

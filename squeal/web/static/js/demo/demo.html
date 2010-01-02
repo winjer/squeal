@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>Throbber demo</title>
+		<style type="text/css">
+			#throbber-container {
+				border: 1px solid lime;
+				height: 16px;
+				width: 16px;
+			}
+			div.throbber img {
+				background-color: lime;
+			}
+			#div {
+				background-color: lime;
+				height: 32px;
+				width: 32px;
+			}
+		</style>
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="../jquery.throbber.js"></script>
+		<script type="text/javascript">
+			$(function() {
+
+				$("#start")
+					.click(function() {
+						// This handler only exists to demonstrate that the original
+						// event handlers are still executed when a throbber was
+						// triggered.
+						$("#loading").html("Loading ...");
+					})
+					.throbber();
+
+				$("#stop")
+					.click(function() {
+						$("#loading").html("Loading stopped!");
+						$.throbberHide();
+					})
+
+				$("#ajax")
+					.click(function() {
+						$("#ajax-target").load("demo_content.html");
+					})
+					.throbber();
+
+				$("#google1").throbber("click");
+
+				$("#google2").throbber({parent: "#throbber-container"});
+
+				$("#div").throbber("dblclick", {image: "throbber_2.gif", wrap: '<div class="throbber"></div>'});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>jQuery Throbber plugin demo</h1>
+		<h2>Throbbers on demand</h2>
+		<p id="loading">This text is going to be replaced by <code>$().html()</code>.</p>
+		<div>
+			<button id="start">Load something</button>
+			<button id="stop">Stop loading</button>
+		</div>
+		<p>Throbbers even work on <code>&lt;a/&gt;</code> tags: <a id="google1" href="http://www.google.com/">Go to Google</a>, but watch the throbber!</p>
+		<p>You can attach throbbers to whatever parent elements you want: <a id="google2" href="http://www.google.com/">Go to Google</a>. The throbber will appear in the box below. Note that the throbber is also wrapped with a custom DIV.</p>
+		<div id="throbber-container"></div>
+		<p>Last, you can bind throbbers to all event types, and you can use different images. Double-click on the green box:</p>
+		<div id="div"></div>
+		<h2>AJAX throbbers</h2>
+		<div id="ajax-target">
+			<p>This text is going to be replaced by some content loaded from a local file using <code>$().load()</code>.</p>
+			<button id="ajax">Load AJAX content</button>
+		</div>
+		</body>
+</html>
