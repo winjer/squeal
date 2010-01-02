@@ -72,6 +72,11 @@ class Main(base.BaseElement):
         
     def handle_search_start(self, ev):
         self.callRemote("startThrobber")
+
+    def human_duration(self, d):
+        mins = int(d/60000)
+        secs = int((d - (mins*60000)) / 1000)
+        return u"%dm %ds" % (mins, secs)
         
     def handle_search_results(self, ev):
         artists = {}
@@ -94,6 +99,9 @@ class Main(base.BaseElement):
             tracks[k] = {
                 u'name': a.name().decode("utf-8"),
                 u'link': k,
+                u'album_name': a.album().name().decode("utf-8"),
+                u'artist_name': ", ".join([x.name() for x in a.artists()]).decode("utf-8"),
+                u'duration': self.human_duration(a.duration()),
             }
         self.callRemote("searchResults", artists, albums, tracks)
 

@@ -46,39 +46,3 @@
     width: 200px;
     margin: auto;
 }
-
-#results-tracks-listing thead tr {
-    display: block;
-}
-
-tbody {
-    height: 500px;
-    overflow: auto;
-    display: block;
-    width: 800px;
-}
-
-td, th {
-    border: solid black 1px;
-    padding: 2px;
-    border-spacing: 0;
-}
-
-.odd {
-    background-color: #e2e4ff;
-}
-
-.even {
-    background-color: #dfd;
-}
-
-.cell-play {
-    width: 20px;
-}
-
-.cell-track,
-.cell-artist,
-.cell-album,
-.cell-time {
-    width: 200px;
-}

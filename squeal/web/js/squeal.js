@@ -47,6 +47,30 @@ Squeal.Main.methods(
         for(k in albums) {
             $(self.node).append(t, {url: albums[k]['link'], name: albums[k]['name']})
         }
+        $(self.node).append("<h2>Tracks:</h2>")
+        $(self.node).append('<table cellpadding="0" cellspacing="0" border="0" class="display" id="tracks-datatable"></table>')
+        var trackData = [];
+        for(k in tracks) {
+            var t = tracks[k];
+            trackData.push([t['name'], t['album_name'], t['artist_name'], t['duration']]);
+        }
+        $('#tracks-datatable').dataTable({
+            "aaData": trackData,
+            "aoColumns": [
+                {'sTitle': "Track",
+                  'fnRender': function(obj) {
+                    return '<a href="#">' + obj.aData[0] + '</a> (<a href="#">play</a>)';
+                  }},
+                {'sTitle': "Album",
+                  'fnRender': function(obj) {
+                    return '<a href="#">' + obj.aData[1] + '</a> (<a href="#">play</a>)';
+                  }},
+                {'sTitle': 'Artist',
+                  'fnRender': function(obj) {
+                    return '<a href="#">' + obj.aData[2] + '</a>';
+                  }},
+                {'sTitle': 'Time'}
+            ]});
     }
     
 );
