@@ -53,12 +53,3 @@ def guess_ip():
     if candidates:
         return candidates[0]
 
-class AdaptiveJSONEncoder(simplejson.JSONEncoder):
-    def default(self, obj):
-        a = IJSON(obj, None)
-        if a is not None:
-            return a.json()
-        return simplejson.JSONEncoder.default(self, obj)
-
-def dumps(ob):
-    return simplejson.dumps(ob, cls=AdaptiveJSONEncoder)

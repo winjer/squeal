@@ -3,7 +3,7 @@ from zope.interface import Interface, implements
 from twisted.python.components import Adapter, registerAdapter
 import unittest
 
-from squeal.adaptivejson import IJsonAdapter, loads, dumps
+from squeal.adaptivejson import IJsonAdapter, loads, dumps, simplify
 
 class Frob(object):
 
@@ -34,4 +34,8 @@ class TestAdaptiveJson(unittest.TestCase):
         f = [10, 20, Frob("qux", "quux", "corge")]
         json = dumps(f)
         self.assertEqual(json, '[10, 20, {"baz": "corge", "foo": "qux", "bar": "quux"}]')
+
+    def test_simplify(self):
+        f = Frob("qux", "quux", "corge")
+        self.assertEqual(simplify(f), {u'baz': u'corge', u'foo': u'qux', u'bar': u'quux'})
 

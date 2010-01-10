@@ -32,7 +32,9 @@ import traceback
 
 from squeal.event import EventReactor
 from squeal import isqueal
+from squeal.adaptivejson import IJsonAdapter
 
+import spotify
 from spotify.manager import SpotifySessionManager
 from spotify import Link
 from ispotify import *
@@ -40,7 +42,7 @@ from ispotify import *
 class SpotifyEvent(object):
     """ Basic event type """
     implements(ISpotifyEvent)
-    
+
 class SpotifyEventWithError(object):
     """ Events that provide an error message """
     implements(ISpotifyEvent)
@@ -147,9 +149,9 @@ class SpotifyPlaylist(object):
         self.name = name
 
 class SpotifyPlaylistJSON(Adapter):
-    implements(isqueal.IJSON)
+    implements(IJsonAdapter)
 
-    def json(self):
+    def encode(self):
         t = self.original
         return {
             u'id': t.id,
@@ -157,7 +159,17 @@ class SpotifyPlaylistJSON(Adapter):
             u'name': unicode(t.name, 'utf-8'),
         }
 
-registerAdapter(SpotifyPlaylistJSON, SpotifyPlaylist, isqueal.IJSON)
+registerAdapter(SpotifyPlaylistJSON, SpotifyPlaylist, IJsonAdapter)
+
+class SpotifyTrackJSON(Adapter):
+    implements(IJsonAdapter)
+    def encode(self):
+        return {
+            u'name': unicode(self.original.name(), 'utf-8'),
+            u'isLoaded': self.original.is_loaded(),
+        }
+
+registerAdapter(SpotifyTrackJSON, spotify.Track, IJsonAdapter)
 
 class SpotifyManager(SpotifySessionManager):
 
@@ -184,7 +196,7 @@ class SpotifyManager(SpotifySessionManager):
         if consumer is not None:
             self.consumer = consumer
             consumer.registerProducer(self, True)
-            
+
     def search(self, query,  **kw):
         def cb(results, userdata):
             r = SpotifySearchResults(results)
@@ -271,7 +283,7 @@ class SpotifyManager(SpotifySessionManager):
         self.playing = False
 
 class Spotify(Item, service.Service):
-    
+
     implements(isqueal.ISpotify, isqueal.ITrackSource)
     powerupInterfaces = (isqueal.ISpotify, isqueal.ITrackSource)
 
@@ -288,7 +300,7 @@ class Spotify(Item, service.Service):
         username = unicode(config.get("Spotify", "username"))
         password = unicode(config.get("Spotify", "password"))
         Item.__init__(self, store=store, username=username, password=password)
-        
+
     def __repr__(self):
         return "Spotify(username=%r, password=SECRET, storeID=%r)" % (self.username, self.storeID)
 
@@ -333,11 +345,13 @@ class Spotify(Item, service.Service):
 
     def search(self, query):
         self.mgr.search(query)
-        
+
     def getTrackByLink(self, link):
         l = Link.from_string(link)
         return l.as_track()
-    getTrackByID = getTrackByLink
-    
 
-    
+    #isqueal.TrackSource
+    getTrackByID = getTrackByLink
+
+
+

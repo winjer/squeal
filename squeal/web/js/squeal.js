@@ -7,7 +7,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
   http://www.apache.org/licenses/LICENSE-2.0
-  
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,22 +19,22 @@ limitations under the License.
 
 Squeal.W = {};
 
- 
+
 Squeal.Widget = Nevow.Athena.Widget.subclass('Squeal.Widget');
- 
+
 Squeal.Widget.methods(
     function __init__(self, widgetNode) {
         Squeal.Widget.upcall(self, "__init__", widgetNode);
         self.callRemote("goingLive");
         self.registerW();
     },
-    
+
     function registerW(self) {
         // register with Squeal.W so other widgets can find us
     }
 );
 
- 
+
 Squeal.Jukebox = Squeal.Widget.subclass("Squeal.Jukebox");
 Squeal.Source = Squeal.Widget.subclass("Squeal.Source");
 Squeal.Account = Squeal.Widget.subclass("Squeal.Account");
@@ -49,16 +49,20 @@ Squeal.Queue.methods(
     function registerW(self) {
         Squeal.W.queue = self;
     },
-    
+
     function reload(self, items) {
-        var ctr = $('queue-items');
-        ctr.html("");
+        Squeal.Foo = items;
+        var ctr = self.nodeById("queue-items");
         for(k in items) {
             var item = items[k];
-            ctr.append(item['name']);
+            if(item.isLoaded) {
+                $(ctr).append(item['name'] + "<br/>");
+            } else {
+                $(ctr).append("Loading...<br/>");
+            }
         }
     },
-    
+
     function queueTrack(self, tid) {
         return self.callRemote("queueTrack", tid);
     }
@@ -78,7 +82,7 @@ Squeal.Main.methods(
                         image: "/static/throbber.gif",
                         ajax: false});
     },
-    
+
     function searchResults(self, artists, albums, tracks) {
         var t = $.template('<a href="${url}">${name}</a>, ');
         $.throbberHide();
@@ -117,5 +121,5 @@ Squeal.Main.methods(
                 {'sTitle': 'Time'}
             ]});
     }
-    
+
 );

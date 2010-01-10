@@ -29,6 +29,7 @@ from axiom.item import Item
 from axiom.attributes import text, timestamp, path, reference, integer, AND
 from epsilon.extime import Time
 from squeal.isqueal import *
+from squeal.adaptivejson import IJsonAdapter
 from itertools import *
 import os
 import magic
@@ -247,9 +248,9 @@ class Track(Item):
 
 class TrackJSON(Adapter):
 
-    implements(IJSON)
+    implements(IJsonAdapter)
 
-    def json(self):
+    def encode(self):
         t = self.original
         return {
             u'id': t.storeID,
@@ -259,4 +260,4 @@ class TrackJSON(Adapter):
             u'title': t.title
         }
 
-registerAdapter(TrackJSON, Track, IJSON)
+registerAdapter(TrackJSON, Track, IJsonAdapter)

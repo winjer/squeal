@@ -23,6 +23,7 @@ __version__ = "$Revision$"[11:-2]
 import os
 
 from twisted.python.util import sibpath
+from squeal.adaptivejson import simplify
 
 from nevow import loaders
 from nevow import tags as T
@@ -65,3 +66,12 @@ class BaseElement(athena.LiveElement):
     @property
     def evreactor(self):
         return self.page.service.evreactor
+
+    def callRemote(self, method, *args):
+        def _simplify(o):
+            try:
+                return simplify(o)
+            except ValueError:
+                return o
+        na = map(_simplify, args)
+        return athena.LiveElement.callRemote(self, method, *na)

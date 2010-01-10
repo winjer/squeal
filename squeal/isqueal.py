@@ -50,11 +50,6 @@ class INamingPolicy(Interface):
     def details(collection, pathname):
         """ returns a dictionary of track details """
 
-class IJSON(Interface):
-
-    def json():
-        """ Return a jsonified representation of the adapted item """
-
 class IPlayerEvent(Interface):
 
     """ Any event that represents a change of state on a player """

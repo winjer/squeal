@@ -29,9 +29,10 @@ from axiom.attributes import reference, inmemory, text, integer, timestamp
 
 from squeal.event import EventReactor
 from squeal.isqueal import *
+from squeal.adaptivejson import IJsonAdapter
 
 class PlayTrack(Item):
-    
+
     """ A track that is queued to play. The track identifier is known to the
     provider, and the provider will deliver a Track object on request. """
 
@@ -43,11 +44,23 @@ class PlayTrack(Item):
     def player_url(self):
         """ Return the URL of the track on the player """
         return "/play?id=%s" % self.storeID
-    
+
     @property
     def track(self):
         return self.provider.getTrackByID(self.tid)
-    
+
+class PlayTrackJSON(Adapter):
+    def encode(self):
+        encoded = IJsonAdapter(self.original.track).encode()
+        encoded.update({
+            u'position': self.original.position,
+            u'added': self.original.added,
+            u'tid': unicode(self.original.tid),
+        })
+        return encoded
+
+registerAdapter(PlayTrackJSON, PlayTrack, IJsonAdapter)
+
 class PlaylistChangeEvent(object):
 
     implements(IPlaylistChangeEvent)
@@ -111,6 +124,7 @@ class Playlist(Item, service.Service):
         return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))
 
     def load(self, playtrack):
+        """ Load the specified track on the player. """
         for p in self.store.powerupsFor(ISlimPlayerService):
             p.play(playtrack.track)
             self.position += 1
@@ -118,6 +132,7 @@ class Playlist(Item, service.Service):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
     def enqueue(self, provider, tid):
+        """ Add a track to the end of the queue, for the specified provider. """
         print "enqueing %r" % tid
         pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
         for r in self.store.powerupsFor(IEventReactor):

@@ -23,6 +23,7 @@ __docformat__ = 'restructuredtext en'
 __version__ = '$Revision$'[11:-2]
 
 from zope.interface import Interface, implements
+from twisted.python.components import registerAdapter
 import simplejson
 
 class IJsonAdapter(Interface):
@@ -39,10 +40,9 @@ class IJsonAdapter(Interface):
 
 class JSONEncoder(simplejson.JSONEncoder):
     def default(self, obj):
-        adapter = IJsonAdapter(obj, None)
-        if adapter:
-            return adapter.encode()
-        else:
+        try:
+            return simplify(obj)
+        except ValueError:
             return simplejson.JSONEncoder.default(self, obj)
 
 def dumps(*a, **kw):
@@ -51,3 +51,10 @@ def dumps(*a, **kw):
 def loads(*a, **kw):
     return simplejson.loads(*a, **kw)
 
+def simplify(obj):
+    adapter = IJsonAdapter(obj, None)
+    if adapter:
+        print adapter
+        return adapter.encode()
+    else:
+        raise ValueError("No encoder registered for %r" % (obj,))
