@@ -1,3 +1,25 @@
+# $Id$
+#
+# Copyright 2010 Doug Winter
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+""" Global interface definitions. """
+
+__author__ = 'Doug Winter <doug.winter@isotoma.com>'
+__docformat__ = 'restructuredtext en'
+__version__ = '$Revision$'[11:-2]
+
 
 from zope.interface import Interface, Attribute
 
@@ -112,3 +134,9 @@ class IManholeService(Interface):
 
 class ISpotify(Interface):
     pass
+
+class ITrackSource(Interface):
+    namespace = Attribute(""" The prefix of track identifiers that this source will handle """)
+    def getTrackById(tid):
+        """ Return an object conforming to ITrack that corresponds to the
+        referenced track identifier """

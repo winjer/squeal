@@ -1,3 +1,26 @@
+# $Id$
+#
+# Copyright 2010 Doug Winter
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+""" Playlist management for squeal. Manages a persistent queue of tracks, and
+schedules the for playing as appropriate. """
+
+__author__ = "Doug Winter <doug.winter@isotoma.com>"
+__docformat__ = "restructuredtext en"
+__version__ = "$Revision$"[11:-2]
+
 from zope.interface import Interface, implements
 from twisted.python.components import registerAdapter, Adapter
 from twisted.application import service
@@ -8,27 +31,23 @@ from squeal.event import EventReactor
 from squeal.isqueal import *
 
 class PlayTrack(Item):
+    
+    """ A track that is queued to play. The track identifier is known to the
+    provider, and the provider will deliver a Track object on request. """
 
     position = integer(default=0)
-    track = reference()
     added = timestamp()
+    tid = text()
+    provider = reference()
 
     def player_url(self):
         """ Return the URL of the track on the player """
         return "/play?id=%s" % self.storeID
-
-class PlayTrackJSON(Adapter):
-    implements(IJSON)
-
-    def json(self):
-        track = IJSON(self.original.track).json()
-        track[u'id'] = self.original.storeID
-        track[u'pos'] = self.original.position
-        track[u'added'] = self.original.added
-        return track
-
-registerAdapter(PlayTrackJSON, PlayTrack, IJSON)
-
+    
+    @property
+    def track(self):
+        return self.provider.getTrackByID(self.tid)
+    
 class PlaylistChangeEvent(object):
 
     implements(IPlaylistChangeEvent)
@@ -98,8 +117,9 @@ class Playlist(Item, service.Service):
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
-    def enqueue(self, track):
-        pt = PlayTrack(store=self.store, position=self.maxposition, track=track)
+    def enqueue(self, provider, tid):
+        print "enqueing %r" % tid
+        pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=[pt]))
         self.maxposition += 1

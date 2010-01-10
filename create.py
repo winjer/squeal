@@ -28,17 +28,18 @@ conf = ConfigParser()
 conf.read("squeal.ini")
 
 services = (
-    (EventReactor, IEventReactor),
-    (Library, ILibrary),
-    (WebService, IWebService),
-    (SlimService, ISlimPlayerService),
-    (DiscoveryService, IDiscoveryService),
-    (Playlist, IPlaylist),
-    (ManholeService, IManholeService),
-    (Spotify, ISpotify),
+    EventReactor,
+    Library,
+    WebService,
+    SlimService,
+    DiscoveryService,
+    Playlist,
+    ManholeService,
+    Spotify,
 )
 
-for srv, iface in services:
+for srv in services:
     s = srv(conf, store=store)
-    store.powerUp(s, iface)
+    for iface in s.powerupInterfaces:
+        store.powerUp(s, iface)
     store.powerUp(s, IService)
