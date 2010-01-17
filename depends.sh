@@ -8,11 +8,16 @@ svn co http://divmod.org/svn/Divmod/trunk/Nevow
 svn co http://divmod.org/svn/Divmod/trunk/Axiom
 svn co http://divmod.org/svn/Divmod/trunk/Epsilon
 git clone git://github.com/winjer/pyspotify.git
-wget http://developer.spotify.com/download/libspotify/libspotify-0.0.2-linux6-x86.tar.gz
-tar -zxf libspotify-0.0.2-linux6-x86.tar.gz
-cd libspotify-0.0.2-linux6-x86
-make setup
-cd ..
+if [ `uname -m` = 'x86_64' ]
+then
+    wget http://developer.spotify.com/download/libspotify/libspotify-0.0.3-linux6-x86_64.tar.gz
+    tar -zxf libspotify-0.0.3-linux6-x86_64.tar.gz
+    mv libspotify-0.0.3-linux6-x86_64 libspotify
+else
+    wget http://developer.spotify.com/download/libspotify/libspotify-0.0.3-linux6-i686.tar.gz
+    tar -zxf libspotify-0.0.3-linux6-i686.tar.gz
+    mv libspotify-0.0.3-linux6-i686 libspotify
+fi
 cd ..
 
 virtualenv virtual
