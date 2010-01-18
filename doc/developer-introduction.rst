@@ -34,8 +34,8 @@ range of functionality. You will need to have a good handle on these bits:
 
  * `Reactor Pattern`_,
  * the concept of Deferreds_,
- * the `Component Architecture`,
- * the `Application Framework` (although we're not directly using twistd),
+ * the `Component Architecture`_,
+ * the `Application Framework`_ (although we're not directly using twistd),
 
 Ultimately, if you really want to get going you should at least work through
 the Howtos_ and try the programs there yourself.
@@ -63,6 +63,15 @@ even which components are installed.
 You should read the tutorial_, particularly the part on powerups.
 
 .. _tutorial: http://divmod.org/trac/wiki/DivmodAxiom/Tutorial
+
+You should be aware that when the program is run with axiomatic, what happens
+is that each component in the store that provides the IService powerup is
+started.
+
+This means that if the store is empty, nothing starts up. This is what the
+create.py script does - it sets up all of the appropriate IService items.
+
+Making this work more neatly is probably a task to add to the todo list.
 
 Nevow
 ~~~~~
