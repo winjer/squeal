@@ -20,6 +20,8 @@ __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
 __version__ = "$Revision$"[11:-2]
 
+import wingdbstub
+
 from zope.interface import Interface, implements
 
 from nevow import rend
@@ -167,6 +169,14 @@ class Queue(base.BaseElement):
 class Connected(base.BaseElement):
     jsClass = u"Squeal.Connected"
     docFactory = base.xmltemplate("connected.html")
+
+    @page.renderer
+    def users(self, request, tag):
+        return tag['USERS']
+
+    @page.renderer
+    def players(self, request, tag):
+        return tag['PLAYERS']
 
 class Jukebox(BaseContainer, athena.LivePage):
 
