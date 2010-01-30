@@ -62,9 +62,22 @@ class Source(base.BaseElement):
     jsClass = u"Squeal.Source"
     docFactory = base.xmltemplate("source.html")
 
+    @page.renderer
+    def sources(self, request, tag):
+        return tag[
+            T.option(selected=True)['Spotify'],
+            T.option['Local music'],
+            T.option['Internet radio'],
+            T.option['last.fm'],
+            ]
+
 class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
     docFactory = base.xmltemplate("account.html")
+
+    @page.renderer
+    def credentials(self, request, tag):
+        return tag['You are not logged in']
 
 class SearchEvent(object):
     def __init__(self, query):

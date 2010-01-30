@@ -1,5 +1,5 @@
-<div n:render="liveElement" 
-     xmlns="http://www.w3.org/1999/xhtml" 
+<div n:render="liveElement"
+     xmlns="http://www.w3.org/1999/xhtml"
      xmlns:n="http://nevow.com/ns/nevow/0.1">
-    Select music from: <select name="music"><option>Spotify</option><option>Local music</option><option>Internet radio</option><option>last.fm</option></select>
+    Select music from: <select n:render="sources" name="music" />
 </div>
