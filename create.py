@@ -16,7 +16,7 @@ from squeal.net.discovery import DiscoveryService
 from squeal.playlist.service import Playlist
 from squeal.event import EventReactor
 from squeal.manhole import ManholeService
-from squeal.streaming.service import Spotify
+from squeal.extension import PluginManager
 
 from squeal.isqueal import *
 
@@ -35,7 +35,7 @@ services = (
     DiscoveryService,
     Playlist,
     ManholeService,
-    Spotify,
+    PluginManager,
 )
 
 for srv in services:

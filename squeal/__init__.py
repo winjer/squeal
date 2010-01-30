@@ -25,3 +25,8 @@ try:
     import wingdbstub
 except ImportError:
     pass
+
+# http://twistedmatrix.com/documents/current/core/howto/plugin.html
+from twisted.plugin import pluginPackagePaths
+__path__.extend(pluginPackagePaths('squeal.plugins'))
+__all__ = []

@@ -22,6 +22,7 @@ __version__ = "$Revision$"[11:-2]
 
 from zope.interface import Interface, implements
 from twisted.python.components import registerAdapter, Adapter
+from twisted.python.util import sibpath
 from twisted.application import service
 from twisted.internet import reactor
 from twisted.internet.interfaces import *
@@ -172,8 +173,10 @@ class SpotifyTrackJSON(Adapter):
 registerAdapter(SpotifyTrackJSON, spotify.Track, IJsonAdapter)
 
 class SpotifyManager(SpotifySessionManager):
-
     implements(IPushProducer, IProducer)
+
+    appkey_file = sibpath(__file__, 'appkey.key')
+
 
     def __init__(self, service):
         self.service = service
@@ -285,7 +288,7 @@ class SpotifyManager(SpotifySessionManager):
 class Spotify(Item, service.Service):
 
     implements(isqueal.ISpotify, isqueal.ITrackSource)
-    powerupInterfaces = (isqueal.ISpotify, isqueal.ITrackSource)
+    powerupInterfaces = (isqueal.ISpotify, isqueal.ITrackSource, isqueal.IMusicSource)
 
     namespace = 'spotify'
     username = text()
@@ -295,6 +298,8 @@ class Spotify(Item, service.Service):
     parent = inmemory()
     mgr = inmemory()
     playing = inmemory()
+
+    label = "Spotify"
 
     def __init__(self, config, store):
         username = unicode(config.get("Spotify", "username"))
@@ -353,5 +358,8 @@ class Spotify(Item, service.Service):
     #isqueal.TrackSource
     getTrackByID = getTrackByLink
 
+    def search_widget(self):
+        from squeal.spot.web import Search
+        return Search()
 
 

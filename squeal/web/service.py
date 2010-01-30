@@ -43,7 +43,6 @@ from nevow import appserver
 from squeal.library.record import *
 from squeal.isqueal import *
 from squeal.event import EventReactor
-from squeal.streaming.service import SpotifyTransfer
 
 import jukebox
 
@@ -83,7 +82,7 @@ class Root(rend.Page):
         request = inevow.IRequest(ctx)
         request.redirect(request.URLPath().child('jukebox'))
         return ''
-    
+
     def child_jukebox(self, ctx):
         return jukebox.Jukebox(self.original)
 

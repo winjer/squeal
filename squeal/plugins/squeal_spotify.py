@@ -1,5 +1,6 @@
 
 from zope.interface import classProvides
+from twisted.application.service import IService
 from squeal.isqueal import ISquealPlugin
 
 from squeal.spot.service import Spotify
@@ -12,7 +13,8 @@ class SpotifyPlugin(object):
     def __init__(self):
         pass
 
-    def install(self, config, store):
+    @staticmethod
+    def install(config, store):
         s = Spotify(config, store=store)
         for iface in s.powerupInterfaces:
             store.powerUp(s, iface)

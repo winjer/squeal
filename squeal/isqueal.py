@@ -22,6 +22,7 @@ __version__ = '$Revision$'[11:-2]
 
 
 from zope.interface import Interface, Attribute
+from twisted.plugin import IPlugin
 
 #### Core services
 
@@ -135,3 +136,18 @@ class ITrackSource(Interface):
     def getTrackById(tid):
         """ Return an object conforming to ITrack that corresponds to the
         referenced track identifier """
+
+class ISquealPlugin(IPlugin):
+    """ A plugin for squeal """
+
+class IPluginManager(Interface):
+    """ Service that manages plugins """
+
+# Extension Points
+
+class IMusicSource(Interface):
+
+    name = Attribute("""The internal name of the source""")
+    label = Attribute("""The text displayed in the source dropdown""")
+    def options_widget():
+        """ Returns the options widget """

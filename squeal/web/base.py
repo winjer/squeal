@@ -35,7 +35,7 @@ def liveElement(*s):
 
 template_dir = sibpath(__file__, 'templates')
 
-def xmltemplate(name):
+def xmltemplate(name, template_dir=template_dir):
     return loaders.xmlfile(os.path.join(template_dir, name))
 
 class BaseElement(athena.LiveElement):

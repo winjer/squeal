@@ -34,7 +34,6 @@ from nevow import athena
 import base
 
 import ijukebox
-from squeal.streaming import ispotify
 from squeal import isqueal
 from squeal.adaptivejson import simplify
 
@@ -64,12 +63,16 @@ class Source(base.BaseElement):
 
     @page.renderer
     def sources(self, request, tag):
+        sources = [T.option(selected=True, value="")['-- None --']]
+        for s in self.store.powerupsFor(isqueal.IMusicSource):
+            sources.append(T.option(value=s.name)[s.label])
         return tag[
-            T.option(selected=True)['Spotify'],
-            T.option['Local music'],
-            T.option['Internet radio'],
-            T.option['last.fm'],
-            ]
+            sources
+        ]
+
+class Search(base.BaseElement):
+    jsClass = u"Squeal.Search"
+    docFactory = base.xmltemplate("search.html")
 
 class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
@@ -83,64 +86,10 @@ class SearchEvent(object):
     def __init__(self, query):
         self.query = query
 
-class Search(base.BaseElement):
-    jsClass = u"Squeal.Search"
-    docFactory = base.xmltemplate("search.html")
-
-    @athena.expose
-    def search(self, query):
-        e = self.evreactor
-        spotify = self.store.powerupsFor(isqueal.ISpotify).next()
-        e.fireEvent(SearchEvent(query), ijukebox.ISearchStartedEvent)
-        spotify.search(query)
-
 class Options(base.BaseElement):
     jsClass = u"Squeal.Options"
     docFactory = base.xmltemplate("options.html")
 
-class Main(base.BaseElement):
-    jsClass = u"Squeal.Main"
-    docFactory = base.xmltemplate("main.html")
-
-    def subscribe(self):
-        e = self.evreactor
-        e.subscribe(self.handle_search_start, ijukebox.ISearchStartedEvent)
-        e.subscribe(self.handle_search_results, ispotify.ISpotifySearchResultsEvent)
-
-    def handle_search_start(self, ev):
-        self.callRemote("startThrobber")
-
-    def human_duration(self, d):
-        mins = int(d/60000)
-        secs = int((d - (mins*60000)) / 1000)
-        return u"%dm %ds" % (mins, secs)
-
-    def handle_search_results(self, ev):
-        artists = {}
-        albums = {}
-        tracks = {}
-        for a in ev.results.artists():
-            k = unicode(Link.from_artist(a))
-            artists[k] = {
-                u'name': a.name().decode("utf-8"),
-                u'link': k,
-            }
-        for a in ev.results.albums():
-            k = unicode(Link.from_album(a))
-            albums[k] = {
-                u'name': a.name().decode("utf-8"),
-                u'link': k,
-            }
-        for a in ev.results.tracks():
-            k = unicode(Link.from_track(a, 0))
-            tracks[k] = {
-                u'name': a.name().decode("utf-8"),
-                u'link': k,
-                u'album_name': a.album().name().decode("utf-8"),
-                u'artist_name': ", ".join([x.name() for x in a.artists()]).decode("utf-8"),
-                u'duration': self.human_duration(a.duration()),
-            }
-        self.callRemote("searchResults", artists, albums, tracks)
 
 class Playing(base.BaseElement):
     jsClass = u"Squeal.Playing"
@@ -178,6 +127,10 @@ class Queue(base.BaseElement):
         else:
             raise KeyError("No track source uses the namespace %s" % namespace)
         queue.enqueue(provider, tid)
+
+class Main(base.BaseElement):
+    jsClass = u"Squeal.Main"
+    docFactory = base.xmltemplate("main.html")
 
 class Connected(base.BaseElement):
     jsClass = u"Squeal.Connected"
