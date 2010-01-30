@@ -1,4 +1,6 @@
 from squeal.web import base
+from twisted.python.util import sibpath
+from nevow import athena
 
 template_dir = sibpath(__file__, 'templates')
 
@@ -7,7 +9,7 @@ def xmltemplate(s):
 
 class Search(base.BaseElement):
     jsClass = u"Spot.Search"
-    docFactory = base.xmltemplate("search.html")
+    docFactory = xmltemplate("search.html")
 
     @athena.expose
     def search(self, query):
@@ -18,7 +20,7 @@ class Search(base.BaseElement):
 
 class Main(base.BaseElement):
     jsClass = u"Spot.Main"
-    docFactory = base.xmltemplate("main.html")
+    docFactory = xmltemplate("main.html")
 
     def subscribe(self):
         e = self.evreactor

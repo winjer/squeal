@@ -46,8 +46,11 @@ class BaseContainer(object):
     contained = {}
 
     def _contained_render(self, name):
+        if not hasattr(self, 'runtime'):
+            self.runtime = {}
         def _(ctx, data):
             elem = self.contained[name]()
+            self.runtime[name] = elem
             elem.setFragmentParent(self)
             return ctx.tag[elem]
         return _
@@ -69,6 +72,14 @@ class Source(base.BaseElement):
         return tag[
             sources
         ]
+
+    @athena.expose
+    def search_widget(self, source):
+        for s in self.store.powerupsFor(isqueal.IMusicSource):
+            if s.name == source:
+                w = s.search_widget()
+                w.setFragmentParent(self.page.runtime['search'])
+                return w
 
 class Search(base.BaseElement):
     jsClass = u"Squeal.Search"

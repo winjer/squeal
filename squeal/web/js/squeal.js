@@ -45,6 +45,18 @@ Squeal.Playing = Squeal.Widget.subclass("Squeal.Playing");
 Squeal.Queue = Squeal.Widget.subclass("Squeal.Queue");
 Squeal.Connected = Squeal.Widget.subclass("Squeal.Connected");
 
+Squeal.Source.methods(
+    function selected(self) {
+        source = self.nodeById("source").value;
+        d = self.callRemote("search_widget", source);
+        d.addCallback(
+            function recv(le) {
+                return Squeal.W.search.replaceChild(le);
+            }
+        );
+    }
+);
+
 Squeal.Queue.methods(
     function registerW(self) {
         Squeal.W.queue = self;
@@ -69,10 +81,24 @@ Squeal.Queue.methods(
 );
 
 Squeal.Search.methods(
+    function registerW(self) {
+    Squeal.W.search = self;
+    },
     function searchButton(self, node) {
         var field = self.nodeById("search-query");
         var query = field.value;
         self.callRemote("search", query);
+    },
+
+    function replaceChild(self, le) {
+        var d = self.addChildWidgetFromWidgetInfo(le);
+        d.addCallback(
+            function childAdded(widget) {
+                self.node.innerHTML = "";
+                self.node.appendChild(widget.node);
+            }
+        );
+        return d;
     }
 );
 

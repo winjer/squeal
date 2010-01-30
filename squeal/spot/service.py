@@ -294,7 +294,7 @@ class Spotify(Item, service.Service):
     username = text()
     password = text()
     running = inmemory()
-    name = inmemory()
+    name = 'spotify'
     parent = inmemory()
     mgr = inmemory()
     playing = inmemory()

@@ -24,7 +24,7 @@ Spot.Widget = Nevow.Athena.Widget.subclass('Spot.Widget');
 
 Spot.Widget.methods(
     function __init__(self, widgetNode) {
-        Squeal.Widget.upcall(self, "__init__", widgetNode);
+        Spot.Widget.upcall(self, "__init__", widgetNode);
         self.callRemote("goingLive");
         self.registerW();
     },
@@ -35,9 +35,9 @@ Spot.Widget.methods(
 );
 
 
-Squeal.Search = Squeal.Widget.subclass("Spot.Search");
-Squeal.Options = Squeal.Widget.subclass("Spot.Options");
-Squeal.Main = Squeal.Widget.subclass("Spot.Main");
+Spot.Search = Spot.Widget.subclass("Spot.Search");
+Spot.Options = Spot.Widget.subclass("Spot.Options");
+Spot.Main = Spot.Widget.subclass("Spot.Main");
 
 Spot.Search.methods(
     function searchButton(self, node) {
