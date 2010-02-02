@@ -19,7 +19,6 @@ limitations under the License.
 
 Spot.W = {};
 
-
 Spot.Widget = Nevow.Athena.Widget.subclass('Spot.Widget');
 
 Spot.Widget.methods(
@@ -30,28 +29,37 @@ Spot.Widget.methods(
     },
 
     function registerW(self) {
-        // register with Squeal.W so other widgets can find us
+        // register with Spot.W so other widgets can find us
     }
 );
 
 
+Spot.Main = Spot.Widget.subclass("Spot.Main");
 Spot.Search = Spot.Widget.subclass("Spot.Search");
 Spot.Options = Spot.Widget.subclass("Spot.Options");
-Spot.Main = Spot.Widget.subclass("Spot.Main");
+Spot.Document = Spot.Widget.subclass("Spot.Document");
 
 Spot.Search.methods(
     function searchButton(self, node) {
         var field = self.nodeById("search-query");
         var query = field.value;
         self.callRemote("search", query);
+    },
+
+    function registerW(self) {
+        Spot.W.search = self;
     }
 );
 
-Spot.Main.methods(
+Spot.Document.methods(
     function startThrobber(self) {
         $.throbberShow({parent: self.node,
                         image: "/static/throbber.gif",
                         ajax: false});
+    },
+
+    function registerW(self) {
+        Spot.W.document = self;
     },
 
     function searchResults(self, artists, albums, tracks) {

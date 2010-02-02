@@ -75,3 +75,47 @@ class BaseElement(athena.LiveElement):
                 return o
         na = map(_simplify, args)
         return athena.LiveElement.callRemote(self, method, *na)
+
+class BaseElementContainer(athena.LiveElement):
+
+    """ Provides a simple method of providing default fragment instantiation """
+
+    contained = {}
+
+    def _contained_render(self, name):
+        if not hasattr(self, 'runtime'):
+            self.runtime = {}
+        def _(request, tag):
+            elem = self.contained[name]()
+            self.runtime[name] = elem
+            elem.setFragmentParent(self.page)
+            return tag[elem]
+        return _
+
+    def renderer(self, name):
+        print "!!!!!!!! FINDING", name
+        if name in self.contained:
+            return self._contained_render(name)
+        return super(BaseElementContainer, self).renderer(name)
+
+class BasePageContainer(athena.LivePage):
+
+    """ Provides a simple method of providing default fragment instantiation """
+
+    contained = {}
+
+    def _contained_render(self, name):
+        if not hasattr(self, 'runtime'):
+            self.runtime = {}
+        def _(ctx, data):
+            elem = self.contained[name]()
+            self.runtime[name] = elem
+            elem.setFragmentParent(self)
+            return ctx.tag[elem]
+        return _
+
+    def renderer(self, ctx, name):
+        print "!!!!!!!! FINDING", name
+        if name in self.contained:
+            return self._contained_render(name)
+        return super(BasePageContainer, self).renderer(ctx, name)

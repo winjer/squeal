@@ -20,8 +20,6 @@ __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
 __version__ = "$Revision$"[11:-2]
 
-import wingdbstub
-
 from zope.interface import Interface, implements
 
 from nevow import rend
@@ -37,29 +35,6 @@ import ijukebox
 from squeal import isqueal
 from squeal.adaptivejson import simplify
 
-from spotify import Link
-
-class BaseContainer(object):
-
-    """ Provides a simple method of providing default fragment instantiation """
-
-    contained = {}
-
-    def _contained_render(self, name):
-        if not hasattr(self, 'runtime'):
-            self.runtime = {}
-        def _(ctx, data):
-            elem = self.contained[name]()
-            self.runtime[name] = elem
-            elem.setFragmentParent(self)
-            return ctx.tag[elem]
-        return _
-
-    def renderer(self, ctx, name):
-        if name in self.contained:
-            return self._contained_render(name)
-        return super(BaseContainer, self).renderer(ctx, name)
-
 class Source(base.BaseElement):
     jsClass = u"Squeal.Source"
     docFactory = base.xmltemplate("source.html")
@@ -74,16 +49,13 @@ class Source(base.BaseElement):
         ]
 
     @athena.expose
-    def search_widget(self, source):
+    def main_widget(self, source):
         for s in self.store.powerupsFor(isqueal.IMusicSource):
             if s.name == source:
-                w = s.search_widget()
-                w.setFragmentParent(self.page.runtime['search'])
+                w = s.main_widget()
+                w.setFragmentParent(self.page.runtime['main'])
+                print "!!!!!!!!!!!!!! returning FRAG"
                 return w
-
-class Search(base.BaseElement):
-    jsClass = u"Squeal.Search"
-    docFactory = base.xmltemplate("search.html")
 
 class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
@@ -92,15 +64,6 @@ class Account(base.BaseElement):
     @page.renderer
     def credentials(self, request, tag):
         return tag['You are not logged in']
-
-class SearchEvent(object):
-    def __init__(self, query):
-        self.query = query
-
-class Options(base.BaseElement):
-    jsClass = u"Squeal.Options"
-    docFactory = base.xmltemplate("options.html")
-
 
 class Playing(base.BaseElement):
     jsClass = u"Squeal.Playing"
@@ -155,15 +118,13 @@ class Connected(base.BaseElement):
     def players(self, request, tag):
         return tag['PLAYERS']
 
-class Jukebox(BaseContainer, athena.LivePage):
+class Jukebox(base.BasePageContainer):
 
     docFactory = base.xmltemplate("jukebox.html")
 
     contained = {
         'source': Source,
         'account': Account,
-        'search': Search,
-        'options': Options,
         'main': Main,
         'playing': Playing,
         'queue': Queue,

@@ -40,6 +40,8 @@ from spotify.manager import SpotifySessionManager
 from spotify import Link
 from ispotify import *
 
+from squeal.spot import web
+
 class SpotifyEvent(object):
     """ Basic event type """
     implements(ISpotifyEvent)
@@ -358,8 +360,7 @@ class Spotify(Item, service.Service):
     #isqueal.TrackSource
     getTrackByID = getTrackByLink
 
-    def search_widget(self):
-        from squeal.spot.web import Search
-        return Search()
+    def main_widget(self):
+        return web.Main()
 
 

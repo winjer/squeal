@@ -2,10 +2,21 @@ from squeal.web import base
 from twisted.python.util import sibpath
 from nevow import athena
 
+from squeal import isqueal
+from squeal.spot import ispotify
+from squeal.web import ijukebox
+
+
+from spotify import Link
+
 template_dir = sibpath(__file__, 'templates')
 
 def xmltemplate(s):
     return base.xmltemplate(s, template_dir)
+
+class SearchEvent(object):
+    def __init__(self, query):
+        self.query = query
 
 class Search(base.BaseElement):
     jsClass = u"Spot.Search"
@@ -18,9 +29,13 @@ class Search(base.BaseElement):
         e.fireEvent(SearchEvent(query), ijukebox.ISearchStartedEvent)
         spotify.search(query)
 
-class Main(base.BaseElement):
-    jsClass = u"Spot.Main"
-    docFactory = xmltemplate("main.html")
+class Options(base.BaseElement):
+    jsClass = u"Spot.Options"
+    docFactory = xmltemplate("options.html")
+
+class Document(base.BaseElement):
+    jsClass = u"Spot.Document"
+    docFactory = xmltemplate("document.html")
 
     def subscribe(self):
         e = self.evreactor
@@ -61,3 +76,13 @@ class Main(base.BaseElement):
                 u'duration': self.human_duration(a.duration()),
             }
         self.callRemote("searchResults", artists, albums, tracks)
+
+class Main(base.BaseElementContainer):
+    docFactory = xmltemplate("main.html")
+
+    contained = {
+        'search': Search,
+        'options': Options,
+        'document': Document,
+    }
+
