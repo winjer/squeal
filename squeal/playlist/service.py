@@ -94,19 +94,24 @@ class Playlist(Item, service.Service):
         self.evreactor.subscribe(self.buttonPressed, IRemoteButtonPressedEvent)
 
     def playerState(self, ev):
-        if ev.state == ev.State.ESTABLISHED:
-            #self.play()
-            self.clear()
+        """ Called by the event system in response to player state change events. """
+        if ev.state == ev.State.ESTABLISHED: # just connected
+            self.play()
+        elif ev.state == ev.State.READY: # finished playing previous track
+            self.play()
+
 
     def buttonPressed(self, ev):
         if ev.button == ev.Button.PLAY:
             self.play()
 
     def clear(self):
+        log.msg("Clear", system="squeal.playlist.service.Playlist")
         for p in self.store.query(PlayTrack):
             p.deleteFromStore()
 
     def reset(self):
+        log.msg("Reset", system="squeal.playlist.service.Playlist")
         for p in self.store.query(PlayTrack, sort=PlayTrack.position.ascending):
             self.position = p.position
             self.play()

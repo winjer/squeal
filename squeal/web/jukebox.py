@@ -131,7 +131,10 @@ class Connected(base.BaseElement):
         players = []
         for p in slimservice.players:
             players.append(T.li["%s (%s)" % (p.mac_address, p.device_type)])
-        return tag[T.h2["Players"], T.ul[players]]
+        if players:
+            return tag[T.h2["Players"], T.ul[players]]
+        else:
+            return tag[T.h2["Players"], "No players connected!"]
 
 class Jukebox(base.BasePageContainer):
 

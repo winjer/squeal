@@ -7,3 +7,7 @@ tmp
 Squeal.wpu
 pip-log.txt
 nevow/plugins/dropin.cache
+_trial_temp
+core
+setuptools*
+wingdbstub.py

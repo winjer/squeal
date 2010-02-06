@@ -44,13 +44,18 @@ class SpotifyTransfer(object):
         self.data = []
         self.paused = False
         self.finished = False
+        self.written = 0
         request.registerProducer(self, 1)
         self.service.registerConsumer(self, tid)
 
     def resumeProducing(self):
+        log.msg("resumeProducing", system="squeal.spot.sfy.SpotifyTransfer")
         if not self.request:
             return
         if self.data:
+            # This is probably wrong, although it seems to work
+            # flushing the entire buffer at once seems like
+            # it might overload the consumer
             for x in self.data:
                 self.request.write(x)
             self.data = []
@@ -61,32 +66,42 @@ class SpotifyTransfer(object):
         self.paused = False
 
     def pauseProducing(self):
+        log.msg("pauseProducing", system="squeal.spot.sfy.SpotifyTransfer")
         self.paused = True
-        pass
 
     def stopProducing(self):
-        self.producer.stopProducing()
-        self.request = None
+        log.msg("stopProducing", system="squeal.spot.sfy.SpotifyTransfer")
+        #self.producer.stopProducing()
+        #self.request = None
 
     def write(self, data):
         """ Called by spotify to queue data to send to the squeezebox  """
 
         if not self.request:
-            log.warning("overrun: writing to a closed request", system="squeal.spot.sfy.SpotifyTransfer")
+            self.stopProducing()
+            log.msg("overrun: writing to a closed request", system="squeal.spot.sfy.SpotifyTransfer")
             return
+        self.written += len(data)
+        if self.written % (1024*1024) == 0:
+            log.msg("%d written" % self.written,  system="squeal.spot.sfy.SpotifyTransfer")
         if self.paused:
+            # you'd think just returning 0 here would work, but it causes
+            # the sound to skip
             self.data.append(data)
         else:
             self.request.write(data)
 
     def registerProducer(self, producer, streaming):
+        log.msg("registerProducer", system="squeal.spot.sfy.SpotifyTransfer")
         self.producer = producer
 
     def unregisterProducer(self):
-        self.request.unregisterProducer()
-        self.request.finish()
+        """ Called by the spotify service when the end of track is reached. We
+        may stop receiving data long before we stop sending it of course, so
+        the request remains active. """
+        log.msg("unregisterProducer", system="squeal.spot.sfy.SpotifyTransfer")
         self.producer = None
-        self.request = None
+        self.finished = True
 
 class SpotifyStreamer(rend.Page):
 

@@ -296,7 +296,7 @@ class Player(protocol.Protocol):
         log.msg("Resume confirmed", system="squeal.net.slimproto.Player")
 
     def stat_STMs(self, data):
-        log.msg("Playback of new track has started", system="squeal.net.slimproto.Player")
+        log.msg("Player status message: playback of new track has started", system="squeal.net.slimproto.Player")
 
     def stat_STMt(self, data):
         """ Timer heartbeat """
@@ -335,11 +335,11 @@ class Player(protocol.Protocol):
             log.msg("Unknown IR received: %r, %r" % (time, code), system="squeal.net.slimproto.Player")
 
     def process_remote_volumeUp(self):
-        vol = self.volume + 0x0100 # some increment
+        vol = self.volume + 0x0400 # some increment
         self.setVolume(vol)
 
     def process_remote_volumeDown(self):
-        vol = self.volume - 0x0100
+        vol = self.volume - 0x0400
         self.setVolume(vol)
 
     def process_remote_play(self):

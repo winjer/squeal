@@ -71,13 +71,25 @@ class SpotifyTrack(object):
     playlist = None
     track = None
     type = 3
-    title = 'unknown'
-    artist = 'unknown'
 
     def __init__(self, tid, playlist=None, track=None):
         self.playlist = playlist
         self.track = track
         self.tid = tid
+
+    @property
+    def spotify_track(self):
+        l = Link.from_string(self.tid)
+        return l.as_track()
+
+    @property
+    def title(self):
+        return self.spotify_track.name()
+
+    @property
+    def artist(self):
+        artists = self.spotify_track.artists()
+        return ",".join(x.name() for x in artists)
 
     def player_url(self):
         return "/spotify?tid=%s" % self.tid
@@ -143,6 +155,7 @@ class SpotifyManager(SpotifySessionManager):
         return self.service.evreactor.fireEvent(*a, **kw)
 
     def load(self, tid):
+        log.msg("load %r" % tid, system="squeal.spot.service.SpotifyManager")
         if self.playing:
             self.session.play(0)
         link = Link.from_string(tid)
@@ -150,6 +163,7 @@ class SpotifyManager(SpotifySessionManager):
         self.session.load(track)
 
     def play(self, consumer=None):
+        log.msg("play", system="squeal.spot.service.SpotifyManager")
         self.playing = True
         self.session.play(1)
         if consumer is not None:
@@ -205,6 +219,8 @@ class SpotifyManager(SpotifySessionManager):
 
     def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
         try:
+            if self.consumer is None:
+                return 0
             frames = frames[:] # copy the frame data out, because it will be free()ed when this function returns
             reactor.callFromThread(self.consumer.write, frames)
         except:
@@ -218,6 +234,7 @@ class SpotifyManager(SpotifySessionManager):
 
     def log_message(self, sess, data):
         try:
+            log.msg(data.encode("utf-8").strip(), system="Spotify")
             reactor.callFromThread(self.fireEvent, SpotifyEventWithMessage(data[:]), ISpotifyLogMessageEvent)
         except:
             traceback.print_exc()
@@ -232,13 +249,19 @@ class SpotifyManager(SpotifySessionManager):
     ### IProducer interface
 
     def stopProducing(self):
+        log.msg("stopProducing", system="squeal.spot.service.SpotifyManager")
+        self.session.play(0)
         self.playing = False
         self.consumer = None
 
     def resumeProducing(self):
+        log.msg("resumeProducing", system="squeal.spot.service.SpotifyManager")
+        self.session.play(1)
         self.playing = True
 
     def pauseProducing(self):
+        log.msg("pauseProducing", system="squeal.spot.service.SpotifyManager")
+        self.session.play(0)
         self.playing = False
 
 class Spotify(Item, service.Service):
@@ -271,7 +294,6 @@ class Spotify(Item, service.Service):
 
     def activate(self):
         self.playing = None
-        self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
 
     def startService(self):
         self.mgr = SpotifyManager(self)
@@ -298,12 +320,6 @@ class Spotify(Item, service.Service):
             else:
                 status = ''
             yield SpotifyPlaylist(id, status, name)
-
-    def playerState(self, ev):
-        """ We listen for state changes on the player. If it's ready for the
-        next track then we initiate playing. """
-        if ev.state == ev.State.READY:
-            self.play(self.playing[0], self.playing[1] + 1)
 
     def search(self, query):
         self.mgr.search(query)
