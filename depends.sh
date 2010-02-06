@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-sudo aptitude install python-crypto python-zopeinterface python-tagpy python-magic python-setuptools realpath python-twisted python-virtualenv python-pysqlite2 wget subversion git-arch python-imaging
+sudo aptitude install python-crypto python-zopeinterface python-tagpy python-magic python-setuptools realpath python-twisted python-virtualenv python-pysqlite2 wget subversion git-arch python-imaging python-netaddr
 
 mkdir thirdparty
 cd thirdparty

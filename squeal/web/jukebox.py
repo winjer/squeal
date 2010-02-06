@@ -123,7 +123,15 @@ class Connected(base.BaseElement):
 
     @page.renderer
     def players(self, request, tag):
-        return tag['PLAYERS']
+        for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
+            slimservice = p
+            break
+        else:
+            raise("Unable to show the connected list with no SlimService running")
+        players = []
+        for p in slimservice.players:
+            players.append(T.li["%s (%s)" % (p.mac_address, p.device_type)])
+        return tag[T.h2["Players"], T.ul[players]]
 
 class Jukebox(base.BasePageContainer):
 

@@ -37,6 +37,7 @@ import os
 import struct
 import time
 import decimal
+from netaddr import EUI
 
 from squeal.event import EventReactor
 from squeal.player.display import Display
@@ -129,6 +130,8 @@ class Player(protocol.Protocol):
         self.buffer = ''
         self.display = Display()
         self.volume = 0
+        self.device_type = None
+        self.mac_address = None
 
     @property
     def service(self):
@@ -196,8 +199,12 @@ class Player(protocol.Protocol):
     def process_HELO(self, data):
         devices = {2: 'squeezebox', 3: 'softsqueeze', 4: 'squeezebox2', 5: 'transporter', 6: 'softsqueeze3'}
         #(devId, rev, mac, wlan, bytes) = struct.unpack('BB6sHL', data[:16])
-        (devId,) = struct.unpack('B', data[:1])
-        log.msg("HELO received from a %s" % devices.get(devId, 'unknown device'), system="squeal.net.slimproto.Player")
+        (devId, rev, mac) = struct.unpack('BB6s', data[:8])
+        (mac,) = struct.unpack("l", "00" + mac)
+        mac = EUI(mac)
+        self.device_type = devices.get(devId, 'unknown device')
+        self.mac_address = str(mac)
+        log.msg("HELO received from %s %s" % (self.mac_address, self.device_type), system="squeal.net.slimproto.Player")
         self.initClient()
 
     def initClient(self):
