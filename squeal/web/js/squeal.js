@@ -79,6 +79,17 @@ Squeal.Queue.methods(
     }
 );
 
+Squeal.Connected.methods(
+    function registerW(self) {
+        Squeal.W.connected = self;
+    },
+
+    function reload(self, tag) {
+        self.nodeById("connected-players").innerHTML = tag;
+    }
+);
+
+
 Squeal.Main.methods(
     function replaceChild(self, le) {
         var d = self.addChildWidgetFromWidgetInfo(le);

@@ -24,6 +24,7 @@ import os
 
 from twisted.python.util import sibpath
 from squeal.adaptivejson import simplify
+from twisted.python import log
 
 from nevow import loaders
 from nevow import tags as T
@@ -41,11 +42,13 @@ def xmltemplate(name, template_dir=template_dir):
 class BaseElement(athena.LiveElement):
 
     def __init__(self, *a, **kw):
+        log.msg("Initializing", system=self.__class__.__name__)
         super(BaseElement, self).__init__(*a, **kw)
         self.subscriptions = []
 
     @athena.expose
     def goingLive(self):
+        log.msg("goingLive", system=self.__class__.__name__)
         self.subscribe()
 
     def subscribe(self):

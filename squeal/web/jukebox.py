@@ -28,6 +28,7 @@ from nevow import loaders
 from nevow import tags as T
 from nevow import page
 from nevow import athena
+from nevow.flat import flatten
 
 import base
 
@@ -117,12 +118,19 @@ class Connected(base.BaseElement):
     jsClass = u"Squeal.Connected"
     docFactory = base.xmltemplate("connected.html")
 
+    def subscribe(self):
+        log.msg("Subscribing", system="squeal.web.jukebox.Connected")
+        self.evreactor.subscribe(self.playerChange, isqueal.IPlayerStateChange)
+
+    def playerChange(self, ev):
+        log.msg("Reloading players", system="squeal.web.jukebox.Connected")
+        self.callRemote("reload", unicode(flatten(self.player_content())))
+
     @page.renderer
     def users(self, request, tag):
         return tag['USERS']
 
-    @page.renderer
-    def players(self, request, tag):
+    def player_content(self):
         for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
             slimservice = p
             break
@@ -132,9 +140,13 @@ class Connected(base.BaseElement):
         for p in slimservice.players:
             players.append(T.li["%s (%s)" % (p.mac_address, p.device_type)])
         if players:
-            return tag[T.h2["Players"], T.ul[players]]
+            return T.h2["Players"], T.ul[players]
         else:
-            return tag[T.h2["Players"], "No players connected!"]
+            return T.h2["Players"], "No players connected!"
+
+    @page.renderer
+    def players(self, request, tag):
+        return tag[self.player_content()]
 
 class Jukebox(base.BasePageContainer):
 
