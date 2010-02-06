@@ -35,6 +35,8 @@ import ijukebox
 from squeal import isqueal
 from squeal.adaptivejson import simplify
 
+from twisted.python import log
+
 class Source(base.BaseElement):
     jsClass = u"Squeal.Source"
     docFactory = base.xmltemplate("source.html")
@@ -91,8 +93,10 @@ class Queue(base.BaseElement):
         """ Called from other UI components, via the javascript partner class
         to this one. Allows queuing of any track if it's global tid is known.
         """
+        log.msg("queueTrack called with %r" % tid, system="squeal.web.jukebox.Queue")
         namespace = tid.split(":")[0]
         for queue in self.store.powerupsFor(isqueal.IPlaylist):
+            # expected to be a squeal.playlist.service.Playlist in general
             pass # one and only one queue is assumed
         for p in self.store.powerupsFor(isqueal.ITrackSource):
             if p.namespace == namespace:

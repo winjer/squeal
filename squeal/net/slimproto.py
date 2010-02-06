@@ -28,6 +28,7 @@ from zope.interface import implements
 from twisted.application import service
 from twisted.application import strports
 from twisted.internet import protocol
+from twisted.python import log
 
 from axiom.item import Item
 from axiom.attributes import text, reference, integer, inmemory
@@ -41,6 +42,17 @@ from squeal.event import EventReactor
 from squeal.player.display import Display
 from squeal.player.remote import Remote
 from squeal.isqueal import *
+
+class RemoteButtonPressed(object):
+
+    implements(IRemoteButtonPressedEvent)
+
+    class Button:
+        PLAY = 0
+
+    def __init__(self, player, button):
+        self.player = player
+        self.button = button
 
 class VolumeChanged(object):
 
@@ -95,6 +107,7 @@ class SlimService(Item, service.Service):
         return service.Service.startService(self)
 
     def play(self, track):
+        log.msg("Playing %r" % track, system="squeal.net.slimproto.SlimService")
         for p in self.players:
             p.play(track)
 
@@ -172,7 +185,7 @@ class Player(protocol.Protocol):
         formatbyte = self.typeMap[track.type]
         data = self.packStream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
         request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_url(),)
-        data = data + request
+        data = data + request.encode("utf-8")
         self.sendFrame('strm', data)
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
         self.displayTrack(track)
@@ -247,7 +260,7 @@ class Player(protocol.Protocol):
         print "ACK strm"
 
     def stat_STMc(self, data):
-        print "Connect"
+        log.msg("Status Message: Connect", system="squeal.net.slimproto.Player")
 
     def stat_STMd(self, data):
         print "Decoder Ready"
@@ -257,10 +270,10 @@ class Player(protocol.Protocol):
         print "Connection established"
 
     def stat_STMf(self, data):
-        print "Connection Closed"
+        log.msg("Status Message: Connection closed", system="squeal.net.slimproto.Player")
 
     def stat_STMh(self, data):
-        print "End of headers"
+        log.msg("Status Message: End of headers", system="squeal.net.slimproto.Player")
 
     def stat_STMn(self, data):
         print "Decoder does not support file format"
@@ -275,7 +288,7 @@ class Player(protocol.Protocol):
         print "Resume confirmed"
 
     def stat_STMs(self, data):
-        print "Playback of new track has started"
+        log.msg("Playback of new track has started", system="squeal.net.slimproto.Player")
 
     def stat_STMt(self, data):
         """ Timer heartbeat """
@@ -306,12 +319,12 @@ class Player(protocol.Protocol):
         (time, code) = struct.unpack("!IxxI", data)
         command = Remote.codes.get(code, None)
         if command is not None:
-            print "IR received: %r, %r" % (time, command)
+            log.msg("IR received: %r, %r" % (time, command), system="squeal.net.slimproto.Player")
             handler = getattr(self, "process_remote_" + command, None)
             if handler is not None:
                 handler()
         else:
-            print "Unknown IR received: %r, %r" % (time, code)
+            log.msg("Unknown IR received: %r, %r" % (time, code), system="squeal.net.slimproto.Player")
 
     def process_remote_volumeUp(self):
         vol = self.volume + 0x0100 # some increment
@@ -320,6 +333,9 @@ class Player(protocol.Protocol):
     def process_remote_volumeDown(self):
         vol = self.volume - 0x0100
         self.setVolume(vol)
+
+    def process_remote_play(self):
+        self.service.evreactor.fireEvent(RemoteButtonPressed(self, RemoteButtonPressed.Button.PLAY))
 
     def process_RAWI(self, data):
         print "RAWI received"

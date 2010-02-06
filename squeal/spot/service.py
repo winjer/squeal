@@ -23,6 +23,7 @@ __version__ = "$Revision$"[11:-2]
 from zope.interface import Interface, implements
 from twisted.python.components import registerAdapter, Adapter
 from twisted.python.util import sibpath
+from twisted.python import log
 from twisted.application import service
 from twisted.internet import reactor
 from twisted.internet.interfaces import *
@@ -65,81 +66,21 @@ class SpotifySearchResults(object):
     def __init__(self, results):
         self.results = results
 
-class SpotifyTransfer(object):
-
-    """ Implements the streaming interface between spotify and a web request. """
-
-    implements(IConsumer, IProducer, IPushProducer)
-
-    request = None
-
-    def __init__(self, playlist, track, service, request):
-        print "Initiating transfer"
-        self.playlist = playlist
-        self.track = track
-        self.request = request
-        self.service = service
-        self.data = []
-        self.paused = False
-        self.finished = False
-        request.registerProducer(self, 1)
-        self.service.registerConsumer(self, playlist, track)
-
-    def resumeProducing(self):
-        if not self.request:
-            return
-        if self.data:
-            for x in self.data:
-                self.request.write(x)
-            self.data = []
-        if self.finished:
-            self.request.unregisterProducer()
-            self.request.finish()
-            self.request = None
-        self.paused = False
-
-    def pauseProducing(self):
-        self.paused = True
-        pass
-
-    def stopProducing(self):
-        self.producer.stopProducing()
-        self.request = None
-
-    def write(self, data):
-        """ Called by spotify to queue data to send to the squeezebox  """
-
-        if not self.request:
-            print "overrun: writing to a closed request"
-            return
-        if self.paused:
-            self.data.append(data)
-        else:
-            self.request.write(data)
-
-    def registerProducer(self, producer, streaming):
-        self.producer = producer
-
-    def unregisterProducer(self):
-        self.request.unregisterProducer()
-        self.request.finish()
-        self.producer = None
-        self.request = None
-
 class SpotifyTrack(object):
 
-    playlist = 1
-    track = 1
+    playlist = None
+    track = None
     type = 3
     title = 'unknown'
     artist = 'unknown'
 
-    def __init__(self, playlist, track):
+    def __init__(self, tid, playlist=None, track=None):
         self.playlist = playlist
         self.track = track
+        self.tid = tid
 
     def player_url(self):
-        return "/spotify?playlist=%s&track=%s" % (self.playlist, self.track)
+        return "/spotify?tid=%s" % self.tid
 
 class SpotifyPlaylist(object):
 
@@ -172,7 +113,18 @@ class SpotifyTrackJSON(Adapter):
             u'isLoaded': self.original.is_loaded(),
         }
 
+class SpotifyTrackTrackJSON(Adapter):
+    implements(IJsonAdapter)
+    def encode(self):
+        link = Link.from_string(self.original.tid)
+        track = Link.as_track(link)
+        return {
+            u'name': unicode(track.name(), 'utf-8'),
+            u'isLoaded': track.is_loaded(),
+        }
+
 registerAdapter(SpotifyTrackJSON, spotify.Track, IJsonAdapter)
+registerAdapter(SpotifyTrackTrackJSON, SpotifyTrack, IJsonAdapter)
 
 class SpotifyManager(SpotifySessionManager):
     implements(IPushProducer, IProducer)
@@ -190,10 +142,12 @@ class SpotifyManager(SpotifySessionManager):
     def fireEvent(self, *a, **kw):
         return self.service.evreactor.fireEvent(*a, **kw)
 
-    def load(self, playlist, track):
+    def load(self, tid):
         if self.playing:
             self.session.play(0)
-        self.session.load(self.ctr[playlist][track])
+        link = Link.from_string(tid)
+        track = link.as_track()
+        self.session.load(track)
 
     def play(self, consumer=None):
         self.playing = True
@@ -324,14 +278,16 @@ class Spotify(Item, service.Service):
         reactor.callInThread(self.mgr.connect)
         return service.Service.startService(self)
 
-    def play(self, playlist, track=0):
-        t = SpotifyTrack(playlist=playlist, track=track)
+    def play(self, tid):
+        log.msg("Play called with %r" % tid, system="squeal.spot.service.Spotify")
+        t = SpotifyTrack(tid)
         for p in self.store.powerupsFor(ISlimPlayerService):
             p.play(t)
 
-    def registerConsumer(self, consumer, playlist, track):
-        self.playing = (playlist, track)
-        self.mgr.load(playlist, track)
+    def registerConsumer(self, consumer, tid):
+        log.msg("registering consumer %r on %r" % (consumer, self), system="squeal.spot.service.Spotify")
+        self.playing = tid
+        self.mgr.load(tid)
         self.mgr.play(consumer)
 
     def playlists(self):
@@ -358,7 +314,8 @@ class Spotify(Item, service.Service):
         return l.as_track()
 
     #isqueal.TrackSource
-    getTrackByID = getTrackByLink
+    def getTrackByID(self, tid):
+        return SpotifyTrack(tid)
 
     def main_widget(self):
         return web.Main()

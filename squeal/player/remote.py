@@ -21,12 +21,12 @@ __docformat__ = "restructuredtext en"
 __version__ = "$Revision$"[11:-2]
 
 class Remote:
-    
+
     codes = {
         1988722815: 'volumeUp',
         1988690175: 'volumeDown',
+        1988694255: 'play',
     }
-    
 
-    
-    
+
+

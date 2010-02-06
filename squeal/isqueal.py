@@ -63,6 +63,11 @@ class IVolumeChangeEvent(Interface):
 
     volume = Attribute(""" The new volume """)
 
+class IRemoteButtonPressedEvent(Interface):
+    """ A button has been pressed on the remote control """
+
+    button = Attribute(""" The code for the button """)
+
 class ILibraryChangeEvent(Interface):
 
     """ A track has been added, removed or changed in the library """

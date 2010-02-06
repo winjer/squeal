@@ -28,6 +28,7 @@ from twisted.internet import reactor
 from twisted.python.util import sibpath
 from twisted.application import service
 from twisted.application import strports
+from twisted.python import log
 
 from axiom.item import Item
 from axiom.attributes import reference, text, integer, inmemory
@@ -43,6 +44,7 @@ from nevow import appserver
 from squeal.library.record import *
 from squeal.isqueal import *
 from squeal.event import EventReactor
+from squeal.spot.sfy import SpotifyStreamer
 
 import jukebox
 
@@ -95,8 +97,6 @@ class Root(rend.Page):
         return File(pathname)
 
     def child_spotify(self, ctx):
-        print ctx.arg
-        playlist = int(ctx.arg('playlist'))
-        track = int(ctx.arg('track'))
-        print "Request received for spotify %s/%s" % (playlist, track)
-        return SpotifyStreamer(self.original, playlist, track)
+        log.msg("Request for spotify track %s received" % ctx.arg('tid'), system="squeal.web.service.Root")
+        tid = ctx.arg('tid')
+        return SpotifyStreamer(self.original, tid)

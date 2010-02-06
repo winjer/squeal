@@ -24,6 +24,7 @@ __version__ = "$Revision$"[11:-2]
 from zope.interface import Interface, implements
 from twisted.python.components import registerAdapter, Adapter
 from twisted.application import service
+from twisted.python import log
 from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer, timestamp
 
@@ -90,11 +91,16 @@ class Playlist(Item, service.Service):
 
     def activate(self):
         self.evreactor.subscribe(self.playerState, IPlayerStateChange)
+        self.evreactor.subscribe(self.buttonPressed, IRemoteButtonPressedEvent)
 
     def playerState(self, ev):
         if ev.state == ev.State.ESTABLISHED:
             #self.play()
             self.clear()
+
+    def buttonPressed(self, ev):
+        if ev.button == ev.Button.PLAY:
+            self.play()
 
     def clear(self):
         for p in self.store.query(PlayTrack):
@@ -110,10 +116,12 @@ class Playlist(Item, service.Service):
             self.maxposition = 0
 
     def play(self):
+        log.msg("Playing", system="squeal.playlist.service.Playlist")
         for p in self.store.query(PlayTrack, PlayTrack.position == self.position):
             self.load(p)
             break
         else:
+            log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
             self.reset()
 
     def stop(self):
@@ -125,7 +133,9 @@ class Playlist(Item, service.Service):
 
     def load(self, playtrack):
         """ Load the specified track on the player. """
+        log.msg("Loading %r" % playtrack.track, system="squeal.playlist.service.Playlist")
         for p in self.store.powerupsFor(ISlimPlayerService):
+            log.msg("Slim player service located")
             p.play(playtrack.track)
             self.position += 1
         for r in self.store.powerupsFor(IEventReactor):
