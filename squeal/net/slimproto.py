@@ -141,11 +141,12 @@ class Player(protocol.Protocol):
         """ Called when a connection has been successfully established with
         the player. """
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.ESTABLISHED))
-        self.render("Connected")
+        self.render("Connected to Squeal")
         log.msg("Connected to squeezebox", system="squeal.net.slimproto.Player")
 
     def connectionLost(self, reason=protocol.connectionDone):
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.DISCONNECTED))
+        self.service.players.remove(self)
 
     def dataReceived(self, data):
         self.buffer = self.buffer + data
