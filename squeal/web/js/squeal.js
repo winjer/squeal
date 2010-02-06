@@ -59,6 +59,10 @@ Squeal.Queue.methods(
         Squeal.W.queue = self;
     },
 
+    function clear(self) {
+        self.callRemote("clear");
+    },
+
     function reload(self, items) {
         Squeal.Foo = items;
         var ctr = self.nodeById("queue-items");

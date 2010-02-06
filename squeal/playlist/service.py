@@ -76,8 +76,8 @@ class Playlist(Item, service.Service):
     implements(IPlaylist)
     powerupInterfaces = (IPlaylist,)
 
-    position = integer(default=0)
-    maxposition = integer(default=0)
+    position = integer(default=0) # the currently playing track
+    maxposition = integer(default=0) # the highest track number
     running = inmemory()
     name = inmemory()
     parent = inmemory()
@@ -99,7 +99,6 @@ class Playlist(Item, service.Service):
             self.play()
         elif ev.state == ev.State.READY: # finished playing previous track
             self.play()
-
 
     def buttonPressed(self, ev):
         if ev.button == ev.Button.PLAY:
@@ -134,7 +133,7 @@ class Playlist(Item, service.Service):
             p.stop()
 
     def __iter__(self):
-        return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))
+        return iter(self.store.query(PlayTrack, PlayTrack.position > self.position, sort=PlayTrack.position.ascending))
 
     def load(self, playtrack):
         """ Load the specified track on the player. """
@@ -152,7 +151,6 @@ class Playlist(Item, service.Service):
         pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=[pt]))
-        self.maxposition += 1
-        if self.position == 0 and self.maxposition == 1:
+        if self.position == self.maxposition:
             self.play()
-
+        self.maxposition += 1

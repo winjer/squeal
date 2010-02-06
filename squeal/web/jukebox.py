@@ -84,11 +84,22 @@ class Queue(base.BaseElement):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
 
+    @property
+    def playlist_service(self):
+        for queue in self.store.powerupsFor(isqueal.IPlaylist):
+            return queue
+
     def queueChange(self, ev):
         self.reload()
 
+    @athena.expose
+    def clear(self):
+        log.msg("clear", system="squeal.web.jukebox.Queue")
+        self.playlist_service.clear()
+        self.reload()
+
     def reload(self):
-        for queue in self.store.powerupsFor(isqueal.IPlaylist): pass
+        queue = self.playlist_service
         items = map(simplify, queue)
         self.callRemote("reload", items)
 
@@ -99,9 +110,7 @@ class Queue(base.BaseElement):
         """
         log.msg("queueTrack called with %r" % tid, system="squeal.web.jukebox.Queue")
         namespace = tid.split(":")[0]
-        for queue in self.store.powerupsFor(isqueal.IPlaylist):
-            # expected to be a squeal.playlist.service.Playlist in general
-            pass # one and only one queue is assumed
+        queue = self.playlist_service
         for p in self.store.powerupsFor(isqueal.ITrackSource):
             if p.namespace == namespace:
                 provider = p
