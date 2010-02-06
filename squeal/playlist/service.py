@@ -143,7 +143,7 @@ class Playlist(Item, service.Service):
 
     def enqueue(self, provider, tid):
         """ Add a track to the end of the queue, for the specified provider. """
-        print "enqueing %r" % tid
+        log.msg("enqueing %r" % tid, system="squeal.playlist.service.Playlist")
         pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=[pt]))

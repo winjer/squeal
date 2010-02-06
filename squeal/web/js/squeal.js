@@ -62,6 +62,7 @@ Squeal.Queue.methods(
     function reload(self, items) {
         Squeal.Foo = items;
         var ctr = self.nodeById("queue-items");
+        ctr.innerHTML = "";
         for(k in items) {
             var item = items[k];
             if(item.isLoaded) {

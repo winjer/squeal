@@ -137,7 +137,7 @@ class SpotifyManager(SpotifySessionManager):
         SpotifySessionManager.__init__(self, service.username, service.password)
         self.ctr = None
         self.playing = False
-        print "Connecting as %s" % service.username
+        log.msg("Connecting as %s" % service.username, system="squeal.spot.service.SpotifyManager")
 
     def fireEvent(self, *a, **kw):
         return self.service.evreactor.fireEvent(*a, **kw)
@@ -303,7 +303,6 @@ class Spotify(Item, service.Service):
         """ We listen for state changes on the player. If it's ready for the
         next track then we initiate playing. """
         if ev.state == ev.State.READY:
-            print "Loading", self.playing[0], self.playing[1] + 1
             self.play(self.playing[0], self.playing[1] + 1)
 
     def search(self, query):

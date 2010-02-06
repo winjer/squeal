@@ -56,7 +56,6 @@ class Source(base.BaseElement):
             if s.name == source:
                 w = s.main_widget()
                 w.setFragmentParent(self.page.runtime['main'])
-                print "!!!!!!!!!!!!!! returning FRAG"
                 return w
 
 class Account(base.BaseElement):
@@ -80,12 +79,16 @@ class Queue(base.BaseElement):
         self.subscribe()
         self.reload()
 
+    def subscribe(self):
+        self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
+        self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
+
+    def queueChange(self, ev):
+        self.reload()
+
     def reload(self):
         for queue in self.store.powerupsFor(isqueal.IPlaylist): pass
-        items = list(queue)
-        print ">>>>>>>>>>>>", items
-        items = map(simplify, items)
-        print ">>>>>>>>>>>>", items
+        items = map(simplify, queue)
         self.callRemote("reload", items)
 
     @athena.expose

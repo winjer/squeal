@@ -54,7 +54,6 @@ def loads(*a, **kw):
 def simplify(obj):
     adapter = IJsonAdapter(obj, None)
     if adapter:
-        print adapter
         return adapter.encode()
     else:
         raise ValueError("No encoder registered for %r" % (obj,))

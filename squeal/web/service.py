@@ -64,7 +64,7 @@ class WebService(Item, service.Service):
         Item.__init__(self, store=store, listen=listen)
 
     def activate(self):
-        self.site = appserver.NevowSite(Root(self))
+        self.site = appserver.NevowSite(Root(self), logPath="/dev/null")
 
     @property
     def evreactor(self):

@@ -65,6 +65,7 @@ from zope.interface import Interface, implements, alsoProvides
 from twisted.application import service
 from twisted.internet import defer
 from twisted.internet import reactor
+from twisted.python import log
 from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer
 
@@ -111,7 +112,7 @@ class EventReactor(Item, service.Service):
     def _fireEvent(self, event, *interfaces):
         """ Fire the specified event. You can optionally provide additional
         interfaces that will be added to the event before firing. """
-        print "-- Firing Event:", repr(event), repr(interfaces)
+        log.msg("Firing Event: %s [%s]" % (event.__class__.__name__, ",".join(x.__name__ for x in interfaces)), system="squeal.event.EventReactor")
         if interfaces:
             event = copy.copy(event)
             alsoProvides(event, *interfaces)

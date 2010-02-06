@@ -93,7 +93,6 @@ class BaseElementContainer(athena.LiveElement):
         return _
 
     def renderer(self, name):
-        print "!!!!!!!! FINDING", name
         if name in self.contained:
             return self._contained_render(name)
         return super(BaseElementContainer, self).renderer(name)
@@ -115,7 +114,6 @@ class BasePageContainer(athena.LivePage):
         return _
 
     def renderer(self, ctx, name):
-        print "!!!!!!!! FINDING", name
         if name in self.contained:
             return self._contained_render(name)
         return super(BasePageContainer, self).renderer(ctx, name)

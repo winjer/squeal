@@ -139,7 +139,7 @@ class Player(protocol.Protocol):
         the player. """
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.ESTABLISHED))
         self.render("Connected")
-        print "Connected to squeezebox"
+        log.msg("Connected to squeezebox", system="squeal.net.slimproto.Player")
 
     def connectionLost(self, reason=protocol.connectionDone):
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.DISCONNECTED))
@@ -197,7 +197,7 @@ class Player(protocol.Protocol):
         devices = {2: 'squeezebox', 3: 'softsqueeze', 4: 'squeezebox2', 5: 'transporter', 6: 'softsqueeze3'}
         #(devId, rev, mac, wlan, bytes) = struct.unpack('BB6sHL', data[:16])
         (devId,) = struct.unpack('B', data[:1])
-        print "HELO received from a %s" % devices.get(devId, 'unknown device')
+        log.msg("HELO received from a %s" % devices.get(devId, 'unknown device'), system="squeal.net.slimproto.Player")
         self.initClient()
 
     def initClient(self):
@@ -243,7 +243,7 @@ class Player(protocol.Protocol):
         #print "STAT received: %r" % data
         ev = data[:4]
         if ev == '\x00\x00\x00\x00':
-            print "Presumed informational stat message"
+            log.msg("Presumed informational stat message", system="squeal.net.slimproto.Player")
         else:
             handler = getattr(self, 'stat_%s' % ev, None)
             if handler is None:
@@ -251,23 +251,23 @@ class Player(protocol.Protocol):
             handler(data[4:])
 
     def stat_aude(self, data):
-        print "ACK aude"
+        log.msg("ACK aude", system="squeal.net.slimproto.Player")
 
     def stat_audg(self, data):
-        print "ACK audg"
+        log.msg("ACK audg", system="squeal.net.slimproto.Player")
 
     def stat_strm(self, data):
-        print "ACK strm"
+        log.msg("ACK strm", system="squeal.net.slimproto.Player")
 
     def stat_STMc(self, data):
         log.msg("Status Message: Connect", system="squeal.net.slimproto.Player")
 
     def stat_STMd(self, data):
-        print "Decoder Ready"
+        log.msg("Decoder Ready", system="squeal.net.slimproto.Player")
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.READY))
 
     def stat_STMe(self, data):
-        print "Connection established"
+        log.msg("Connection established", system="squeal.net.slimproto.Player")
 
     def stat_STMf(self, data):
         log.msg("Status Message: Connection closed", system="squeal.net.slimproto.Player")
@@ -276,16 +276,16 @@ class Player(protocol.Protocol):
         log.msg("Status Message: End of headers", system="squeal.net.slimproto.Player")
 
     def stat_STMn(self, data):
-        print "Decoder does not support file format"
+        log.msg("Decoder does not support file format", system="squeal.net.slimproto.Player")
 
     def stat_STMo(self, data):
-        print "Output Underrun"
+        log.msg("Output Underrun", system="squeal.net.slimproto.Player")
 
     def stat_STMp(self, data):
-        print "Pause confirmed"
+        log.msg("Pause confirmed", system="squeal.net.slimproto.Player")
 
     def stat_STMr(self, data):
-        print "Resume confirmed"
+        log.msg("Resume confirmed", system="squeal.net.slimproto.Player")
 
     def stat_STMs(self, data):
         log.msg("Playback of new track has started", system="squeal.net.slimproto.Player")
@@ -295,25 +295,25 @@ class Player(protocol.Protocol):
         self.last_heartbeat = time.time()
 
     def stat_STMu(self, data):
-        print "Underrun"
+        log.msg("Underrun", system="squeal.net.slimproto.Player")
 
     def process_BYE(self, data):
-        print "BYE received"
+        log.msg("BYE received", system="squeal.net.slimproto.Player")
 
     def process_RESP(self, data):
-        print "RESP received"
+        log.msg("RESP received", system="squeal.net.slimproto.Player")
 
     def process_BODY(self, data):
-        print "BODY received"
+        log.msg("BODY received", system="squeal.net.slimproto.Player")
 
     def process_META(self, data):
-        print "META received"
+        log.msg("META received", system="squeal.net.slimproto.Player")
 
     def process_DSCO(self, data):
-        print "Data Stream Disconnected"
+        log.msg("Data Stream Disconnected", system="squeal.net.slimproto.Player")
 
     def process_DBUG(self, data):
-        print "DBUG received"
+        log.msg("DBUG received", system="squeal.net.slimproto.Player")
 
     def process_IR(self, data):
         (time, code) = struct.unpack("!IxxI", data)
@@ -338,22 +338,22 @@ class Player(protocol.Protocol):
         self.service.evreactor.fireEvent(RemoteButtonPressed(self, RemoteButtonPressed.Button.PLAY))
 
     def process_RAWI(self, data):
-        print "RAWI received"
+        log.msg("RAWI received", system="squeal.net.slimproto.Player")
 
     def process_ANIC(self, data):
-        print "ANIC received"
+        log.msg("ANIC received", system="squeal.net.slimproto.Player")
 
     def process_BUTN(self, data):
-        print "BUTN received"
+        log.msg("BUTN received", system="squeal.net.slimproto.Player")
 
     def process_KNOB(self, data):
-        print "KNOB received"
+        log.msg("KNOB received", system="squeal.net.slimproto.Player")
 
     def process_SETD(self, data):
-        print "SETD received"
+        log.msg("SETD received", system="squeal.net.slimproto.Player")
 
     def process_UREQ(self, data):
-        print "UREQ received"
+        log.msg("UREQ received", system="squeal.net.slimproto.Player")
 
 class Factory(protocol.ServerFactory):
 
@@ -363,7 +363,6 @@ class Factory(protocol.ServerFactory):
         self.service = service
 
     def buildProtocol(self, addr):
-        print "Building protocol"
         p = self.protocol()
         p.factory = self
         self.service.players.append(p)

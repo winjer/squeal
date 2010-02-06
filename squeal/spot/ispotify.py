@@ -23,6 +23,8 @@ __version__ = "$Revision$"[11:-2]
 
 from zope.interface import Interface, Attribute
 
+from squeal import isqueal
+
 class ISpotifyEvent(Interface):
     """ Any spotify event """
 
@@ -34,7 +36,7 @@ class ISpotifyLoggedOutEvent(ISpotifyEvent):
 
     error = Attribute("""The error that caused us to be logged out. """)
 
-class ISpotifyMetadataUpdatedEvent(ISpotifyEvent):
+class ISpotifyMetadataUpdatedEvent(ISpotifyEvent, isqueal.IMetadataChangeEvent):
     """ Spotify metadata has been updated. """
 
 class ISpotifyConnectionErrorEvent(ISpotifyEvent):
@@ -51,7 +53,7 @@ class ISpotifyEndOfTrackEvent(ISpotifyEvent):
 
 class ISpotifyPlayTokenLostEvent(ISpotifyEvent):
     """ Play token has been lost """
-    
+
 class ISpotifySearchResultsEvent(ISpotifyEvent):
     """ A search has completed """
 

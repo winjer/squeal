@@ -27,6 +27,7 @@ from zope.interface import implements
 from twisted.application import service
 from twisted.application import internet
 from twisted.internet import protocol
+from twisted.python import log
 
 from axiom.item import Item
 from axiom.attributes import text, integer, reference, inmemory
@@ -103,12 +104,12 @@ class DiscoveryProtocol(protocol.DatagramProtocol):
 
     def datagramReceived(self, datagram, addr):
         dgram = Datagram.decode(datagram)
-        print "Data received from %r: %r" % (addr, dgram)
+        log.msg("Data received from %r: %r" % (addr, dgram), system="squeal.net.discovery.DiscoveryProtocol")
         if isinstance(dgram, ClientDiscoveryDatagram):
             self.sendDiscoveryResponse(addr)
 
     def sendDiscoveryResponse(self, addr):
         dgram = DiscoveryResponseDatagram(self.service.hostname, 3483)
-        print "Sending discovery response %r" % (dgram.packet,)
+        log.msg("Sending discovery response %r" % (dgram.packet,), system="squeal.net.discovery.DiscoveryProtocol")
         self.transport.write(dgram.packet, addr)
 
