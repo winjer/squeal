@@ -63,16 +63,21 @@ Squeal.Queue.methods(
         self.callRemote("clear");
     },
 
-    function reload(self, items) {
-        Squeal.Foo = items;
+    function reload(self, data) {
+        var items = data['items'];
+        var position = data['position'];
         var ctr = self.nodeById("queue-items");
         ctr.innerHTML = "";
         for(k in items) {
             var item = items[k];
+            var name = "Loading...";
             if(item.isLoaded) {
-                $(ctr).append(item['name'] + "<br/>");
+                name = item['name'];
+            }
+            if(k == position) {
+                $(ctr).append("> " + name + "<br />");
             } else {
-                $(ctr).append("Loading...<br/>");
+                $(ctr).append(k + ":"+ name + "<br/>");
             }
         }
     },

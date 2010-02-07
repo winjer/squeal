@@ -101,7 +101,10 @@ class Queue(base.BaseElement):
     def reload(self):
         queue = self.playlist_service
         items = map(simplify, queue)
-        self.callRemote("reload", items)
+        self.callRemote("reload", {
+            u'items': items,
+            u'position': queue.position,
+        })
 
     @athena.expose
     def queueTrack(self, tid):

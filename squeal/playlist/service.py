@@ -108,6 +108,7 @@ class Playlist(Item, service.Service):
         log.msg("Clear", system="squeal.playlist.service.Playlist")
         for p in self.store.query(PlayTrack):
             p.deleteFromStore()
+        self.position = self.maxposition = 0
 
     def reset(self):
         log.msg("Reset", system="squeal.playlist.service.Playlist")
@@ -133,8 +134,7 @@ class Playlist(Item, service.Service):
             p.stop()
 
     def __iter__(self):
-        log.msg("Iterating playlist from %d up" % self.position, system="squeal.playlist.service.Playlist")
-        return iter(self.store.query(PlayTrack, PlayTrack.position > self.position, sort=PlayTrack.position.ascending))
+        return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))
 
     def load(self, playtrack):
         """ Load the specified track on the player. """
