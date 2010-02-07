@@ -133,6 +133,7 @@ class Playlist(Item, service.Service):
             p.stop()
 
     def __iter__(self):
+        log.msg("Iterating playlist from %d up" % self.position, system="squeal.playlist.service.Playlist")
         return iter(self.store.query(PlayTrack, PlayTrack.position > self.position, sort=PlayTrack.position.ascending))
 
     def load(self, playtrack):
@@ -140,14 +141,17 @@ class Playlist(Item, service.Service):
         log.msg("Loading %r" % playtrack.track, system="squeal.playlist.service.Playlist")
         for p in self.store.powerupsFor(ISlimPlayerService):
             log.msg("Slim player service located")
-            p.play(playtrack.track)
-            self.position += 1
+            if p.players:
+                p.play(playtrack.track)
+                self.position += 1
+            else:
+                log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
     def enqueue(self, provider, tid):
         """ Add a track to the end of the queue, for the specified provider. """
-        log.msg("enqueing %r" % tid, system="squeal.playlist.service.Playlist")
+        log.msg("enqueing %r at %d" % (tid, self.maxposition), system="squeal.playlist.service.Playlist")
         pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=[pt]))
