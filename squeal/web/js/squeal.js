@@ -65,7 +65,7 @@ Squeal.Queue.methods(
 
     function reload(self, data) {
         var items = data['items'];
-        var position = data['position'];
+        var current = data['current'];
         var ctr = self.nodeById("queue-items");
         ctr.innerHTML = "";
         for(k in items) {
@@ -74,7 +74,7 @@ Squeal.Queue.methods(
             if(item.isLoaded) {
                 name = item['name'];
             }
-            if(k == position) {
+            if(k == current) {
                 $(ctr).append("> " + name + "<br />");
             } else {
                 $(ctr).append(k + ":"+ name + "<br/>");
@@ -98,6 +98,11 @@ Squeal.Connected.methods(
     }
 );
 
+Squeal.Playing.methods(
+    function reload(self, tag) {
+        self.nodeById("playing").innerHTML = tag;
+    }
+);
 
 Squeal.Main.methods(
     function replaceChild(self, le) {

@@ -87,9 +87,17 @@ class SpotifyTrack(object):
         return self.spotify_track.name()
 
     @property
+    def is_loaded(self):
+        return self.spotify_track.is_loaded()
+
+    @property
     def artist(self):
         artists = self.spotify_track.artists()
         return ",".join(x.name() for x in artists)
+
+    @property
+    def album(self):
+        return self.spotify_track.album().name()
 
     def player_url(self):
         return "/spotify?tid=%s" % self.tid

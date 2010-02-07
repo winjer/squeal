@@ -76,7 +76,7 @@ class Playlist(Item, service.Service):
     implements(IPlaylist)
     powerupInterfaces = (IPlaylist,)
 
-    position = integer(default=0) # the currently playing track
+    current = integer(default=-1) # currently playing
     maxposition = integer(default=0) # the highest track number
     running = inmemory()
     name = inmemory()
@@ -108,26 +108,16 @@ class Playlist(Item, service.Service):
         log.msg("Clear", system="squeal.playlist.service.Playlist")
         for p in self.store.query(PlayTrack):
             p.deleteFromStore()
-        self.position = self.maxposition = 0
-
-    def reset(self):
-        log.msg("Reset", system="squeal.playlist.service.Playlist")
-        for p in self.store.query(PlayTrack, sort=PlayTrack.position.ascending):
-            self.position = p.position
-            self.play()
-            break
-        else:
-            self.position = 0
-            self.maxposition = 0
+        self.maxposition = 0
+        self.current = -1
 
     def play(self):
         log.msg("Playing", system="squeal.playlist.service.Playlist")
-        for p in self.store.query(PlayTrack, PlayTrack.position == self.position):
+        for p in self.store.query(PlayTrack, PlayTrack.position == self.current + 1):
             self.load(p)
             break
         else:
             log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
-            self.reset()
 
     def stop(self):
         for p in self.store.powerupsFor(ISlimPlayerService):
@@ -136,6 +126,10 @@ class Playlist(Item, service.Service):
     def __iter__(self):
         return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))
 
+    def get_current_track(self):
+        for p in self.store.query(PlayTrack, PlayTrack.position == self.current):
+            return p.track
+
     def load(self, playtrack):
         """ Load the specified track on the player. """
         log.msg("Loading %r" % playtrack.track, system="squeal.playlist.service.Playlist")
@@ -143,7 +137,7 @@ class Playlist(Item, service.Service):
             log.msg("Slim player service located")
             if p.players:
                 p.play(playtrack.track)
-                self.position += 1
+                self.current = playtrack.position
             else:
                 log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
         for r in self.store.powerupsFor(IEventReactor):
@@ -153,8 +147,6 @@ class Playlist(Item, service.Service):
         """ Add a track to the end of the queue, for the specified provider. """
         log.msg("enqueing %r at %d" % (tid, self.maxposition), system="squeal.playlist.service.Playlist")
         pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
+        self.maxposition += 1
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=[pt]))
-        if self.position == self.maxposition:
-            self.play()
-        self.maxposition += 1

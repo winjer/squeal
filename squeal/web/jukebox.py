@@ -71,6 +71,47 @@ class Playing(base.BaseElement):
     jsClass = u"Squeal.Playing"
     docFactory = base.xmltemplate("playing.html")
 
+    @athena.expose
+    def goingLive(self):
+        self.subscribe()
+
+    def subscribe(self):
+        self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
+        self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
+
+    @property
+    def playlist_service(self):
+        for queue in self.store.powerupsFor(isqueal.IPlaylist):
+            return queue
+
+    def queueChange(self, ev):
+        self.reload()
+
+    def reload(self):
+        self.callRemote("reload", unicode(flatten(self.playtag())))
+
+    def playtag(self):
+        current = self.playlist_service.get_current_track()
+        if current is None:
+            return "Nothing"
+        elif not current.is_loaded:
+            return "Loading..."
+        else:
+            return (
+                T.img(src="/static/jesus.jpg", width="100px"),
+                T.br,
+                "Now playing ",
+                T.a(href="")[current.title],
+                " by ",
+                T.a(href="")[current.artist],
+                " on ",
+                T.a(href="")[current.album]
+            )
+
+    @page.renderer
+    def playing(self, request, tag):
+        return tag[self.playtag()]
+
 class Queue(base.BaseElement):
     jsClass = u"Squeal.Queue"
     docFactory = base.xmltemplate("queue.html")
@@ -103,7 +144,7 @@ class Queue(base.BaseElement):
         items = map(simplify, queue)
         self.callRemote("reload", {
             u'items': items,
-            u'position': queue.position,
+            u'current': queue.current,
         })
 
     @athena.expose
