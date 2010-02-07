@@ -114,3 +114,20 @@ class SpotifyStreamer(rend.Page):
             request = inevow.IRequest(ctx)
             SpotifyTransfer(self.tid, service, request)
             return request.deferred
+
+class SpotifyImage(rend.Page):
+
+    def __init__(self, original, image_id):
+        self.original = original
+        self.image_id = image_id
+
+    def renderHTTP(self, ctx):
+        request = inevow.IRequest(ctx)
+        def _(image):
+            request.setHeader("content-type", "image/jpeg")
+            return str(image.data())
+        for service in self.original.store.powerupsFor(ISpotify):
+            d = service.image(self.image_id)
+            d.addCallback(_)
+            return d
+

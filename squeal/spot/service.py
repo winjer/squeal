@@ -27,6 +27,7 @@ from twisted.python import log
 from twisted.application import service
 from twisted.internet import reactor
 from twisted.internet.interfaces import *
+from twisted.internet import defer
 from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer, timestamp
 
@@ -35,7 +36,7 @@ import traceback
 from squeal.event import EventReactor
 from squeal import isqueal
 from squeal.adaptivejson import IJsonAdapter
-
+import sys
 import spotify
 from spotify.manager import SpotifySessionManager
 from spotify import Link
@@ -98,6 +99,10 @@ class SpotifyTrack(object):
     @property
     def album(self):
         return self.spotify_track.album().name()
+
+    @property
+    def image_id(self):
+        return self.spotify_track.album().cover()
 
     def player_url(self):
         return "/spotify?tid=%s" % self.tid
@@ -183,6 +188,18 @@ class SpotifyManager(SpotifySessionManager):
             r = SpotifySearchResults(results)
             reactor.callFromThread(self.fireEvent, r)
         self.session.search(query.encode("utf-8"), cb, **kw)
+
+    def image(self, image_id):
+        assert len(image_id) == 20
+        print >>sys.stderr, "AAAAAAAAAAAAAAAAAAAAAAAA"
+        d = defer.Deferred()
+        def cb(image, userdata):
+            reactor.callFromThread(d.callback, image)
+        print >>sys.stderr, "BBBBBBBBBBBBBBBBBBBBBBBB"
+        image = self.session.image_create(image_id)
+        print >>sys.stderr, "IMAGE LOCATED:", repr(image)
+        image.add_load_callback(cb, None)
+        return d
 
     ### Callbacks from Spotify
 
@@ -328,6 +345,9 @@ class Spotify(Item, service.Service):
             else:
                 status = ''
             yield SpotifyPlaylist(id, status, name)
+
+    def image(self, image_id):
+        return self.mgr.image(image_id)
 
     def search(self, query):
         self.mgr.search(query)

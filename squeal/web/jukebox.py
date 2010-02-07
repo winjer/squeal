@@ -29,6 +29,7 @@ from nevow import tags as T
 from nevow import page
 from nevow import athena
 from nevow.flat import flatten
+import urllib
 
 import base
 
@@ -98,7 +99,7 @@ class Playing(base.BaseElement):
             return "Loading..."
         else:
             return (
-                T.img(src="/static/jesus.jpg", width="100px"),
+                T.img(src="/spotify_image?%s" % (urllib.urlencode({"image": current.image_id})), width="100px"),
                 T.br,
                 "Now playing ",
                 T.a(href="")[current.title],

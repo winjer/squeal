@@ -44,7 +44,7 @@ from nevow import appserver
 from squeal.library.record import *
 from squeal.isqueal import *
 from squeal.event import EventReactor
-from squeal.spot.sfy import SpotifyStreamer
+from squeal.spot.sfy import SpotifyStreamer, SpotifyImage
 
 import jukebox
 
@@ -96,7 +96,15 @@ class Root(rend.Page):
         pathname = self.original.store.getItemByID(tid).pathname
         return File(pathname)
 
+    # these spotify children should move into the plugin
+    # and have some Interface based thingy for locating main children or something
+
     def child_spotify(self, ctx):
         log.msg("Request for spotify track %s received" % ctx.arg('tid'), system="squeal.web.service.Root")
         tid = ctx.arg('tid')
         return SpotifyStreamer(self.original, tid)
+
+    def child_spotify_image(self, ctx):
+        #log.msg("Request for spotify image %s received" % ctx.arg('image'), system="squeal.web.service.Root")
+        image_id = ctx.arg('image')
+        return SpotifyImage(self.original, image_id)
