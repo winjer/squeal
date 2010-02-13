@@ -59,15 +59,18 @@ class Options(base.BaseElement):
     jsClass = u"Spot.Options"
     docFactory = xmltemplate("options.html")
 
-class Playlist(athena.LiveElement):
-    docFactory = xmltemplate("playlist.html")
+class Playlist(page.Element):
+    docFactory = loaders.stan(
+        T.li(render=T.directive("link")))
 
     def __init__(self, original):
         self.original = original
 
     @page.renderer
-    def name(self, request, tag):
-        return tag[self.original.name]
+    def link(self, request, tag):
+        return tag[
+            T.a(href="#", id="playlist-%s" % self.original.id)[self.original.name]
+        ]
 
 class Playlists(base.BaseElement):
     jsClass = u"Spot.Playlists"
@@ -81,10 +84,10 @@ class Playlists(base.BaseElement):
 
     @page.renderer
     def playlists(self, request, tag):
-        for p in self.spotify_service.playlists():
-            pl = Playlist(p)
-            pl.setFragmentParent(self)
-            yield pl
+        def _(request, tag):
+            for p in self.spotify_service.playlists():
+                yield Playlist(p)
+        return tag[_]
 
 class Document(base.BaseElement):
     jsClass = u"Spot.Document"

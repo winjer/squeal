@@ -40,6 +40,17 @@ Spot.Options = Spot.Widget.subclass("Spot.Options");
 Spot.Document = Spot.Widget.subclass("Spot.Document");
 Spot.Playlists = Spot.Widget.subclass("Spot.Playlists");
 
+Spot.Playlists.methods(
+    function click(self, node, ev) {
+        ev.preventDefault();
+        var tid = ev.target.id;
+        if(tid.substring(0, 8) == "playlist") {
+            var pid = tid.substring(9);
+            Spot.W.document.playlist(pid);
+        };
+    }
+)
+
 Spot.Search.methods(
     function searchButton(self, node) {
         var field = self.nodeById("search-query");
@@ -61,6 +72,10 @@ Spot.Document.methods(
 
     function registerW(self) {
         Spot.W.document = self;
+    },
+
+    function playlist(self, pid) {
+        $(self.node).html("<h1>Playlist " + pid + "</h1>");
     },
 
     function searchResults(self, artists, albums, tracks) {
