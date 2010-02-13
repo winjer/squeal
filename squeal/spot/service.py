@@ -1,5 +1,3 @@
-# $Id$
-#
 # Copyright 2010 Doug Winter
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -112,8 +110,9 @@ class SpotifyPlaylist(object):
     id = None
     name = None
 
-    def __init__(self, id, status, name):
+    def __init__(self, id, is_loaded, status, name):
         self.id = id
+        self.is_loaded = is_loaded
         self.status = status
         self.name = name
 
@@ -291,8 +290,8 @@ class SpotifyManager(SpotifySessionManager):
 
 class Spotify(Item, service.Service):
 
-    implements(isqueal.ISpotify, isqueal.ITrackSource)
-    powerupInterfaces = (isqueal.ISpotify, isqueal.ITrackSource, isqueal.IMusicSource)
+    implements(ISpotifyService, isqueal.ITrackSource)
+    powerupInterfaces = (ISpotifyService, isqueal.ITrackSource, isqueal.IMusicSource)
 
     namespace = 'spotify'
     username = text()
@@ -344,7 +343,7 @@ class Spotify(Item, service.Service):
                 status = 'Playing'
             else:
                 status = ''
-            yield SpotifyPlaylist(id, status, name)
+            yield SpotifyPlaylist(id, p.is_loaded(), status, name)
 
     def image(self, image_id):
         return self.mgr.image(image_id)

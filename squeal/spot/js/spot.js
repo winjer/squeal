@@ -38,6 +38,7 @@ Spot.Main = Spot.Widget.subclass("Spot.Main");
 Spot.Search = Spot.Widget.subclass("Spot.Search");
 Spot.Options = Spot.Widget.subclass("Spot.Options");
 Spot.Document = Spot.Widget.subclass("Spot.Document");
+Spot.Playlists = Spot.Widget.subclass("Spot.Playlists");
 
 Spot.Search.methods(
     function searchButton(self, node) {

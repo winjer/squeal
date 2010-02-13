@@ -133,9 +133,6 @@ class IMetadataChangeEvent(Interface):
 class IManholeService(Interface):
     """ Provided by the manhole service """
 
-class ISpotify(Interface):
-    pass
-
 class ITrackSource(Interface):
     namespace = Attribute(""" The prefix of track identifiers that this source will handle """)
     def getTrackById(tid):

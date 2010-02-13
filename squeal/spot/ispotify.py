@@ -57,3 +57,29 @@ class ISpotifyPlayTokenLostEvent(ISpotifyEvent):
 class ISpotifySearchResultsEvent(ISpotifyEvent):
     """ A search has completed """
 
+class ISpotifyService(Interface):
+    """ This is the spotify powerup """
+
+    def play(tid):
+        """ Play the track specified by this track id """
+
+    def registerConsumer(consumer, tid):
+        pass
+
+    def playlists():
+        """ Iterate through the playlists available to the user, returns
+        SpotifyPlaylists """
+
+    def image(image_id):
+        pass
+
+    def search(query):
+        pass
+
+    def getTrackByLink(link):
+        pass
+
+    def main_widget():
+        pass
+
+

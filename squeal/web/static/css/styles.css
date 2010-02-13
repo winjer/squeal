@@ -46,3 +46,10 @@
     width: 200px;
     margin: auto;
 }
+
+li {
+    font-size: 80%;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
