@@ -26,5 +26,6 @@ python pip.py install -E virtual -e thirdparty/Epsilon
 python pip.py install -E virtual -e thirdparty/Axiom
 python pip.py install -E virtual -e thirdparty/pyspotify
 
-patch -d thirdparty/Axiom -p0 < axiom-indexed.diff
-patch -d thirdparty/Axiom -p0 < axiom-indexed2.diff
+patch -d thirdparty/Axiom -p0 < patches/axiom-indexed.diff
+patch -d thirdparty/Axiom -p0 < patches/axiom-indexed2.diff
+patch -d thirdparty/Nevow -p0 < patches/nevow-event.diff

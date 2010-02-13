@@ -1,0 +1,35 @@
+Index: nevow/athena.py
+===================================================================
+--- nevow/athena.py	(revision 17887)
++++ nevow/athena.py	(working copy)
+@@ -1415,7 +1415,7 @@
+ 
+ 
+ handler = stan.Proto('athena:handler')
+-_handlerFormat = "return Nevow.Athena.Widget.handleEvent(this, %(event)s, %(handler)s);"
++_handlerFormat = "return Nevow.Athena.Widget.handleEvent(this, %(event)s, %(handler)s, event ? event : window.event);"
+ 
+ def _rewriteEventHandlerToAttribute(tag):
+     """
+Index: nevow/js/Nevow/Athena/__init__.js
+===================================================================
+--- nevow/js/Nevow/Athena/__init__.js	(revision 17887)
++++ nevow/js/Nevow/Athena/__init__.js	(working copy)
+@@ -1213,7 +1213,7 @@
+  * queue to allow multiple messages from the event handler to be batched up
+  * into a single request.
+  */
+-Nevow.Athena.Widget.handleEvent = function handleEvent(node, eventName, handlerName) {
++Nevow.Athena.Widget.handleEvent = function handleEvent(node, eventName, handlerName, ev) {
+     var widget = Nevow.Athena.Widget.get(node);
+     var method = widget[handlerName];
+     var result = false;
+@@ -1223,7 +1223,7 @@
+         result = Nevow.Athena.Widget.dispatchEvent(
+             widget, eventName, handlerName,
+             function() {
+-                return method.call(widget, node);
++                return method.call(widget, node, ev);
+             });
+     }
+     return result;
