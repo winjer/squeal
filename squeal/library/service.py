@@ -50,7 +50,7 @@ class Library(Item, service.Service):
         for collection in self.store.query(Collection):
             reactor.callLater(0, collection.scan)
 
-    def addCollection(self, pathname):
+    def add_collection(self, pathname):
         for c in self.store.query(Collection, pathname == pathname):
             break
         else:

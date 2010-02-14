@@ -29,11 +29,39 @@ from twisted.plugin import IPlugin
 class ISlimPlayerService(Interface):
     """ The player management service.  This manages the connection of players to the server. """
 
+    def play(track):
+        """ Play the specified track.  The track should provide the ITrack interface. """
+
 class ILibrary(Interface):
     """ The music library management service. """
 
+    def add_collection(pathname):
+        """ Add the files in the specified path to the library. The files are
+        not moved or copied, but references to their paths are kept within the
+        collection database. """
+
+    def tracks():
+        """ Return an iterator of all tracks in the library """
+
+    def rescan():
+        """ Rescan every track in the library """
+
 class IPlaylist(Interface):
     """ The playlist management service """
+
+    def clear():
+        """ Delete all tracks from this playlist completely. """
+
+    def play():
+        """ Start playing - either resume the currently loaded track, if it
+        has time left to run, or load the next track and play that. """
+
+    def stop():
+        """ Stop playing all players. """
+
+    def enqueue(track):
+        """ Add the specified track to the end of the playlist. The Track
+        should provide the ISerializableTrack interface. """
 
 class IWebService(Interface):
     """ The web service, that manages the creation of the web site. """
@@ -48,8 +76,17 @@ class IEventReactor(Interface):
 
 class INamingPolicy(Interface):
 
+    """ Returns a set of details on a track. Different policies will make
+    different decisions on naming (for example tags win or filename wins) """
+
     def details(collection, pathname):
         """ returns a dictionary of track details """
+
+################################################################################
+# Events
+################################################################################
+
+# Player events
 
 class IPlayerEvent(Interface):
 
@@ -57,16 +94,30 @@ class IPlayerEvent(Interface):
 
     player = Attribute(""" The local player instance representation """)
 
-class IVolumeChangeEvent(Interface):
+class IVolumeChangeEvent(IPlayerEvent):
 
     """ The volume has changed """
 
     volume = Attribute(""" The new volume """)
 
-class IRemoteButtonPressedEvent(Interface):
+class IRemoteButtonPressedEvent(IPlayerEvent):
     """ A button has been pressed on the remote control """
 
     button = Attribute(""" The code for the button """)
+
+class IPlayerStateChange(Interface):
+
+    """ The state of the player has changed """
+
+    state = Attribute(""" The new player state """)
+
+class IPlayerTrackChange(IPlayerEvent):
+
+    """ A new track has been loaded on the player """
+
+    track = Attribute(""" The track """)
+
+# Library events
 
 class ILibraryChangeEvent(Interface):
 
@@ -75,18 +126,6 @@ class ILibraryChangeEvent(Interface):
     added = Attribute(""" A list of tracks that have been added """)
     removed = Attribute(""" A list of tracks that have been removed """)
     changed = Attribute(""" A list of tracks that have changed """)
-
-class IPlayerStateChange(Interface):
-
-    """ The state of the player has changed """
-
-    state = Attribute(""" The new player state """)
-
-class IPlayerTrackChange(Interface):
-
-    """ A new track has been loaded on the player """
-
-    track = Attribute(""" The track """)
 
 class ILibraryEvent(Interface):
 
@@ -134,8 +173,13 @@ class IManholeService(Interface):
     """ Provided by the manhole service """
 
 class ITrackSource(Interface):
+
+    """ A source of tracks. This is able to provide an ITrack when called with
+    a track identifier from within it's namespace """
+
     namespace = Attribute(""" The prefix of track identifiers that this source will handle """)
-    def getTrackById(tid):
+
+    def get_track(tid):
         """ Return an object conforming to ITrack that corresponds to the
         referenced track identifier """
 
@@ -144,6 +188,34 @@ class ISquealPlugin(IPlugin):
 
 class IPluginManager(Interface):
     """ Service that manages plugins """
+
+class ICollection(Interface):
+    """ A collection in the library """
+
+    def update(pathname, ftype, details):
+        # TBC
+        pass
+
+    def scan():
+        """ Re-examine every file and update metadata stored accordingly. """
+
+class ITrack(Interface):
+
+    track_id = Attribute(""" An identifier that is unique for the track within the provider namespace """)
+    provider = Attribute(""" The service that provides this track.  Required to successfully serialize the track. """)
+    track_type = Attribute(""" The type of the track, one of, 0: ogg, 1: mp3,
+    2: flac, 3: pcm""")
+    is_loaded = Attribute(""" A boolean indicating whether the source of this
+    track has loaded all information on the track yet """)
+    title = Attribute(""" The name of the track, as a unicode string """)
+    artist = Attribute(""" The name of the artist, as a unicode string """)
+    album = Attribute(""" The name of the album, as a unicode string """)
+
+    def player_uri():
+        """ The URI from which the track data can be requested by the squeezebox. """
+
+    def image_uri():
+        """ The URI from which the image can be requested """
 
 # Extension Points
 

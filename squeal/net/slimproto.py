@@ -46,6 +46,8 @@ from squeal.isqueal import *
 
 class RemoteButtonPressed(object):
 
+    """ Someone has pressed a button on a remote control. """
+
     implements(IRemoteButtonPressedEvent)
 
     class Button:
@@ -108,6 +110,8 @@ class SlimService(Item, service.Service):
         return service.Service.startService(self)
 
     def play(self, track):
+        """ Play the track. """
+        assert ITrack.providedBy(track)
         log.msg("Playing %r" % track, system="squeal.net.slimproto.SlimService")
         for p in self.players:
             p.play(track)
@@ -188,7 +192,7 @@ class Player(protocol.Protocol):
         autostart = '1'
         formatbyte = self.typeMap[track.type]
         data = self.packStream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
-        request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_url(),)
+        request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_uri(),)
         data = data + request.encode("utf-8")
         self.sendFrame('strm', data)
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))

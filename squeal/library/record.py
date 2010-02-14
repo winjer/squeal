@@ -48,6 +48,14 @@ class LibraryChangeEvent(object):
 
 class StandardNamingPolicy(Item):
 
+    """ Extracts details from tags and from the pathname assuming the path is of the form:
+
+        /artist/album/num - track
+
+        or similar formats. The pathname is considered to be more trustworthy
+        than the tags, as long as the pathname is of that form, or similar.
+        """
+
     implements(INamingPolicy)
 
     wins = text(default=u'path') # who wins.  "path" or "tags"
@@ -121,6 +129,11 @@ class StandardNamingPolicy(Item):
         return details
 
 class Collection(Item):
+
+    """ A collection of tracks in the library """
+
+    implements(ICollection)
+
     pathname = text()
     last = timestamp()
 
@@ -140,6 +153,8 @@ class Collection(Item):
             Track.create(self, pathname, ftype, details)
 
     def scan(self):
+        """ Loop through every file in the collection and update the metadata
+        stored against the track from it's tags and/or name """
         m = magic.open(magic.MAGIC_NONE)
         m.load()
         scanning = enumerate(os.walk(self.pathname))

@@ -35,6 +35,7 @@ from squeal.event import EventReactor
 from squeal import isqueal
 from squeal.adaptivejson import IJsonAdapter
 import sys
+import urllib
 import spotify
 from spotify.manager import SpotifySessionManager
 from spotify import Link
@@ -67,45 +68,47 @@ class SpotifySearchResults(object):
 
 class SpotifyTrack(object):
 
-    playlist = None
-    track = None
+    """ A wrapper for spotify.Track that conforms to ITrack. Generally you'd
+    get this from the spotify service's get_track method. """
+
+    implements(isqueal.ITrack)
+
+    # all spotify tracks are played as raw PCM
     type = 3
 
-    def __init__(self, tid, playlist=None, track=None):
-        self.playlist = playlist
+    def __init__(self, provider, track):
+        self.provider = provider
         self.track = track
-        self.tid = tid
 
     @property
-    def spotify_track(self):
-        l = Link.from_string(self.tid)
-        return l.as_track()
-
-    @property
-    def title(self):
-        return self.spotify_track.name()
+    def track_id(self):
+        """ Return the id of the track within the provider namespace. """
+        return unicode(Link.from_track(self.track, 0))
 
     @property
     def is_loaded(self):
-        return self.spotify_track.is_loaded()
+        return self.track.is_loaded()
+
+    @property
+    def title(self):
+        return self.track.name().decode("utf-8")
 
     @property
     def artist(self):
-        artists = self.spotify_track.artists()
-        return ",".join(x.name() for x in artists)
+        artists = self.track.artists()
+        return ",".join(x.name().decode("utf-8") for x in artists)
 
     @property
     def album(self):
-        return self.spotify_track.album().name()
+        return self.track.album().name().decode("utf-8")
 
-    @property
-    def image_id(self):
-        return self.spotify_track.album().cover()
+    def image_uri(self):
+        return "/spotify_image?%s" % (urllib.urlencode({"image": self.track.image_id()}))
 
-    def player_url(self):
-        return "/spotify?tid=%s" % self.tid
+    def player_uri(self):
+        return "/spotify?tid=%s" % self.track_id
 
-class SpotifyPlaylistJSON(Adapter):
+class PlaylistJSON(Adapter):
     implements(IJsonAdapter)
 
     def encode(self):
@@ -116,7 +119,7 @@ class SpotifyPlaylistJSON(Adapter):
             u'name': unicode(t.name(), 'utf-8'),
         }
 
-registerAdapter(SpotifyPlaylistJSON, spotify.Playlist, IJsonAdapter)
+registerAdapter(PlaylistJSON, spotify.Playlist, IJsonAdapter)
 
 class SpotifyTrackJSON(Adapter):
     implements(IJsonAdapter)
@@ -126,20 +129,22 @@ class SpotifyTrackJSON(Adapter):
             u'isLoaded': self.original.is_loaded(),
         }
 
-class SpotifyTrackTrackJSON(Adapter):
+class TrackJSON(Adapter):
     implements(IJsonAdapter)
     def encode(self):
-        link = Link.from_string(self.original.tid)
-        track = Link.as_track(link)
         return {
-            u'name': unicode(track.name(), 'utf-8'),
-            u'isLoaded': track.is_loaded(),
+            u'name': self.original.title,
+            u'isLoaded': self.original.is_loaded,
         }
 
 registerAdapter(SpotifyTrackJSON, spotify.Track, IJsonAdapter)
-registerAdapter(SpotifyTrackTrackJSON, SpotifyTrack, IJsonAdapter)
+registerAdapter(TrackJSON, SpotifyTrack, IJsonAdapter)
 
 class SpotifyManager(SpotifySessionManager):
+
+    """ Only the Spotify service talks to the Manager directly. The Manager is
+    running in it's own thread, so be careful. """
+
     implements(IPushProducer, IProducer)
 
     appkey_file = sibpath(__file__, 'appkey.key')
@@ -276,6 +281,9 @@ class SpotifyManager(SpotifySessionManager):
 
 class Spotify(Item, service.Service):
 
+    """ The spotify service. Provides an interface to the rest of the system
+    for the spotify session and related machinery. """
+
     implements(ISpotifyService, isqueal.ITrackSource)
     powerupInterfaces = (ISpotifyService, isqueal.ITrackSource, isqueal.IMusicSource)
 
@@ -312,9 +320,9 @@ class Spotify(Item, service.Service):
 
     def play(self, tid):
         log.msg("Play called with %r" % tid, system="squeal.spot.service.Spotify")
-        t = SpotifyTrack(tid)
+        track = self.get_track(tid)
         for p in self.store.powerupsFor(ISlimPlayerService):
-            p.play(t)
+            p.play(track)
 
     def registerConsumer(self, consumer, tid):
         log.msg("registering consumer %r on %r" % (consumer, self), system="squeal.spot.service.Spotify")
@@ -335,11 +343,12 @@ class Spotify(Item, service.Service):
         l = Link.from_string(link)
         return l.as_track()
 
-    #isqueal.TrackSource
-    def getTrackByID(self, tid):
-        return SpotifyTrack(tid)
-
     def main_widget(self):
         return web.Main()
 
+    #isqueal.TrackSource
+
+    def get_track(self, tid):
+        track = Link.from_string(tid).as_track()
+        return SpotifyTrack(self, track)
 

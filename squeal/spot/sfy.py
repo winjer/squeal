@@ -25,6 +25,7 @@ from twisted.python import log
 from nevow import rend
 from nevow import inevow
 from squeal.isqueal import *
+import ispotify
 
 class SpotifyTransfer(object):
 
@@ -108,7 +109,7 @@ class SpotifyStreamer(rend.Page):
         self.tid = tid
 
     def renderHTTP(self, ctx):
-        for service in self.original.store.powerupsFor(ISpotify):
+        for service in self.original.store.powerupsFor(ispotify.ISpotifyService):
             request = inevow.IRequest(ctx)
             SpotifyTransfer(self.tid, service, request)
             return request.deferred

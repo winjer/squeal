@@ -107,7 +107,7 @@ Spot.Document.methods(
                 {'bVisible': false},
                 {'sTitle': "Track",
                   'fnRender': function(obj) {
-                    return '<a href="#">' + obj.aData[1] + '</a> (<a href="javascript:Squeal.W.queue.queueTrack(\'' + obj.aData[0] + '\')">queue</a>)';
+                    return '<a href="#">' + obj.aData[1] + '</a> (<a href="javascript:Squeal.W.queue.queueTrack(\'spotify\', \'' + obj.aData[0] + '\')">queue</a>)';
                   }},
                 {'sTitle': "Album",
                   'fnRender': function(obj) {

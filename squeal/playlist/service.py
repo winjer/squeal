@@ -42,13 +42,13 @@ class PlayTrack(Item):
     tid = text()
     provider = reference()
 
-    def player_url(self):
+    def player_uri(self):
         """ Return the URL of the track on the player """
         return "/play?id=%s" % self.storeID
 
     @property
     def track(self):
-        return self.provider.getTrackByID(self.tid)
+        return self.provider.get_track(self.tid)
 
 class PlayTrackJSON(Adapter):
     def encode(self):
@@ -73,6 +73,11 @@ class PlaylistChangeEvent(object):
         self.playing = playing
 
 class Playlist(Item, service.Service):
+
+    """ The service that hosts the list of tracks queued up to play on the
+    players. Right now there may only be one of these, and if there is more
+    than one player they are assumed to be synchronised. """
+
     implements(IPlaylist)
     powerupInterfaces = (IPlaylist,)
 
@@ -143,10 +148,11 @@ class Playlist(Item, service.Service):
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
-    def enqueue(self, provider, tid):
-        """ Add a track to the end of the queue, for the specified provider. """
-        log.msg("enqueing %r at %d" % (tid, self.maxposition), system="squeal.playlist.service.Playlist")
-        pt = PlayTrack(store=self.store, position=self.maxposition, tid=tid, provider=provider)
+    def enqueue(self, track):
+        """ Add a track to the end of the queue.  Track must conform to ITrack. """
+        assert ITrack.providedBy(track)
+        log.msg("enqueing %r at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
+        pt = PlayTrack(store=self.store, position=self.maxposition, tid=track.track_id, provider=track.provider)
         self.maxposition += 1
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=[pt]))

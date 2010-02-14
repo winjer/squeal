@@ -99,7 +99,7 @@ class Playing(base.BaseElement):
             return "Loading..."
         else:
             return (
-                T.img(src="/spotify_image?%s" % (urllib.urlencode({"image": current.image_id})), width="100px"),
+                T.img(src=current.image_uri(), width="100px"),
                 T.br,
                 "Now playing ",
                 T.a(href="")[current.title],
@@ -149,12 +149,11 @@ class Queue(base.BaseElement):
         })
 
     @athena.expose
-    def queueTrack(self, tid):
+    def queueTrack(self, namespace, tid):
         """ Called from other UI components, via the javascript partner class
         to this one. Allows queuing of any track if it's global tid is known.
         """
-        log.msg("queueTrack called with %r" % tid, system="squeal.web.jukebox.Queue")
-        namespace = tid.split(":")[0]
+        log.msg("queueTrack called with %r, %r" % (namespace, tid), system="squeal.web.jukebox.Queue")
         queue = self.playlist_service
         for p in self.store.powerupsFor(isqueal.ITrackSource):
             if p.namespace == namespace:
@@ -162,7 +161,8 @@ class Queue(base.BaseElement):
                 break
         else:
             raise KeyError("No track source uses the namespace %s" % namespace)
-        queue.enqueue(provider, tid)
+        track = provider.get_track(tid)
+        queue.enqueue(track)
 
 class Main(base.BaseElement):
     jsClass = u"Squeal.Main"

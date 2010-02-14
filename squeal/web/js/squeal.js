@@ -82,9 +82,9 @@ Squeal.Queue.methods(
         }
     },
 
-    function queueTrack(self, tid) {
-        console.log("Squeal.Queue.queueTrack(" + tid + ") called")
-        return self.callRemote("queueTrack", tid);
+    function queueTrack(self, provider, tid) {
+        console.log("Squeal.Queue.queueTrack(" + provider +", " + tid + ") called")
+        return self.callRemote("queueTrack", provider, tid);
     }
 );
 
