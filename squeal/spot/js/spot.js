@@ -46,7 +46,7 @@ Spot.Playlists.methods(
         var tid = ev.target.id;
         if(tid.substring(0, 8) == "playlist") {
             var pid = tid.substring(9);
-            Spot.W.document.playlist(pid);
+            Spot.W.document.loadPlaylist(pid);
         };
     }
 )
@@ -74,8 +74,12 @@ Spot.Document.methods(
         Spot.W.document = self;
     },
 
-    function playlist(self, pid) {
+    function renderPlaylist(self, playlist) {
         $(self.node).html("<h1>Playlist " + pid + "</h1>");
+    },
+
+    function loadPlaylist(self, pid) {
+        self.callRemote("playlist_info", int(pid)).addCallback(self.renderPlaylist);
     },
 
     function searchResults(self, artists, albums, tracks) {

@@ -105,29 +105,18 @@ class SpotifyTrack(object):
     def player_url(self):
         return "/spotify?tid=%s" % self.tid
 
-class SpotifyPlaylist(object):
-
-    id = None
-    name = None
-
-    def __init__(self, id, is_loaded, status, name):
-        self.id = id
-        self.is_loaded = is_loaded
-        self.status = status
-        self.name = name
-
 class SpotifyPlaylistJSON(Adapter):
     implements(IJsonAdapter)
 
     def encode(self):
         t = self.original
         return {
-            u'id': t.id,
-            u'status': unicode(t.status, 'utf-8'),
-            u'name': unicode(t.name, 'utf-8'),
+            u'id': unicode(Link.from_playlist(t)),
+            u'status': "",
+            u'name': unicode(t.name(), 'utf-8'),
         }
 
-registerAdapter(SpotifyPlaylistJSON, SpotifyPlaylist, IJsonAdapter)
+registerAdapter(SpotifyPlaylistJSON, spotify.Playlist, IJsonAdapter)
 
 class SpotifyTrackJSON(Adapter):
     implements(IJsonAdapter)
@@ -190,13 +179,10 @@ class SpotifyManager(SpotifySessionManager):
 
     def image(self, image_id):
         assert len(image_id) == 20
-        print >>sys.stderr, "AAAAAAAAAAAAAAAAAAAAAAAA"
         d = defer.Deferred()
         def cb(image, userdata):
             reactor.callFromThread(d.callback, image)
-        print >>sys.stderr, "BBBBBBBBBBBBBBBBBBBBBBBB"
         image = self.session.image_create(image_id)
-        print >>sys.stderr, "IMAGE LOCATED:", repr(image)
         image.add_load_callback(cb, None)
         return d
 
@@ -337,13 +323,7 @@ class Spotify(Item, service.Service):
         self.mgr.play(consumer)
 
     def playlists(self):
-        for id, p in enumerate(self.mgr.ctr):
-            name = p.name() if p.is_loaded() else '-- Loading --'
-            if self.playing and self.playing[0] == id:
-                status = 'Playing'
-            else:
-                status = ''
-            yield SpotifyPlaylist(id, p.is_loaded(), status, name)
+        return self.mgr.ctr
 
     def image(self, image_id):
         return self.mgr.image(image_id)

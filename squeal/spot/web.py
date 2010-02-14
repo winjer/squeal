@@ -69,7 +69,7 @@ class Playlist(page.Element):
     @page.renderer
     def link(self, request, tag):
         return tag[
-            T.a(href="#", id="playlist-%s" % self.original.id)[self.original.name]
+            T.a(href="#", id="playlist-%s" % str(Link.from_playlist(self.original)))[self.original.name()]
         ]
 
 class Playlists(base.BaseElement):
@@ -93,6 +93,12 @@ class Document(base.BaseElement):
     jsClass = u"Spot.Document"
     docFactory = xmltemplate("document.html")
 
+    @property
+    def spotify_service(self):
+        """ Return the one and only one spotify service running on the store """
+        for spotify in self.store.powerupsFor(ispotify.ISpotifyService):
+            return spotify
+
     def subscribe(self):
         e = self.evreactor
         e.subscribe(self.handle_search_start, ijukebox.ISearchStartedEvent)
@@ -105,6 +111,9 @@ class Document(base.BaseElement):
         mins = int(d/60000)
         secs = int((d - (mins*60000)) / 1000)
         return u"%dm %ds" % (mins, secs)
+
+    def playlist_info(self, pid):
+        self.spotify_service.pl
 
     def handle_search_results(self, ev):
         artists = {}
