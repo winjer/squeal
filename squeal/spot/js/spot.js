@@ -74,12 +74,32 @@ Spot.Document.methods(
         Spot.W.document = self;
     },
 
+    function queuePlaylistById(self, pid) {
+        self.callRemote("playlist_info", pid).addCallback(function (playlist) {
+            self.queuePlaylistByInfo(playlist);
+        });
+    },
+
+    function queuePlaylistByInfo(self, playlist) {
+        for(t in playlist['tracks']) {
+            var track = playlist['tracks'][t];
+            Squeal.W.queue.queueTrack('spotify', track.id);
+        }
+    },
+
     function renderPlaylist(self, playlist) {
-        $(self.node).html("<h1>Playlist " + pid + "</h1>");
+        $(self.node).html("<h1>Playlist: " + playlist.name + "</h1>");
+        $(self.node).append('<a href="javascript:Spot.W.document.queuePlaylistById(\'' + playlist.id + '\');">Queue</a>');
+        for(t in playlist['tracks']) {
+            var track = playlist['tracks'][t];
+            $(self.node).append(track.name + "<br />");
+        }
     },
 
     function loadPlaylist(self, pid) {
-        self.callRemote("playlist_info", int(pid)).addCallback(self.renderPlaylist);
+        self.callRemote("playlist_info", pid).addCallback(function(playlist) {
+            self.renderPlaylist(playlist);
+        });
     },
 
     function searchResults(self, artists, albums, tracks) {

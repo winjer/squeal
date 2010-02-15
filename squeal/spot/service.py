@@ -33,7 +33,7 @@ import traceback
 
 from squeal.event import EventReactor
 from squeal import isqueal
-from squeal.adaptivejson import IJsonAdapter
+from squeal.adaptivejson import IJsonAdapter, simplify
 import sys
 import urllib
 import spotify
@@ -103,7 +103,7 @@ class SpotifyTrack(object):
         return self.track.album().name().decode("utf-8")
 
     def image_uri(self):
-        return "/spotify_image?%s" % (urllib.urlencode({"image": self.track.image_id()}))
+        return "/spotify_image?%s" % (urllib.urlencode({"image": self.track.album().cover()}))
 
     def player_uri(self):
         return "/spotify?tid=%s" % self.track_id
@@ -115,8 +115,9 @@ class PlaylistJSON(Adapter):
         t = self.original
         return {
             u'id': unicode(Link.from_playlist(t)),
-            u'status': "",
+            u'status': u"",
             u'name': unicode(t.name(), 'utf-8'),
+            u"tracks": [simplify(x) for x in t]
         }
 
 registerAdapter(PlaylistJSON, spotify.Playlist, IJsonAdapter)
@@ -125,6 +126,7 @@ class SpotifyTrackJSON(Adapter):
     implements(IJsonAdapter)
     def encode(self):
         return {
+            u'id': unicode(Link.from_track(self.original, 0)),
             u'name': unicode(self.original.name(), 'utf-8'),
             u'isLoaded': self.original.is_loaded(),
         }
@@ -133,6 +135,7 @@ class TrackJSON(Adapter):
     implements(IJsonAdapter)
     def encode(self):
         return {
+            u'id': unicode(self.original.track_id),
             u'name': self.original.title,
             u'isLoaded': self.original.is_loaded,
         }
@@ -332,6 +335,11 @@ class Spotify(Item, service.Service):
 
     def playlists(self):
         return self.mgr.ctr
+
+    def get_playlist(self, pid):
+        for playlist in self.mgr.ctr:
+            if unicode(Link.from_playlist(playlist)) == pid:
+                return playlist
 
     def image(self, image_id):
         return self.mgr.image(image_id)

@@ -125,7 +125,7 @@ class SpotifyImage(rend.Page):
         def _(image):
             request.setHeader("content-type", "image/jpeg")
             return str(image.data())
-        for service in self.original.store.powerupsFor(ISpotify):
+        for service in self.original.store.powerupsFor(ispotify.ISpotifyService):
             d = service.image(self.image_id)
             d.addCallback(_)
             return d

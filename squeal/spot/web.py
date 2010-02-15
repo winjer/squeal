@@ -28,6 +28,7 @@ from nevow import loaders
 from squeal import isqueal
 from squeal.spot import ispotify
 from squeal.web import ijukebox
+from squeal import adaptivejson
 
 import ispotify
 
@@ -112,8 +113,9 @@ class Document(base.BaseElement):
         secs = int((d - (mins*60000)) / 1000)
         return u"%dm %ds" % (mins, secs)
 
+    @athena.expose
     def playlist_info(self, pid):
-        self.spotify_service.pl
+        return adaptivejson.simplify(self.spotify_service.get_playlist(pid))
 
     def handle_search_results(self, ev):
         artists = {}
