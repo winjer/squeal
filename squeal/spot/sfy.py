@@ -52,11 +52,8 @@ class SpotifyTransfer(object):
         if not self.request:
             return
         if self.data:
-            # This is probably wrong, although it seems to work
-            # flushing the entire buffer at once seems like
-            # it might overload the consumer
-            for x in self.data:
-                self.request.write(x)
+            # calling write multiple times causes a slew of pauses to come back
+            self.request.write("".join(self.data))
             self.data = []
         if self.finished:
             self.request.unregisterProducer()
