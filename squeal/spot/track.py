@@ -44,7 +44,7 @@ class SpotifyTrack(object):
         return self.track.album().name().decode("utf-8")
 
     def image_uri(self):
-        return "/spotify_image?%s" % (urllib.urlencode({"image": self.track.album().cover()}))
+        return "/spotify/image?%s" % (urllib.urlencode({"image": self.track.album().cover()}))
 
     def player_uri(self):
-        return "/spotify?tid=%s" % self.track_id
+        return "/spotify/stream?tid=%s" % self.track_id

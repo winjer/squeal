@@ -54,11 +54,13 @@ class Spotify(Item, service.Service):
                isqueal.IMusicSource,
                isqueal.ITrackSource,
                isqueal.IUserConfigurable,
+               isqueal.IRootResourceExtension,
                )
     powerupInterfaces = (ispotify.ISpotifyService,
                          isqueal.ITrackSource,
                          isqueal.IMusicSource,
                          isqueal.IUserConfigurable,
+                         isqueal.IRootResourceExtension,
                          )
 
     namespace = 'spotify'
@@ -131,4 +133,10 @@ class Spotify(Item, service.Service):
     def get_track(self, tid):
         track = Link.from_string(tid).as_track()
         return SpotifyTrack(self, track)
+
+
+    #isqueal.IRootResourceExtension
+
+    def add_resources(self, root):
+        root.putChild("spotify", web.Root(self))
 

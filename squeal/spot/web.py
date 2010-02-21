@@ -18,21 +18,26 @@ __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
 __version__ = "$Revision$"[11:-2]
 
-from squeal.web import base
 from twisted.python.util import sibpath
+from twisted.python import log
+
+from nevow import inevow
 from nevow import athena
 from nevow import page
 from nevow import tags as T
 from nevow import loaders
+from nevow import rend
 
 from squeal import isqueal
 from squeal.spot import ispotify
 from squeal.web import ijukebox
+from squeal.web import base
 from squeal import adaptivejson
 
 import ispotify
 
 from spotify import Link
+from sfy import SpotifyStreamer, SpotifyImage
 
 from nevow.rend import sequence
 
@@ -154,3 +159,21 @@ class Main(base.BaseElementContainer):
         'playlists': Playlists,
     }
 
+class Root(rend.Page):
+
+    """ This hangs from /spotify at the root of the server. """
+
+    def renderHTTP(self, ctx):
+        request = inevow.IRequest(ctx)
+        request.redirect(request.URLPath().child('jukebox'))
+        return ''
+
+    def child_stream(self, ctx):
+        log.msg("Request for spotify track %s received" % ctx.arg('tid'), system="squeal.web.service.Root")
+        tid = ctx.arg('tid')
+        return SpotifyStreamer(self.original, tid)
+
+    def child_image(self, ctx):
+        #log.msg("Request for spotify image %s received" % ctx.arg('image'), system="squeal.web.service.Root")
+        image_id = ctx.arg('image')
+        return SpotifyImage(self.original, image_id)

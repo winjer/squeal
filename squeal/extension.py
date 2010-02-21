@@ -9,6 +9,15 @@ from twisted.python import log
 from squeal import isqueal
 from squeal import plugins
 
+class PluginInstallEvent(object):
+    implements(isqueal.IPluginInstallEvent)
+
+    def __init__(self, plugin, version, path):
+        self.plugin = plugin
+        self.version = version
+        self.path = path
+
+
 class InstalledPlugin(Item):
 
     path = text()
@@ -26,6 +35,11 @@ class PluginManager(Item, service.Service):
     installable = inmemory()
     uninstallable = inmemory()
 
+
+    @property
+    def evreactor(self):
+        for s in self.store.powerupsFor(isqueal.IEventReactor):
+            return s
 
     def activate(self):
         self.installable = []
@@ -71,5 +85,6 @@ class PluginManager(Item, service.Service):
         InstalledPlugin(store=self.store,
                         version=unicode(version),
                         path=unicode(path))
+        self.evreactor.fireEvent(PluginInstallEvent(plugin, version, path))
         return s
 

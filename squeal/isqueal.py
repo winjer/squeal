@@ -191,3 +191,13 @@ class IMusicSource(Interface):
     def options_widget():
         """ Returns the options widget """
 
+class IRootResourceExtension(Interface):
+
+    """ I provide a resource that hangs off the root resource provided by the web service. """
+
+    def add_resources(resource):
+        """ Adds children to this resource as required """
+
+class IPluginInstallEvent(Interface):
+
+    """ A new plugin has been installed into the system. """
