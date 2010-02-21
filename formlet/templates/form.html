@@ -1,5 +1,6 @@
 <form class="formlet-form" n:render="liveElement" xmlns="http://www.w3.org/1999/xhtml" xmlns:n="http://nevow.com/ns/nevow/0.1" xmlns:athena="http://divmod.org/ns/athena/0.7">
     <athena:handler event="onsubmit" handler="submit" />
+    <input type="hidden" name="formlet.action" n:render="action" />
     <div class="formlet-fields">
         <n:invisible n:render="fields" />
     </div>

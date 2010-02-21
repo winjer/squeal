@@ -195,7 +195,7 @@ class PluginInstaller(base.BaseElement):
 
     @page.renderer
     def configform(self, request, tag):
-        setup_form = form.Form("setup", action="Squeal.W.setup.install")
+        setup_form = form.Form("setup", action="Squeal.SetupHelper.installPlugin")
         field.HiddenField(form=setup_form, name="plugin", value=self.original['plugin'].name)
         field.StringField(form=setup_form, name="username", label="Username")
         field.StringField(form=setup_form, name="password", label="Password")

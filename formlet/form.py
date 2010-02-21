@@ -19,6 +19,10 @@ class FormElement(athena.LiveElement):
         self.original = original
 
     @page.renderer
+    def action(self, request, tag):
+        return tag(value=self.original.action)
+
+    @page.renderer
     def fields(self, request, tag):
         return tag[(f.element(self) for f in self.original.fields)]
 

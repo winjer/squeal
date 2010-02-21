@@ -121,6 +121,12 @@ Squeal.Setup.methods(
 
 );
 
+Squeal.SetupHelper = {}
+Squeal.SetupHelper.installPlugin = function (fields) {
+        alert("moo");
+        alert(fields['username']);
+}
+
 Squeal.Playing.methods(
     function reload(self, tag) {
         self.nodeById("playing").innerHTML = tag;
