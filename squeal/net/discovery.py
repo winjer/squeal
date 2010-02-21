@@ -33,6 +33,7 @@ from axiom.item import Item
 from axiom.attributes import text, integer, reference, inmemory
 
 from squeal.isqueal import *
+from socket import gethostname
 
 class DiscoveryService(Item, service.Service):
 
@@ -42,15 +43,10 @@ class DiscoveryService(Item, service.Service):
     powerupInterfaces = (IDiscoveryService,)
 
     parent = inmemory()
-    listen = integer()
-    hostname = text()
+    listen = integer(default=3483)
+    hostname = text(default=unicode(gethostname()))
     protocol = inmemory()
     running = inmemory()
-
-    def __init__(self, config, store):
-        listen = config.getint("DiscoveryService", "listen")
-        hostname = unicode(config.get("DiscoveryService", "hostname"))
-        Item.__init__(self, store=store, listen=listen, hostname=hostname)
 
     def activate(self):
         self.protocol = DiscoveryProtocol(self)

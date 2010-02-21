@@ -86,16 +86,12 @@ class SlimService(Item, service.Service):
     implements(ISlimPlayerService)
     powerupInterfaces = (ISlimPlayerService,)
 
-    listen = text()
+    listen = text(default=u"tcp:3483")
     parent = inmemory()
     pages = inmemory()
     players = inmemory()
     factory = inmemory()
     running = inmemory()
-
-    def __init__(self, config, store):
-        listen = unicode(config.get("SlimService", "listen"))
-        Item.__init__(self, store=store, listen=listen)
 
     def activate(self):
         self.players = []

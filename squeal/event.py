@@ -102,9 +102,6 @@ class EventReactor(Item, service.Service):
     parent = inmemory()
     subscribers = inmemory()
 
-    def __init__(self, config, store):
-        Item.__init__(self, store=store)
-
     def activate(self):
         self.subscribers = []
 

@@ -45,15 +45,9 @@ class ManholeService(Item, service.Service):
     parent = inmemory()
     services = inmemory()
     namedServices = inmemory()
-    listen = text()
+    listen = text(default="tcp:2222")
     username = text()
     password = text()
-
-    def __init__(self, config, store):
-        Item.__init__(self, store=store)
-        self.listen = unicode(config.get("ManholeService", "listen"))
-        self.username = unicode(config.get("ManholeService", "username"))
-        self.password = unicode(config.get("ManholeService", "password"))
 
     def startService(self):
         def getManhole():

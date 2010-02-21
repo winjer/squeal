@@ -87,9 +87,6 @@ class Playlist(Item, service.Service):
     name = inmemory()
     parent = inmemory()
 
-    def __init__(self, config, store):
-        Item.__init__(self, store=store)
-
     @property
     def evreactor(self):
         return self.store.findFirst(EventReactor)

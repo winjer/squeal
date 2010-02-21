@@ -53,15 +53,11 @@ class WebService(Item, service.Service):
     implements(IWebService)
     powerupInterfaces = (IWebService,)
 
-    listen = text()
+    listen = text(default=u"tcp:9000")
     parent = inmemory()
     site = inmemory()
     running = inmemory()
     pages = inmemory()
-
-    def __init__(self, config, store):
-        listen = unicode(config.get("WebService", "listen"))
-        Item.__init__(self, store=store, listen=listen)
 
     def activate(self):
         self.site = appserver.NevowSite(Root(self), logPath="/dev/null")

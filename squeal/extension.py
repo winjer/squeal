@@ -23,21 +23,13 @@ class PluginManager(Item, service.Service):
     running = inmemory()
     name = inmemory()
     parent = inmemory()
-    config = inmemory()
     installable = inmemory()
     uninstallable = inmemory()
 
 
-    def __init__(self, conf, store):
-        self.config = conf
-        Item.__init__(self, store=store)
-
     def activate(self):
         self.installable = []
         self.uninstallable = []
-        from ConfigParser import ConfigParser
-        self.config = ConfigParser()
-        self.config.read("squeal.ini")
         installed = {}
         available = {}
         for i in self.store.query(InstalledPlugin):
@@ -55,13 +47,10 @@ class PluginManager(Item, service.Service):
                     'path': path
                 })
                 if plugin.version > installed[path]:
-                    print "Plugin", path, "has been upgraded"
+                    log.warning("Plugin %s has been upgraded" % path)
                 elif plugin.version < installed[path]:
-                    print "Plugin", path, "has been downgraded"
-                else:
-                    print "Plugin still present"
+                    log.warning("Plugin %s has been downgraded" % path)
             else:
-                print "Plugin", path, "is new"
                 self.installable.append({
                     'plugin': plugin,
                     'version': a.version,
