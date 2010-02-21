@@ -37,12 +37,13 @@ field.StringField(form=setup_form, name="pathname", label="Directory containing 
 field.SubmitButton(form=setup_form, name="submit", label="Configure library")
 
 class Library(Item, service.Service):
-    implements(ILibrary)
-    powerupInterfaces = (ILibrary,)
+    implements(ILibrary, IMusicSource)
+    powerupInterfaces = (ILibrary, IMusicSource)
 
     collections = reference()
     running = inmemory()
-    name = inmemory()
+    name = 'library'
+    label = 'Local music'
     parent = inmemory()
     naming_policy = reference()
 
@@ -69,3 +70,4 @@ class Library(Item, service.Service):
 
     def tracks(self):
         return self.store.query(Track)
+
