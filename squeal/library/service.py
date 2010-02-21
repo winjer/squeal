@@ -1,5 +1,3 @@
-# $Id$
-#
 # Copyright 2010 Doug Winter
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,13 +20,21 @@ __version__ = "$Revision$"[11:-2]
 
 
 from zope.interface import Interface, implements
+from twisted.python import log
 from twisted.application import service
 from twisted.internet import reactor
 from axiom.item import Item
 from axiom.attributes import reference, inmemory
 
 from record import *
-from squeal.isqueal import *
+from ilibrary import *
+
+from formlet import form
+from formlet import field
+
+setup_form = form.Form("library-setup", action="install")
+field.StringField(form=setup_form, name="pathname", label="Directory containing music files")
+field.SubmitButton(form=setup_form, name="submit", label="Configure library")
 
 class Library(Item, service.Service):
     implements(ILibrary)
@@ -38,23 +44,28 @@ class Library(Item, service.Service):
     running = inmemory()
     name = inmemory()
     parent = inmemory()
+    naming_policy = reference()
 
-    def __init__(self, config, store):
-        """ I have no configuration """
-        Item.__init__(self, store=store)
+    setup_form = setup_form
 
     def activate(self):
         self.rescan()
 
     def rescan(self):
+        log.msg("Rescanning music collections", system="squeal.library.service.Library")
         for collection in self.store.query(Collection):
+            log.msg("Initiating scan on %r" % collection)
             reactor.callLater(0, collection.scan)
 
     def add_collection(self, pathname):
-        for c in self.store.query(Collection, pathname == pathname):
-            break
-        else:
-            return Collection(store=self.store, pathname=pathname)
+        """ Add a new collection, representing a set of music under a specific
+        pathname. If this pathname has already been added then a duplicate is
+        not created - the original is returned instead. """
+        for c in self.store.query(Collection, Collection.pathname == pathname):
+            log.msg("Found duplicate collection %s" % pathname, system="squeal.library.service.Library")
+            return c
+        log.msg("Adding a collection at %s" % pathname, system="squeal.library.service.Library")
+        return Collection(store=self.store, pathname=pathname)
 
     def tracks(self):
         return self.store.query(Track)

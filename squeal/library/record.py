@@ -1,5 +1,3 @@
-# $Id$
-#
 # Copyright 2010 Doug Winter
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,21 +18,24 @@ __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
 __version__ = "$Revision$"[11:-2]
 
+
+import os
+import magic
+
 from zope.interface import Interface, implements
 
 from twisted.internet import reactor
 from twisted.python.components import Adapter, registerAdapter
+from twisted.python import log
 
 from axiom.item import Item
 from axiom.attributes import text, timestamp, path, reference, integer, AND
 from epsilon.extime import Time
+
 from squeal.isqueal import *
 from squeal.adaptivejson import IJsonAdapter
-from itertools import *
-import os
-import magic
-import tagpy
-import stat
+
+from ilibrary import *
 
 class LibraryChangeEvent(object):
 
@@ -45,88 +46,6 @@ class LibraryChangeEvent(object):
         self.removed = removed
         self.changed = changed
         self.playing = playing
-
-class StandardNamingPolicy(Item):
-
-    """ Extracts details from tags and from the pathname assuming the path is of the form:
-
-        /artist/album/num - track
-
-        or similar formats. The pathname is considered to be more trustworthy
-        than the tags, as long as the pathname is of that form, or similar.
-        """
-
-    implements(INamingPolicy)
-
-    wins = text(default=u'path') # who wins.  "path" or "tags"
-
-    tags = ['artist', 'album', 'comment', 'genre', 'title', 'track', 'year']
-
-    def detailsFromPath(self, pathname):
-        def normalise(s):
-            return s.replace("_", " ")
-        segments = pathname.split("/")
-        parts = segments.pop(-1).split("-")
-        details = dict(zip(self.tags, cycle([None])))
-        if len(parts) == 1:
-            details['track'] = None
-            details['title'] = normalise(parts[0])
-        elif len(parts) == 2:
-            try:
-                details['track'] = int(parts[0])
-            except ValueError:
-                details['track'] = None
-            details['title'] = "-".join(parts)
-        if len(segments) == 0:
-            pass
-        elif len(segments) == 1:
-                details['album'] = normalise(segments[0])
-        elif len(segments) == 2:
-                details['artist'] = normalise(segments[0])
-                details['album'] = normalise(segments[1])
-        else:
-            details['artist'] = normalise(segments[-2])
-            details['album'] = normalise(segments[-1])
-        return details
-
-    def detailsFromTags(self, pathname):
-        f = tagpy.FileRef(pathname.encode("UTF-8"))
-        if f.isNull():
-            return None
-        t = f.tag()
-        return {
-            'artist': t.artist,
-            'album': t.album,
-            'comment': t.comment,
-            'genre': t.genre,
-            'title': t.title,
-            'track': t.track,
-            'year': unicode(t.year),
-            }
-
-    def details(self, collection, pathname):
-        pathd = self.detailsFromPath(os.path.join(collection.pathname, pathname))
-        try:
-            tagsd = self.detailsFromTags(pathname)
-        except ValueError:
-            tagsd = None
-        details = {}
-        for t in self.tags:
-            if tagsd is None:
-                details[t] = pathd[t]
-            elif pathd[t] is None:
-                details[t] = tagsd[t]
-            elif tagsd[t] is None:
-                details[t] = pathd[t]
-            elif tagsd[t] == pathd[t]:
-                details[t] = tagsd[t]
-            elif self.wins == 'tags':
-                details[t] = tagsd[t]
-            elif self.wins == 'path':
-                details[t] = pathd[t]
-            else:
-                raise NotImplementedError
-        return details
 
 class Collection(Item):
 
@@ -152,16 +71,21 @@ class Collection(Item):
         else:
             Track.create(self, pathname, ftype, details)
 
+    @property
+    def library(self):
+        for l in self.store.powerupsFor(ILibrary):
+            return l
+
     def scan(self):
         """ Loop through every file in the collection and update the metadata
         stored against the track from it's tags and/or name """
+        log.msg("Scanning collection %s" % self.pathname, system="squeal.library.record.Collection")
         m = magic.open(magic.MAGIC_NONE)
         m.load()
         scanning = enumerate(os.walk(self.pathname))
         if self.last is not None:
             timestamp = self.last.asPOSIXTimestamp()
-        for policy in self.powerupsFor(INamingPolicy):
-            break
+        policy = self.library.naming_policy
         def _process():
             try:
                 i, (dirpath, dirnames, filenames) = scanning.next()
@@ -184,7 +108,7 @@ class Collection(Item):
                     mtype = 'wav'
                 else:
                     mtype = None
-                print pathname, mtype
+                log.msg("Found file %s of type %s" % (pathname, mtype), system="squeal.library.record.Collection")
                 ftype = self.filetypes.get(mtype, None)
                 details = policy.details(self, pathname)
                 self.update(pathname, ftype, details)

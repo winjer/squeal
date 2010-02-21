@@ -13,9 +13,6 @@ class SpotifyPlugin(object):
     description = "Streaming music from spotify - only available if you have a premium spotify account"
     setup_form = Spotify.setup_form
 
-    def __init__(self):
-        pass
-
     @staticmethod
     def install(store, username, password):
         s = Spotify(store=store, username=username, password=password)
