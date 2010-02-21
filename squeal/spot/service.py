@@ -36,12 +36,14 @@ from manager import SpotifyManager
 from spotify import Link
 import json
 
-import formal
+from formlet import form
+from formlet import field
 
-setup_form = formal.Form()
-setup_form.name = 'Setup'
-setup_form.add(formal.Field('username', formal.String()))
-setup_form.add(formal.Field('password', formal.String()))
+setup_form = form.Form("setup", action="install")
+field.StringField(form=setup_form, name="username", label="Username")
+field.StringField(form=setup_form, type_="password", name="password", label="Password")
+field.SubmitButton(form=setup_form, name="submit", label="Configure spotify")
+
 
 class Spotify(Item, service.Service):
 

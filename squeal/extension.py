@@ -83,3 +83,4 @@ class PluginManager(Item, service.Service):
                         version=unicode(version),
                         path=unicode(path))
         return s
+

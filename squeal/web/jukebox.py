@@ -195,18 +195,15 @@ class PluginInstaller(base.BaseElement):
 
     @page.renderer
     def configform(self, request, tag):
-        setup_form = form.Form("setup", action="install")
-        field.StringField(form=setup_form, name="username", label="Username")
-        field.StringField(form=setup_form, name="password", label="Password")
-        field.SubmitButton(form=setup_form, name="submit", label="Install")
+        setup_form = self.original['plugin'].setup_form
         return tag[setup_form.element(self)]
 
     @athena.expose
     def install(self, **kw):
         pm = self.plugin_manager
-        pm.install(args=kw, **self.original)
-
-
+        s = pm.install(args=kw, **self.original)
+        s.setServiceParent(self.plugin_manager.parent)
+        s.startService()
 
 class Setup(base.BaseElement):
     jsClass = u"Squeal.Setup"

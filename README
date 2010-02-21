@@ -65,8 +65,12 @@ Starting it up
 
 Then point your browser to http://localhost:9000
 
-The interface is "limited" at the moment, and is really just a proof of
-concept.
+Setting up Spotify
+==================
+
+You should now configure the spotify credentials through the web interface.  Hit the "Setup" button in the bottom right, and enter your spotify credentials in the web form.
+
+When you submit this form, it will connect to spotify.
 
 Connecting a SqueezeBox
 =======================

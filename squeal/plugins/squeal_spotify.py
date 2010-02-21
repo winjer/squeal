@@ -23,3 +23,4 @@ class SpotifyPlugin(object):
             store.powerUp(s, iface)
         store.powerUp(s, IService)
         return s
+
