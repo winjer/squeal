@@ -41,6 +41,15 @@ Squeal.Main = Squeal.Widget.subclass("Squeal.Main");
 Squeal.Playing = Squeal.Widget.subclass("Squeal.Playing");
 Squeal.Queue = Squeal.Widget.subclass("Squeal.Queue");
 Squeal.Connected = Squeal.Widget.subclass("Squeal.Connected");
+Squeal.Setup = Squeal.Widget.subclass("Squeal.Setup");
+Squeal.PluginInstaller = Squeal.Widget.subclass("Squeal.PluginInstaller");
+
+Squeal.PluginInstaller.methods(
+
+    function install(self, node, ev) {
+        self.callRemote("install");
+    }
+);
 
 Squeal.Source.methods(
     function selected(self) {
@@ -95,7 +104,18 @@ Squeal.Connected.methods(
 
     function reload(self, tag) {
         self.nodeById("connected-players").innerHTML = tag;
+    },
+
+    function setupClick(self) {
+        $('.setup-pane').show(500);
     }
+);
+
+Squeal.Setup.methods(
+    function closeClick(self) {
+        $('.setup-pane').hide(500);
+    }
+
 );
 
 Squeal.Playing.methods(

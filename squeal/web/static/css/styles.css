@@ -5,11 +5,9 @@
 }
 
 .yui-b {
-    border: solid red 1px;
 }
 
 .yui-g {
-    border: solid green 1px;
 }
 
 #source,
@@ -53,3 +51,16 @@ li {
     list-style-position: inside;
 }
 
+.setup-pane {
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    right: 50px;
+    bottom: 50px;
+    border: solid 1px black;
+    padding: 0.5em;
+    background: white;
+    text-align: left;
+    z-index: 0;
+    display: none;
+}

@@ -4,6 +4,7 @@ from axiom.item import Item
 from axiom.attributes import text, integer, inmemory, reference
 from axiom.sequence import List
 from twisted.plugin import getPlugins
+from twisted.python import log
 
 from squeal import isqueal
 from squeal import plugins
@@ -23,12 +24,17 @@ class PluginManager(Item, service.Service):
     name = inmemory()
     parent = inmemory()
     config = inmemory()
+    installable = inmemory()
+    uninstallable = inmemory()
+
 
     def __init__(self, conf, store):
         self.config = conf
         Item.__init__(self, store=store)
 
     def activate(self):
+        self.installable = []
+        self.uninstallable = []
         from ConfigParser import ConfigParser
         self.config = ConfigParser()
         self.config.read("squeal.ini")
@@ -43,6 +49,11 @@ class PluginManager(Item, service.Service):
 
         for path, plugin in available.items():
             if path in installed:
+                self.uninstallable.append({
+                    'plugin': plugin,
+                    'version': a.version,
+                    'path': path
+                })
                 if plugin.version > installed[path]:
                     print "Plugin", path, "has been upgraded"
                 elif plugin.version < installed[path]:
@@ -51,12 +62,24 @@ class PluginManager(Item, service.Service):
                     print "Plugin still present"
             else:
                 print "Plugin", path, "is new"
-                plugin.install(self.config, self.store)
-                InstalledPlugin(store=self.store,
-                                version=unicode(a.version),
-                                path=unicode(path))
-
+                self.installable.append({
+                    'plugin': plugin,
+                    'version': a.version,
+                    'path': path
+                })
 
         for path, version in installed.items():
             if path not in available:
                 print "Plugin", path, "has been removed"
+
+    def install(self, plugin, version, path):
+        """ Install the specified plugin and record the details of it's
+        installation. Returns the service object in the store that manages
+        this plugin. This service should be configured and then started if you
+        want the plugin to actually do anything. """
+        log.msg("Installing plugin %s" % (plugin.name), system="squeal.extension.PluginManager")
+        s = plugin.install(self.store)
+        InstalledPlugin(store=self.store,
+                        version=unicode(version),
+                        path=unicode(path))
+        return s

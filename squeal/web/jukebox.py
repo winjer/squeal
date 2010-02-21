@@ -37,6 +37,10 @@ import ijukebox
 from squeal import isqueal
 from squeal.adaptivejson import simplify
 
+from formlet import widget
+from formlet import form
+from formlet import field
+
 from twisted.python import log
 
 class Source(base.BaseElement):
@@ -168,6 +172,59 @@ class Main(base.BaseElement):
     jsClass = u"Squeal.Main"
     docFactory = base.xmltemplate("main.html")
 
+class PluginInstaller(base.BaseElement):
+    jsClass = u"Squeal.PluginInstaller"
+    docFactory = base.xmltemplate("plugin_installer.html")
+
+    def __init__(self, original):
+        super(PluginInstaller, self).__init__()
+        self.original = original
+
+    @property
+    def plugin_manager(self):
+        for s in self.store.powerupsFor(isqueal.IPluginManager):
+            return s
+
+    @page.renderer
+    def name(self, request, tag):
+        return self.original['plugin'].name
+
+    @page.renderer
+    def description(self, request, tag):
+        return self.original['plugin'].description
+
+    @page.renderer
+    def configform(self, request, tag):
+        setup_form = form.Form("setup")
+        field.StringField(form=setup_form, name="username", label="Username")
+        field.StringField(form=setup_form, name="password", label="Password")
+        return tag[setup_form.element(self)]
+
+    @athena.expose
+    def install(self):
+        pass
+        #pm = self.plugin_manager
+        #pm.install(**self.original)
+
+
+
+class Setup(base.BaseElement):
+    jsClass = u"Squeal.Setup"
+    docFactory = base.xmltemplate("setup.html")
+
+    @property
+    def plugin_manager(self):
+        for s in self.store.powerupsFor(isqueal.IPluginManager):
+            return s
+
+    @page.renderer
+    def install(self, request, tag):
+        def installer(i):
+            p = PluginInstaller(i)
+            p.setFragmentParent(self)
+            return p
+        return tag[(installer(i) for i in self.plugin_manager.installable)]
+
 class Connected(base.BaseElement):
     jsClass = u"Squeal.Connected"
     docFactory = base.xmltemplate("connected.html")
@@ -213,6 +270,7 @@ class Jukebox(base.BasePageContainer):
         'playing': Playing,
         'queue': Queue,
         'connected': Connected,
+        'setup': Setup,
     }
 
     def __init__(self, service):

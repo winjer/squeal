@@ -1,0 +1,9 @@
+<div class="setup-pane" n:render="liveElement" xmlns="http://www.w3.org/1999/xhtml" xmlns:n="http://nevow.com/ns/nevow/0.1" xmlns:athena="http://divmod.org/ns/athena/0.7">
+<h1>Plugins</h1>
+<p>Squeal can be extended using plugins - all music sources are provided as plugins so you can enable just the ones you want.</p>
+<h2>Install a new plugin</h2>
+<n:invisible n:render="install" />
+<button>Close
+<athena:handler event="onclick" handler="closeClick" />
+</button>
+</div>

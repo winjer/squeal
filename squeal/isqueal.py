@@ -217,6 +217,13 @@ class ITrack(Interface):
     def image_uri():
         """ The URI from which the image can be requested """
 
+
+class IUserConfigurable(Interface):
+
+    """ Indicates a service that is configurable by the user """
+
+    setup_interface = Attribute(""" The Interface that specifies the form to display """)
+
 # Extension Points
 
 class IMusicSource(Interface):
@@ -225,3 +232,4 @@ class IMusicSource(Interface):
     label = Attribute("""The text displayed in the source dropdown""")
     def options_widget():
         """ Returns the options widget """
+
