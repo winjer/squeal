@@ -115,17 +115,12 @@ Squeal.Setup.methods(
     function registerW(self) {
         Squeal.W.setup = self;
     },
+
     function closeClick(self) {
         $('.setup-pane').hide(500);
     }
 
 );
-
-Squeal.SetupHelper = {}
-Squeal.SetupHelper.installPlugin = function (fields) {
-        alert("moo");
-        alert(fields['username']);
-}
 
 Squeal.Playing.methods(
     function reload(self, tag) {

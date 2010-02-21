@@ -1,7 +1,9 @@
-
-from twisted.python.components import Adapter
-from squeal.adaptivejson import IJsonAdapter
+from zope.interface import implements
+from twisted.python.components import Adapter, registerAdapter
+from squeal.adaptivejson import IJsonAdapter, simplify
 from spotify import Link
+import spotify
+from track import SpotifyTrack
 
 class PlaylistJSON(Adapter):
     implements(IJsonAdapter)

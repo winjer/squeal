@@ -2,7 +2,7 @@
 
 import traceback
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.internet.interfaces import IPushProducer, IProducer
 from twisted.python import log
 from twisted.python.util import sibpath

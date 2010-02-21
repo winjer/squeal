@@ -1,8 +1,11 @@
 
+import urllib
+
 from zope.interface import implements
 
 from squeal import isqueal
 from spotify import Link
+
 
 class SpotifyTrack(object):
 

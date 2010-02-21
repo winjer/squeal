@@ -72,13 +72,13 @@ class PluginManager(Item, service.Service):
             if path not in available:
                 print "Plugin", path, "has been removed"
 
-    def install(self, plugin, version, path):
+    def install(self, plugin, version, path, args):
         """ Install the specified plugin and record the details of it's
         installation. Returns the service object in the store that manages
         this plugin. This service should be configured and then started if you
         want the plugin to actually do anything. """
         log.msg("Installing plugin %s" % (plugin.name), system="squeal.extension.PluginManager")
-        s = plugin.install(self.store)
+        s = plugin.install(self.store, **args)
         InstalledPlugin(store=self.store,
                         version=unicode(version),
                         path=unicode(path))

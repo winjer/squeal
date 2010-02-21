@@ -20,6 +20,6 @@ Formlet.Form.methods(
         _.map(node, function (elem) {
             fields[elem.name] = elem.value;
         });
-        executeFunctionByName(fields['formlet.action'], window, fields);
+        self.callRemote("process", fields);
     }
 );

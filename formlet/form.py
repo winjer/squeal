@@ -30,6 +30,13 @@ class FormElement(athena.LiveElement):
     def buttons(self, request, tag):
         return tag[(b.element(self) for b in self.original.buttons)]
 
+    @athena.expose
+    def process(self, kw):
+        # todo - check the method being called is exposed
+        action = str(kw.pop('formlet.action'))
+        kw = dict((str(a), b) for (a,b) in kw.items() if a)
+        getattr(self.fragmentParent, action)(**kw)
+
 class Form(object):
 
     def __init__(self, name, action):
