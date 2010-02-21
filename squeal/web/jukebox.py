@@ -203,7 +203,6 @@ class PluginInstaller(base.BaseElement):
         pm = self.plugin_manager
         s = pm.install(args=kw, **self.original)
         s.setServiceParent(self.plugin_manager.parent)
-        s.startService()
 
 class Setup(base.BaseElement):
     jsClass = u"Squeal.Setup"

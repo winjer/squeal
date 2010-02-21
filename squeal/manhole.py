@@ -36,6 +36,15 @@ from axiom.attributes import inmemory, text
 
 from squeal.isqueal import *
 
+from formlet import form
+from formlet import field
+
+setup_form = form.Form("manhole-setup", action="install")
+field.StringField(form=setup_form, name="listen", label="Listen", value="tcp:2222")
+field.StringField(form=setup_form, name="username", label="Username")
+field.StringField(form=setup_form, type_="password", name="password", label="Password")
+field.SubmitButton(form=setup_form, name="submit", label="Configure manhole")
+
 class ManholeService(Item, service.Service):
     implements(IManholeService)
     powerupInterfaces = (IManholeService,)
@@ -48,12 +57,12 @@ class ManholeService(Item, service.Service):
     listen = text(default="tcp:2222")
     username = text()
     password = text()
+    setup_form = setup_form
 
     def startService(self):
-        def getManhole():
-            return Manhole({'store': self.store})
-
         def chainedProtocolFactory():
+            def getManhole():
+                return Manhole({'store': self.store})
             protocol = insults.ServerProtocol(ColoredManhole)
             protocol.protocolFactory = getManhole
             return protocol
@@ -63,40 +72,3 @@ class ManholeService(Item, service.Service):
         realm.chainedProtocolFactory = chainedProtocolFactory
         p = portal.Portal(realm, [checker])
         strports.service(self.listen, ConchFactory(p)).setServiceParent(self.parent)
-
-
-
-#def makeService(args):
-    #checker = checkers.InMemoryUsernamePasswordDatabaseDontUse(username="password")
-
-    #f = protocol.ServerFactory()
-    #f.protocol = lambda: TelnetTransport(TelnetBootstrapProtocol,
-                                         #insults.ServerProtocol,
-                                         #args['protocolFactory'],
-                                         #*args.get('protocolArgs', ()),
-                                         #**args.get('protocolKwArgs', {}))
-    #tsvc = internet.TCPServer(args['telnet'], f)
-
-    #def chainProtocolFactory():
-        #return insults.ServerProtocol(
-            #args['protocolFactory'],
-            #*args.get('protocolArgs', ()),
-            #**args.get('protocolKwArgs', {}))
-
-    #rlm = TerminalRealm()
-    #rlm.chainedProtocolFactory = chainProtocolFactory
-    #ptl = portal.Portal(rlm, [checker])
-    #f = ConchFactory(ptl)
-    #csvc = internet.TCPServer(args['ssh'], f)
-
-    #m = service.MultiService()
-    #tsvc.setServiceParent(m)
-    #csvc.setServiceParent(m)
-    #return m
-
-#application = service.Application("Interactive Python Interpreter")
-
-#makeService({'protocolFactory': ColoredManhole,
-             #'protocolArgs': (None,),
-             #'telnet': 6023,
-             #'ssh': 6022}).setServiceParent(application)

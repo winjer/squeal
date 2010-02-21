@@ -44,7 +44,6 @@ field.StringField(form=setup_form, name="username", label="Username")
 field.StringField(form=setup_form, type_="password", name="password", label="Password")
 field.SubmitButton(form=setup_form, name="submit", label="Configure spotify")
 
-
 class Spotify(Item, service.Service):
 
     """ The spotify service. Provides an interface to the rest of the system
