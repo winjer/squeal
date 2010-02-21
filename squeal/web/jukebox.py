@@ -187,17 +187,19 @@ class PluginInstaller(base.BaseElement):
 
     @page.renderer
     def name(self, request, tag):
-        return self.original['plugin'].name
+        return tag[self.original['plugin'].name]
 
     @page.renderer
     def description(self, request, tag):
-        return self.original['plugin'].description
+        return tag[self.original['plugin'].description]
 
     @page.renderer
     def configform(self, request, tag):
-        setup_form = form.Form("setup")
+        setup_form = form.Form("setup", action="Squeal.W.setup.install")
+        field.HiddenField(form=setup_form, name="plugin", value=self.original['plugin'].name)
         field.StringField(form=setup_form, name="username", label="Username")
         field.StringField(form=setup_form, name="password", label="Password")
+        field.SubmitButton(form=setup_form, name="submit", label="Install")
         return tag[setup_form.element(self)]
 
     @athena.expose

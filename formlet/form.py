@@ -24,16 +24,21 @@ class FormElement(athena.LiveElement):
 
     @page.renderer
     def buttons(self, request, tag):
-        return tag
+        return tag[(b.element(self) for b in self.original.buttons)]
 
 class Form(object):
 
-    def __init__(self, name):
+    def __init__(self, name, action):
         self.name = name
+        self.action = action
         self.fields = []
+        self.buttons = []
 
     def addField(self, field):
         self.fields.append(field)
+
+    def addButton(self, button):
+        self.buttons.append(button)
 
     def fieldID(self, field):
         return "formlet-%s-%s" % (self.name, field.name)

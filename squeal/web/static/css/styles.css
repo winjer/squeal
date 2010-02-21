@@ -64,3 +64,19 @@ li {
     z-index: 0;
     display: none;
 }
+
+
+.formlet-form {
+    border: dotted red 1px;
+    padding: 0.5em;
+}
+
+h1 {
+    size: 120%;
+    font-weight: bold;
+}
+
+h2 {
+    size: 110%;
+    font-weight: bold;
+}

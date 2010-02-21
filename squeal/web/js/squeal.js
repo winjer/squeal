@@ -112,6 +112,9 @@ Squeal.Connected.methods(
 );
 
 Squeal.Setup.methods(
+    function registerW(self) {
+        Squeal.W.setup = self;
+    },
     function closeClick(self) {
         $('.setup-pane').hide(500);
     }
