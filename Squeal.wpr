@@ -5,7 +5,12 @@
 ##################################################################
 [project attributes]
 proj.directory-list = [{'dirloc': loc('.'),
-                        'excludes': (),
+                        'excludes': [u'setuptools-0.6c11-py2.6.egg',
+                                     u'squeal.ini.example',
+                                     u'db',
+                                     u'wingdbstub.py',
+                                     u'pip.py',
+                                     u'pip-log.txt'],
                         'filter': '*',
                         'include_hidden': False,
                         'recursive': True,

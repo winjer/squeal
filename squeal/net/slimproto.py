@@ -334,11 +334,11 @@ class Player(protocol.Protocol):
         else:
             log.msg("Unknown IR received: %r, %r" % (time, code), system="squeal.net.slimproto.Player")
 
-    def process_remote_volumeUp(self):
+    def process_remote_volumeup(self):
         vol = self.volume + 0x0400 # some increment
         self.setVolume(vol)
 
-    def process_remote_volumeDown(self):
+    def process_remote_volumedown(self):
         vol = self.volume - 0x0400
         self.setVolume(vol)
 

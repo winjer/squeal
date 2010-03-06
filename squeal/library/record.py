@@ -21,6 +21,7 @@ __version__ = "$Revision$"[11:-2]
 
 import os
 import magic
+import stat
 
 from zope.interface import Interface, implements
 
