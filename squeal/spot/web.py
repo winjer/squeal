@@ -39,8 +39,6 @@ import ispotify
 from spotify import Link
 from sfy import SpotifyStreamer, SpotifyImage
 
-from nevow.rend import sequence
-
 template_dir = sibpath(__file__, 'templates')
 
 def xmltemplate(s):

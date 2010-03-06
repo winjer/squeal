@@ -26,6 +26,7 @@ from twisted.internet import reactor
 from axiom.item import Item
 from axiom.attributes import reference, inmemory
 
+import web
 from record import *
 from ilibrary import *
 
@@ -71,3 +72,6 @@ class Library(Item, service.Service):
     def tracks(self):
         return self.store.query(Track)
 
+
+    def main_widget(self):
+        return web.Main()
