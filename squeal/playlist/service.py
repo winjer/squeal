@@ -81,6 +81,7 @@ class Playlist(Item, service.Service):
     implements(IPlaylist)
     powerupInterfaces = (IPlaylist,)
 
+    playing = inmemory()
     current = integer(default=-1) # currently playing
     maxposition = integer(default=0) # the highest track number
     running = inmemory()
@@ -92,6 +93,7 @@ class Playlist(Item, service.Service):
         return self.store.findFirst(EventReactor)
 
     def activate(self):
+        self.playing = False
         self.evreactor.subscribe(self.playerState, IPlayerStateChange)
         self.evreactor.subscribe(self.buttonPressed, IRemoteButtonPressedEvent)
 
@@ -103,7 +105,7 @@ class Playlist(Item, service.Service):
             self.play()
 
     def buttonPressed(self, ev):
-        if ev.button == 'play':
+        if ev.button == 'play' and not self.playing:
             self.play()
 
     def clear(self):
@@ -124,6 +126,7 @@ class Playlist(Item, service.Service):
     def stop(self):
         for p in self.store.powerupsFor(ISlimPlayerService):
             p.stop()
+        self.playing = False
 
     def __iter__(self):
         return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))
@@ -140,6 +143,7 @@ class Playlist(Item, service.Service):
             if p.players:
                 p.play(playtrack.track)
                 self.current = playtrack.position
+                self.playing = True
             else:
                 log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
         for r in self.store.powerupsFor(IEventReactor):
