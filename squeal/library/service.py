@@ -72,6 +72,11 @@ class Library(Item, service.Service):
     def tracks(self):
         return self.store.query(Track)
 
+    def artists(self):
+        return self.store.query(Artist)
+
+    def albums(self):
+        return self.store.query(Album)
 
     def main_widget(self):
         return web.Main()

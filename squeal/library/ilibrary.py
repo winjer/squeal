@@ -31,6 +31,9 @@ class ILibrary(Interface):
         not moved or copied, but references to their paths are kept within the
         collection database. """
 
+    def artists():
+        """ Return an iterator of all artists in the library, in alphabetical order. """
+
     def tracks():
         """ Return an iterator of all tracks in the library """
 

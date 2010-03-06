@@ -33,5 +33,6 @@ Library.Widget.methods(
 );
 
 Library.Main = Library.Widget.subclass("Library.Main");
-Library.Document = Library.Widget.subclass("Library.Document");
+Library.Artists = Library.Widget.subclass("Library.Artists");
+Library.Albums = Library.Widget.subclass("Library.Albums");
 
