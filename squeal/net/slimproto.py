@@ -167,35 +167,35 @@ class Player(protocol.Protocol):
                     raise NotImplementedError
                 handler(packet)
 
-    def sendFrame(self, command, data):
+    def send_frame(self, command, data):
         packet = struct.pack('!H', len(data) + 4) + command + data
         #print "Sending packet %r" % packet
         self.transport.write(packet)
 
-    def sendVersion(self):
-        self.sendFrame('vers', '7.0')
+    def send_version(self):
+        self.send_frame('vers', '7.0')
 
-    def packStream(self, command, autostart="1", formatbyte = 'o', pcmargs = '1321', threshold = 255, spdif = 0, transDuration = 0, transType = '0', flags = 0x40, outputThreshold = 0, replayGain = 0, serverPort = 9000, serverIp = 0):
+    def pack_stream(self, command, autostart="1", formatbyte = 'o', pcmargs = '1321', threshold = 255, spdif = 0, transDuration = 0, transType = '0', flags = 0x40, outputThreshold = 0, replayGain = 0, serverPort = 9000, serverIp = 0):
         return struct.pack("!ccc4sBBBcBBBLHL",
                            command, autostart, formatbyte, pcmargs,
                            threshold, spdif, transDuration, transType,
                            flags, outputThreshold, 0, replayGain, serverPort, serverIp)
 
-    def stopStreaming(self):
-        data = self.packStream("q", autostart="0", flags=0)
-        self.sendFrame("strm", data)
+    def stop_streaming(self):
+        data = self.pack_stream("q", autostart="0", flags=0)
+        self.send_frame("strm", data)
 
     def stop(self):
-        self.stopStreaming()
+        self.stop_streaming()
 
     def play(self, track):
         command = 's'
         autostart = '1'
         formatbyte = self.typeMap[track.type]
-        data = self.packStream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
+        data = self.pack_stream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
         request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_uri(),)
         data = data + request.encode("utf-8")
-        self.sendFrame('strm', data)
+        self.send_frame('strm', data)
         self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
         self.displayTrack(track)
 
@@ -211,36 +211,36 @@ class Player(protocol.Protocol):
         self.device_type = devices.get(devId, 'unknown device')
         self.mac_address = str(mac)
         log.msg("HELO received from %s %s" % (self.mac_address, self.device_type), system="squeal.net.slimproto.Player")
-        self.initClient()
+        self.init_client()
 
-    def initClient(self):
-        self.sendVersion()
-        self.stopStreaming()
+    def init_client(self):
+        self.send_version()
+        self.stop_streaming()
         self.setBrightness()
         self.set_visualisation(SpectrumAnalyser())
-        self.sendFrame("setd", struct.pack("B", 0))
-        self.sendFrame("setd", struct.pack("B", 4))
+        self.send_frame("setd", struct.pack("B", 0))
+        self.send_frame("setd", struct.pack("B", 4))
         self.enableAudio()
         self.send_volume()
-        self.sendFrame("strm", self.packStream('t', autostart="1", flags=0, replayGain=int(time.time() * 1000 % 0xffffffff)))
+        self.send_frame("strm", self.pack_stream('t', autostart="1", flags=0, replayGain=int(time.time() * 1000 % 0xffffffff)))
         self.connectionEstablished()
 
     def enableAudio(self):
-        self.sendFrame("aude", struct.pack("2B", 1, 1))
+        self.send_frame("aude", struct.pack("2B", 1, 1))
 
     def send_volume(self):
         og = self.volume.old_gain()
         ng = self.volume.new_gain()
         log.msg("Volume set to %d (%d/%d)" % (self.volume.volume, og, ng), system="squeal.net.slimproto.Player")
-        self.sendFrame("audg", struct.pack("!LLBBLL", og, og, 1, 255, ng, ng))
+        self.send_frame("audg", struct.pack("!LLBBLL", og, og, 1, 255, ng, ng))
         self.service.evreactor.fireEvent(VolumeChanged(self, self.volume))
 
     def setBrightness(self, level=4):
         assert 0 <= level <= 4
-        self.sendFrame("grfb", struct.pack("!H", level))
+        self.send_frame("grfb", struct.pack("!H", level))
 
     def set_visualisation(self, visualisation):
-        self.sendFrame("visu", visualisation.pack())
+        self.send_frame("visu", visualisation.pack())
 
     def render(self, text):
         self.display.clear()
@@ -249,7 +249,7 @@ class Player(protocol.Protocol):
 
     def updateDisplay(self, bitmap, transition = 'c', offset=0, param=0):
         frame = struct.pack("!Hcb", offset, transition, param) + bitmap
-        self.sendFrame("grfe", frame)
+        self.send_frame("grfe", frame)
 
     def process_STAT(self, data):
         #print "STAT received: %r" % data
