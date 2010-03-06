@@ -43,6 +43,7 @@ from squeal.event import EventReactor
 from squeal.player.display import Display
 from squeal.player.volume import Volume
 from squeal.player.remote import Remote
+from squeal.player.visualisation import NoVisualisation, SpectrumAnalyser
 from squeal.isqueal import *
 
 class RemoteButtonPressed(object):
@@ -216,7 +217,7 @@ class Player(protocol.Protocol):
         self.sendVersion()
         self.stopStreaming()
         self.setBrightness()
-        self.disableVisualisation()
+        self.set_visualisation(SpectrumAnalyser())
         self.sendFrame("setd", struct.pack("B", 0))
         self.sendFrame("setd", struct.pack("B", 4))
         self.enableAudio()
@@ -238,8 +239,8 @@ class Player(protocol.Protocol):
         assert 0 <= level <= 4
         self.sendFrame("grfb", struct.pack("!H", level))
 
-    def disableVisualisation(self):
-        self.sendFrame("visu", struct.pack("!BB", 0, 0))
+    def set_visualisation(self, visualisation):
+        self.sendFrame("visu", visualisation.pack())
 
     def render(self, text):
         self.display.clear()
