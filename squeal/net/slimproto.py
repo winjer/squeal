@@ -41,6 +41,7 @@ from netaddr import EUI
 
 from squeal.event import EventReactor
 from squeal.player.display import Display
+from squeal.player.volume import Volume
 from squeal.player.remote import Remote
 from squeal.isqueal import *
 
@@ -49,9 +50,6 @@ class RemoteButtonPressed(object):
     """ Someone has pressed a button on a remote control. """
 
     implements(IRemoteButtonPressedEvent)
-
-    class Button:
-        PLAY = 0
 
     def __init__(self, player, button):
         self.player = player
@@ -96,6 +94,12 @@ class SlimService(Item, service.Service):
     def activate(self):
         self.players = []
         self.factory = Factory(self)
+        self.evreactor.subscribe(self.button_pressed, IRemoteButtonPressedEvent)
+
+    def button_pressed(self, ev):
+        handler = getattr(ev.player, 'process_remote_' + ev.button, None)
+        if handler is not None:
+            handler()
 
     @property
     def evreactor(self):
@@ -129,7 +133,7 @@ class Player(protocol.Protocol):
     def __init__(self):
         self.buffer = ''
         self.display = Display()
-        self.volume = 0
+        self.volume = Volume()
         self.device_type = None
         self.mac_address = None
 
@@ -216,20 +220,19 @@ class Player(protocol.Protocol):
         self.sendFrame("setd", struct.pack("B", 0))
         self.sendFrame("setd", struct.pack("B", 4))
         self.enableAudio()
-        self.setVolume(0x1800)
+        self.send_volume()
         self.sendFrame("strm", self.packStream('t', autostart="1", flags=0, replayGain=int(time.time() * 1000 % 0xffffffff)))
         self.connectionEstablished()
 
     def enableAudio(self):
         self.sendFrame("aude", struct.pack("2B", 1, 1))
 
-    def setVolume(self, volume):
-        self.volume = volume
-        self.sendFrame("audg", struct.pack("!2I2B2I", 0, 0, 1, 0xff, volume, volume))
-        most = volume >> 16
-        least = volume - (most << 16)
-        d = decimal.Decimal("%d.%d" % (most, least))
-        self.service.evreactor.fireEvent(VolumeChanged(self, d))
+    def send_volume(self):
+        og = self.volume.old_gain()
+        ng = self.volume.new_gain()
+        log.msg("Volume set to %d (%d/%d)" % (self.volume.volume, og, ng), system="squeal.net.slimproto.Player")
+        self.sendFrame("audg", struct.pack("!LLBBLL", og, og, 1, 255, ng, ng))
+        self.service.evreactor.fireEvent(VolumeChanged(self, self.volume))
 
     def setBrightness(self, level=4):
         assert 0 <= level <= 4
@@ -324,26 +327,17 @@ class Player(protocol.Protocol):
         log.msg("DBUG received", system="squeal.net.slimproto.Player")
 
     def process_IR(self, data):
+        """ Slightly involved codepath here. This raises an event, which may
+        be picked up by the service and then the process_remote_* function in
+        this player will be called. This is mostly relevant for volume changes
+        - most other button presses will require some context to operate. """
         (time, code) = struct.unpack("!IxxI", data)
         command = Remote.codes.get(code, None)
         if command is not None:
-            log.msg("IR received: %r, %r" % (time, command), system="squeal.net.slimproto.Player")
-            handler = getattr(self, "process_remote_" + command, None)
-            if handler is not None:
-                handler()
+            #log.msg("IR received: %r, %r" % (time, command), system="squeal.net.slimproto.Player")
+            self.service.evreactor.fireEvent(RemoteButtonPressed(self, command))
         else:
             log.msg("Unknown IR received: %r, %r" % (time, code), system="squeal.net.slimproto.Player")
-
-    def process_remote_volumeup(self):
-        vol = self.volume + 0x0400 # some increment
-        self.setVolume(vol)
-
-    def process_remote_volumedown(self):
-        vol = self.volume - 0x0400
-        self.setVolume(vol)
-
-    def process_remote_play(self):
-        self.service.evreactor.fireEvent(RemoteButtonPressed(self, RemoteButtonPressed.Button.PLAY))
 
     def process_RAWI(self, data):
         log.msg("RAWI received", system="squeal.net.slimproto.Player")
@@ -362,6 +356,14 @@ class Player(protocol.Protocol):
 
     def process_UREQ(self, data):
         log.msg("UREQ received", system="squeal.net.slimproto.Player")
+
+    def process_remote_volumeup(self):
+        self.volume.increment()
+        self.send_volume()
+
+    def process_remote_volumedown(self):
+        self.volume.decrement()
+        self.send_volume()
 
 class Factory(protocol.ServerFactory):
 

@@ -109,7 +109,7 @@ class EventReactor(Item, service.Service):
     def _fireEvent(self, event, *interfaces):
         """ Fire the specified event. You can optionally provide additional
         interfaces that will be added to the event before firing. """
-        log.msg("Firing Event: %s [%s]" % (event.__class__.__name__, ",".join(x.__name__ for x in interfaces)), system="squeal.event.EventReactor")
+        #log.msg("Firing Event: %s [%s]" % (event.__class__.__name__, ",".join(x.__name__ for x in interfaces)), system="squeal.event.EventReactor")
         if interfaces:
             event = copy.copy(event)
             alsoProvides(event, *interfaces)

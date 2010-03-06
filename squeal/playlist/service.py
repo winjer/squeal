@@ -103,7 +103,7 @@ class Playlist(Item, service.Service):
             self.play()
 
     def buttonPressed(self, ev):
-        if ev.button == ev.Button.PLAY:
+        if ev.button == 'play':
             self.play()
 
     def clear(self):
