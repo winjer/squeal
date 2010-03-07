@@ -206,7 +206,7 @@ class Player(protocol.Protocol):
         devices = {2: 'squeezebox', 3: 'softsqueeze', 4: 'squeezebox2', 5: 'transporter', 6: 'softsqueeze3'}
         #(devId, rev, mac, wlan, bytes) = struct.unpack('BB6sHL', data[:16])
         (devId, rev, mac) = struct.unpack('BB6s', data[:8])
-        (mac,) = struct.unpack("l", "00" + mac)
+        (mac,) = struct.unpack(">q", '00'+mac)
         mac = EUI(mac)
         self.device_type = devices.get(devId, 'unknown device')
         self.mac_address = str(mac)
