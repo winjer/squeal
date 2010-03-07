@@ -46,7 +46,8 @@ class JSONEncoder(simplejson.JSONEncoder):
             return simplejson.JSONEncoder.default(self, obj)
 
 def dumps(*a, **kw):
-    return simplejson.dumps(*a, cls=JSONEncoder, **kw)
+    kw['cls']=JSONEncoder
+    return simplejson.dumps(*a, **kw)
 
 def loads(*a, **kw):
     return simplejson.loads(*a, **kw)
