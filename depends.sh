@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 
 sudo aptitude install python python-crypto python-tagpy python-magic realpath unzip python-setuptools patch wget tar make
 
@@ -6,7 +6,7 @@ py26=`python -V | grep 'Python 2.6'`
 codename=`lsb_release -c`
 # Python setuptools doesn't install for Python 2.6 under intrepid / hardy, neither does magic
 # tagpy actually requires compiling for Py2.6 in this case.
-if [(echo $codename | egrep '(intrepid|hardy)') && py26]
+if [ `echo $codename | egrep '(intrepid|hardy)'` && py26 ]
 then
     wget http://pypi.python.org/packages/2.6/s/setuptools/setuptools-0.6c11-py2.6.egg#md5=bfa92100bd772d5a213eedd356d64086
     sudo sh setuptools-0.6c11-py2.6.egg
@@ -71,10 +71,10 @@ axiom_path=`python -c 'import axiom; print axiom.__path__[0]' 2>/dev/null`
 axiom_path=`dirname $axiom_path`
 sudo patch -d $axiom_path -p0 < patches/axiom-indexed.diff
 sudo patch -d $axiom_path -p0 < patches/axiom-indexed2.diff
-rm axiom-indexed.diff
-rm axiom-indexed2.diff
+#rm axiom-indexed.diff
+#rm axiom-indexed2.diff
 
 nevow_path=`python -c 'import nevow; print nevow.__path__[0]' 2>/dev/null`
 nevow_path=`dirname $nevow_path`
 sudo patch -d $nevow_path -p0 < patches/nevow-event.diff
-rm nevow-event.diff
+#rm nevow-event.diff
