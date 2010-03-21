@@ -17,14 +17,15 @@ class PlaylistJSON(Adapter):
             u"tracks": [simplify(x) for x in t]
         }
 
-class TrackJSON(Adapter):
+class SpotifyTrackJSON(Adapter):
     implements(IJsonAdapter)
     def encode(self):
         return {
-            u'id': unicode(self.original.track_id),
-            u'name': self.original.title,
-            u'isLoaded': self.original.is_loaded,
+            u'id': unicode(Link.from_track(self.original, 0)),
+            u'name': unicode(self.original.name(), 'utf-8'),
+            u'isLoaded': self.original.is_loaded(),
         }
 
+
 registerAdapter(PlaylistJSON, spotify.Playlist, IJsonAdapter)
-registerAdapter(TrackJSON, SpotifyTrack, IJsonAdapter)
+registerAdapter(SpotifyTrackJSON, spotify.Track, IJsonAdapter)
