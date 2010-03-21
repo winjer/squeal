@@ -16,16 +16,18 @@
 
 __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
-__version__ = "$Revision$"[11:-2]
 
 from twisted.python.util import sibpath
 
 from nevow import page
 from nevow import loaders
 from nevow import tags as T
+from nevow import athena
 
 from squeal.web import base
+from squeal import isqueal
 
+import record
 import ilibrary
 
 template_dir = sibpath(__file__, 'templates')
@@ -57,9 +59,8 @@ class Album(page.Element):
     @page.renderer
     def link(self, request, tag):
         return tag[
-            T.a(href="#", id="artist-%s" % self.original.storeID)[
-                self.original.name
-            ]]
+            T.a(href="#", id="album-%s" % self.original.storeID)[self.original.name],
+        ]
 
 class Artists(base.BaseElement):
     jsClass = u"Library.Artists"
@@ -94,11 +95,33 @@ class Albums(base.BaseElement):
         return tag[_]
 
 
-class Main(base.BaseElementContainer):
+class Main(base.BaseElement, base.BaseElementContainer):
+    jsClass = u"Library.Main"
     docFactory = xmltemplate("main.html")
 
     contained = {
         'artists': Artists,
         'albums': Albums
     }
+
+    @property
+    def library(self):
+        for library in self.store.powerupsFor(ilibrary.ILibrary):
+            return library
+
+    @property
+    def playlist_service(self):
+        for queue in self.store.powerupsFor(isqueal.IPlaylist):
+            return queue
+
+    @athena.expose
+    def load_album(self, aid):
+        album = self.store.getItemByID(int(aid))
+        for track in self.store.query(record.Track,
+                                      record.Track.album==album,
+                                      sort=record.Track.track.ascending):
+
+            self.playlist_service.enqueue(track)
+
+
 

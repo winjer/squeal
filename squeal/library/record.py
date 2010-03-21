@@ -124,7 +124,9 @@ class Album(Item):
     name = text()
     artist = reference()
 
+
 class Track(Item):
+
     collection = reference()
     artist = reference()
     album = reference()
@@ -186,6 +188,7 @@ class Track(Item):
         self.genre = details['genre']
 
 
+
 class TrackJSON(Adapter):
 
     implements(IJsonAdapter)
@@ -201,3 +204,39 @@ class TrackJSON(Adapter):
         }
 
 registerAdapter(TrackJSON, Track, IJsonAdapter)
+
+class TrackITrackAdapter(Adapter):
+    implements(ITrack)
+
+    @property
+    def track_id(self):
+        return unicode(self.original.storeID)
+
+    @property
+    def provider(self):
+        for library in self.original.store.powerupsFor(ILibrary):
+            return library
+
+    @property
+    def track_type(self):
+        return self.original.type
+
+    @property
+    def is_loaded(self):
+        return True
+
+    @property
+    def title(self):
+        return self.original.title
+
+    @property
+    def artist(self):
+        return self.original.artist.name
+
+    @property
+    def album(self):
+        return self.original.album.name
+
+registerAdapter(TrackITrackAdapter, Track, ITrack)
+
+

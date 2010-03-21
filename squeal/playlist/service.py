@@ -29,6 +29,7 @@ from axiom.attributes import reference, inmemory, text, integer, timestamp
 from squeal.event import EventReactor
 from squeal.isqueal import *
 from squeal.adaptivejson import IJsonAdapter
+from squeal import adapters
 
 class PlayTrack(Item):
 
@@ -50,7 +51,7 @@ class PlayTrack(Item):
 
 class PlayTrackJSON(Adapter):
     def encode(self):
-        encoded = IJsonAdapter(self.original.track).encode()
+        encoded = IJsonAdapter(ITrack(self.original.track)).encode()
         encoded.update({
             u'position': self.original.position,
             u'added': self.original.added,
@@ -148,8 +149,9 @@ class Playlist(Item, service.Service):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
     def enqueue(self, track):
-        """ Add a track to the end of the queue.  Track must conform to ITrack. """
-        assert ITrack.providedBy(track)
+        """ Add a track to the end of the queue. Track must be conformable to
+        ITrack. """
+        track = ITrack(track)
         log.msg("enqueing %r at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
         pt = PlayTrack(store=self.store, position=self.maxposition, tid=track.track_id, provider=track.provider)
         self.maxposition += 1

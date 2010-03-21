@@ -80,3 +80,7 @@ class Library(Item, service.Service):
 
     def main_widget(self):
         return web.Main()
+
+    def get_track(self, tid):
+        return self.store.getItemByID(int(tid))
+

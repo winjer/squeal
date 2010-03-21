@@ -36,3 +36,27 @@ Library.Main = Library.Widget.subclass("Library.Main");
 Library.Artists = Library.Widget.subclass("Library.Artists");
 Library.Albums = Library.Widget.subclass("Library.Albums");
 
+Library.Main.methods(
+
+    function registerW(self) {
+        Library.W.main = self;
+    },
+
+    function loadAlbum(self, pid) {
+        self.callRemote("load_album", pid);
+    }
+);
+
+Library.Albums.methods(
+
+    function click(self, node, ev) {
+        ev.preventDefault();
+        var tid = ev.target.id;
+        if(tid.substring(0, 5) == "album") {
+            var pid = tid.substring(6);
+            Library.W.main.loadAlbum(pid);
+        };
+    }
+
+);
+
