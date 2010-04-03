@@ -1,6 +1,12 @@
 #!/bin/bash -x
 
+# lets use virtualenv, so we don't clobber some poor sap's computer by surprise
+
 sudo aptitude install python python-crypto python-tagpy python-magic realpath unzip python-setuptools patch wget tar make
+
+sourcedir=`realpath .`
+virtualenv $sourcedir || exit 1
+
 
 py26=`python -V | grep 'Python 2.6'`
 codename=`lsb_release -c`
@@ -45,27 +51,11 @@ else
     mv libspotify-0.0.3-linux6-i686 libspotify
 fi
 cd libspotify
-sudo make install
+sudo make install prefix=`realpath ..`
 cd ..
 rm -rf libspotify
 
-sudo easy_install simplejson netaddr zope.interface twisted pysqlite PIL
-sudo easy_install Nevow Epsilon
-sudo easy_install Axiom
-
-wget http://forms-project.pollenation.net/cgi-bin/trac.cgi/changeset/314/trunk?format=zip\&new=314\&old=314\&new_path=trunk\&old_path=%2F -O formal.zip
-unzip formal.zip -d formal
-rm formal.zip
-sudo easy_install formal/trunk
-sudo rm -rf formal
-
-wget http://github.com/winjer/pyspotify/tarball/master -O pyspotify.tar.gz
-mkdir pyspotify
-tar -zxf pyspotify.tar.gz --strip-components 1 -C pyspotify
-rm pyspotify.tar.gz
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-sudo easy_install pyspotify
-sudo rm -rf pyspotify
+easy_install formal.zip
 
 axiom_path=`python -c 'import axiom; print axiom.__path__[0]' 2>/dev/null`
 axiom_path=`dirname $axiom_path`
