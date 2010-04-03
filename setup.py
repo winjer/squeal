@@ -28,11 +28,10 @@ setup(
         'zope.interface',
         'twisted',
         'pysqlite',
-        'PIL',
         'Nevow',
         'Axiom',
         'Epsilon',
-        'tagpy',
+        #PIL and tagpy also, but they don't work in here
     ],
 )
 
