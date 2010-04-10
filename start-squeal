@@ -1,7 +1,0 @@
-#! /bin/sh
-[ -d db ] || {
-    echo Database does not exist - creating default services
-    ./create.py
-}
-
-PYTHONPATH=$PWD axiomatic -d db start -n

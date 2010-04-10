@@ -13,6 +13,7 @@ setup(
     author = "Doug Winter",
     author_email = "doug.winter@isotoma.com",
     license="Apache Software License",
+    package_dir = {'': 'src'},
     packages = find_packages(exclude=['ez_setup']),
     package_data = {
         '': ['README.rst', 'CHANGES.txt'],
@@ -25,12 +26,8 @@ setup(
         'spotify',
         'simplejson',
         'netaddr',
-        'zope.interface',
-        'twisted',
         'pysqlite',
-        'Nevow',
-        'Axiom',
-        'Epsilon',
+        'axiom'
         #PIL and tagpy also, but they don't work in here
     ],
 )
