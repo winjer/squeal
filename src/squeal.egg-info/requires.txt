@@ -1,6 +1,0 @@
-setuptools
-isotoma.recipe.gocaptain
-spotify
-simplejson
-netaddr
-pysqlite

@@ -1,7 +1,0 @@
-setup.py
-src/squeal.egg-info/PKG-INFO
-src/squeal.egg-info/SOURCES.txt
-src/squeal.egg-info/dependency_links.txt
-src/squeal.egg-info/not-zip-safe
-src/squeal.egg-info/requires.txt
-src/squeal.egg-info/top_level.txt
