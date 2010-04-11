@@ -7,6 +7,8 @@
 
 VENV=`realpath $1`
 
+echo Installing into $VENV
+
 if [ `uname -m` = 'x86_64' ]
 then
     wget http://developer.spotify.com/download/libspotify/libspotify-0.0.3-linux6-x86_64.tar.gz
@@ -24,4 +26,4 @@ cd libspotify
 
 make install prefix=$VENV
 
-echo >> $VENV/bin/activate export LD_LIBRARY_PATH=$venv/lib:$LD_LIBRARY_PATH
+echo >> $VENV/bin/activate export LD_LIBRARY_PATH=$VENV/lib:$LD_LIBRARY_PATH

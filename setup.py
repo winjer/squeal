@@ -27,6 +27,7 @@ setup(
         'simplejson',
         'netaddr',
         'pysqlite',
+        'epsilon',
         'axiom'
         #PIL and tagpy also, but they don't work in here
     ],
