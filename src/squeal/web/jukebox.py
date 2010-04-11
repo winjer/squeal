@@ -60,33 +60,6 @@ class Setup(base.BaseElement):
             return p
         return tag[(installer(i) for i in self.plugin_manager.installable)]
 
-
-
-class Source(base.BaseElementContainer, base.BaseElement):
-    jsClass = u"Squeal.Source"
-    docFactory = base.xmltemplate("source.html")
-
-    contained = {
-        'setup': Setup,
-    }
-
-    @page.renderer
-    def sources(self, request, tag):
-        sources = [T.option(selected=True, value="")['-- None --']]
-        for s in self.store.powerupsFor(isqueal.IMusicSource):
-            sources.append(T.option(value=s.name)[s.label])
-        return tag[
-            sources
-        ]
-
-    @athena.expose
-    def main_widget(self, source):
-        for s in self.store.powerupsFor(isqueal.IMusicSource):
-            if s.name == source:
-                w = s.main_widget()
-                w.setFragmentParent(self.page.runtime['main'])
-                return w
-
 class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
     docFactory = base.xmltemplate("account.html")
@@ -261,19 +234,36 @@ class Connected(base.BaseElement):
     def players(self, request, tag):
         return tag[self.player_content()]
 
+### this is really confusing
+### we're mixing Elements and Pages, and they do
+### stuff quite differently
+
 class Jukebox(base.BasePageContainer):
 
     docFactory = base.xmltemplate("jukebox.html")
 
     contained = {
-        'source': Source,
         'account': Account,
         'main': Main,
         'playing': Playing,
         'queue': Queue,
         'connected': Connected,
+        'setup': Setup,
     }
 
     def __init__(self, service):
         super(Jukebox, self).__init__()
         self.service = service
+
+    def render_sources(self, ctx, data):
+        sources = []
+        for s in self.service.store.powerupsFor(isqueal.IMusicSource):
+            w = s.main_widget()
+            w.setFragmentParent(self)
+            sources.append(w)
+        setup = Setup()
+        setup.setFragmentParent(self)
+        sources.append(setup)
+        return ctx.tag[
+            sources
+        ]
