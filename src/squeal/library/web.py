@@ -35,6 +35,12 @@ template_dir = sibpath(__file__, 'templates')
 def xmltemplate(s):
     return base.xmltemplate(s, template_dir)
 
+class LibraryElement(base.BaseElement):
+    @property
+    def library(self):
+        for library in self.store.powerupsFor(ilibrary.ILibrary):
+            return library
+
 class Artist(page.Element):
     docFactory = loaders.stan(
         T.li(render=T.directive("link")))
@@ -62,14 +68,22 @@ class Album(page.Element):
             T.a(href="#", id="album-%s" % self.original.storeID)[self.original.name],
         ]
 
-class Artists(base.BaseElement):
+class Track(page.Element):
+    docFactory = loaders.stan(
+        T.li(render=T.directive("link")))
+
+    def __init__(self, original):
+        self.original = original
+
+    @page.renderer
+    def link(self, request, tag):
+        return tag[
+            T.a(href="#", id="track-%s" % self.original.storeID)[self.original.title],
+        ]
+
+class Artists(LibraryElement):
     jsClass = u"Library.Artists"
     docFactory = xmltemplate("artists.html")
-
-    @property
-    def library(self):
-        for library in self.store.powerupsFor(ilibrary.ILibrary):
-            return library
 
     @page.renderer
     def artists(self, request, tag):
@@ -78,14 +92,9 @@ class Artists(base.BaseElement):
                 yield Artist(a)
         return tag[_]
 
-class Albums(base.BaseElement):
+class Albums(LibraryElement):
     jsClass = u"Library.Albums"
     docFactory = xmltemplate("albums.html")
-
-    @property
-    def library(self):
-        for library in self.store.powerupsFor(ilibrary.ILibrary):
-            return library
 
     @page.renderer
     def albums(self, request, tag):
@@ -94,6 +103,16 @@ class Albums(base.BaseElement):
                 yield Album(a)
         return tag[_]
 
+class Tracks(LibraryElement):
+    jsClass = u"Library.Tracks"
+    docFactory = xmltemplate("tracks.html")
+
+    @page.renderer
+    def tracks(self, request, tag):
+        def _(request, tag):
+            for t in self.library.tracks():
+                yield Track(t)
+        return tag[_]
 
 class Main(base.BaseElement, base.BaseElementContainer):
     jsClass = u"Library.Main"
@@ -101,7 +120,8 @@ class Main(base.BaseElement, base.BaseElementContainer):
 
     contained = {
         'artists': Artists,
-        'albums': Albums
+        'albums': Albums,
+        'tracks': Tracks,
     }
 
     @property
@@ -123,5 +143,15 @@ class Main(base.BaseElement, base.BaseElementContainer):
 
             self.playlist_service.enqueue(track)
 
+    @page.renderer
+    def artist_count(self, request, tag):
+        return "[%d]" % self.library.artists().count()
 
+    @page.renderer
+    def album_count(self, request, tag):
+        return "[%d]" % self.library.albums().count()
+
+    @page.renderer
+    def track_count(self, request, tag):
+        return "[%d]" % self.library.tracks().count()
 

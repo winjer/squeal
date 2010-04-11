@@ -70,13 +70,13 @@ class Library(Item, service.Service):
         return Collection(store=self.store, pathname=pathname)
 
     def tracks(self):
-        return self.store.query(Track)
+        return self.store.query(Track, sort=Track.title.asc)
 
     def artists(self):
-        return self.store.query(Artist)
+        return self.store.query(Artist, sort=Artist.name.asc)
 
     def albums(self):
-        return self.store.query(Album)
+        return self.store.query(Album, sort=Album.name.asc)
 
     def main_widget(self):
         return web.Main()

@@ -6,26 +6,12 @@
             <input type="button" class="button" value="Search" />
         </form>
         <dl>
-            <dt>Artists <span>[1]</span></dt>
-            <dd>
-                <ul>
-                    <li><a href="#">Ministry</a></li>
-                </ul>
-            </dd>
-            <dt>Albums <span>[2]</span></dt>
-            <dd>
-                <ul>
-                    <li><a href="#">Ministry Cover CD - Danny Howells TechTrance</a></li>
-                    <li><a href="#">Ministry Of Sound - The Annual 2002 [UK] Disc 3</a></li>
-                </ul>
-            </dd>
-            <dt>Tracks <span>[2]</span></dt>
-            <dd>
-                <ul>
-                    <li><a href="#">Ministry / Jesus Built My Hotrod (Redline by Various Artists from Hot Wired Monstertrux</a></li>
-                    <li><a href="#">The Mole From The Ministry by The Dukes of Stratosphear from Chips From The Chocolate Fireball</a></li>
-                </ul>
-            </dd>
+            <dt>Artists <span n:render="artist_count" /></dt>
+            <dd n:render="artists" />
+            <dt>Albums <span n:render="album_count" /></dt>
+            <dd n:render="albums" />
+            <dt>Tracks <span n:render="track_count" /></dt>
+            <dd n:render="tracks" />
         </dl>
     </div>
 </n:invisible>
