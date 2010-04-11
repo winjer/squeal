@@ -1,0 +1,310 @@
+html, body {
+    text-align: left;
+    background: #F9F9F9;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+/*
+  -----------------------------------------------
+  Header
+  -----------------------------------------------
+*/
+
+#header {
+    height: 7.5em;
+    background: #333;
+    padding: 0.5em 1em 1em 1em;
+}
+
+#header h1 {
+    font: normal 2.5em serif;
+    color: #FFF;
+}
+
+#header h2 {
+    display: inline;
+    font-size: 1.5em;
+    color: #CCC;
+}
+
+h2#current-album {
+    border-left: 0.1em solid #999;
+    margin-left: 0.5em;
+    padding-left: 0.7em;
+}
+
+#progress {
+    margin-top: 0.5em;
+}
+
+#controls {
+    position: relative;
+    height: 6em;
+    padding-top: 1.5em;
+}
+
+#controls #volume {
+    position: absolute;
+    bottom: 0.5em;
+    left: 0;
+    width: 100%;
+}
+
+/*
+  -----------------------------------------------
+  Main
+  -----------------------------------------------
+*/
+
+#main {
+    padding: 1em;
+}
+
+#main h3 {
+    line-height: 1.5em;
+    font-size: 1.5em;
+    color: #EEE;
+    background: #555;
+    padding: 0.25em;
+}
+
+#main h3.ui-state-active {
+    background: #333;
+}
+
+#main h3 span {
+    background-repeat: no-repeat;
+    background-position: left center;
+    height: 30px;
+    width: 35px;
+    float: left;
+}
+
+#main div.panel {
+    border-top: 1px solid #AAA;
+    padding: 0.5em 0.5em 2em 0.5em;
+}
+
+#main div.panel dl dt {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #333;
+    cursor: pointer;
+}
+
+#main div.panel dl dt span {
+    font-weight: normal;
+}
+
+#main div.panel dl dt span.toggle {
+    margin-right: 0.25em;
+}
+
+#main div.panel dl dd {
+    padding-left: 1em;
+}
+
+#main div.panel dl dd ul li {
+    line-height: 1.5em;
+    font-size: 1em;
+    padding: 0 30px 0 0;
+    position: relative;
+    text-overflow: ellipsis;
+	overflow:hidden;
+	white-space:nowrap;
+}
+
+#play-actions {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+
+#play-actions span {
+    display: inline-block;
+}
+
+#main div.panel dl dd ul li a {
+    text-decoration: none;
+}
+
+#main div.panel dl dd ul li:hover {
+    background: #EEE;
+    cursor: pointer;
+}
+
+#main div.panel form.search {
+    text-align: right;
+}
+
+/*
+  -----------------------------------------------
+  Track list table
+  -----------------------------------------------
+*/
+
+table.tracklist {
+    width: 100%;
+}
+
+table.tracklist thead th {
+    font-weight: bold;
+    color: #333;
+}
+
+table.tracklist thead th,
+table.tracklist tbody td {
+    padding: 0.25em;
+    position: relative;
+}
+
+table.tracklist tbody td {
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+table.tracklist tbody tr:hover {
+    background: #EEE;
+}
+ 
+/*
+  -----------------------------------------------
+  Music Library
+  -----------------------------------------------
+*/
+#main h3.title-musiclibrary span {
+    background-image: url(../images/ico_musiclibrary.png);
+}
+
+#main #panel-musiclibrary form.search {
+    border-bottom: 0.1em solid #CCC;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+/*
+  -----------------------------------------------
+  Spotify
+  -----------------------------------------------
+*/
+#main h3.title-spotify span {
+    background-image: url(../images/ico_spotify.png);
+}
+
+#main #panel-spotify form.search {
+    
+}
+
+#spotify-playlists ul li {
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/*
+  -----------------------------------------------
+  Playlist
+  -----------------------------------------------
+*/
+
+#panel-playlist ul li {
+    border-bottom: 1px solid #EEE;
+    padding: 0.5em;
+    height: 3.5em;
+    position: relative;
+
+}
+
+#panel-playlist ul li.current {
+    font-size: 1.3em;
+    background-color: #EEE;
+}
+
+#panel-playlist ul li p.track {
+    font-size: 1.1em;
+	margin-right: 2em;
+	white-space: nowrap;
+}
+
+#panel-playlist ul li p.track span.track,
+#panel-playlist ul li p.track span.artist,
+#panel-playlist ul li p.track span.album {
+    text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+#panel-playlist ul li p.track span.album {
+    border-left: 0.1em solid #999;
+    margin-left: 0.1em;
+    padding-left: 0.4em;
+}
+
+#panel-playlist ul li p.track span.cover-art {
+    display: block;
+    height: 3em;
+    width: 3em;
+        
+    float: left;
+    margin-right: 0.25em;
+    background: #FFF url(../images/jesus.jpg) no-repeat;
+    
+    background-size: auto 100%;
+    -moz-background-size: auto 100%;
+    -o-background-size: auto 100%;
+    -webkit-background-size: auto 100%;
+    -khtml-background-size: auto 100%;
+}
+
+
+#panel-playlist ul li p.track span.track {
+    font-size: 1.3em;
+    display: block;
+}
+
+#panel-playlist ul li p.info {
+    text-align: right;
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    width: 5em;
+}
+
+#panel-playlist ul li p.info span {
+    display: block;
+}
+
+
+/*
+  -----------------------------------------------
+  jQuery UI tweaks
+  -----------------------------------------------
+*/
+
+.ui-tabs {
+	border: none;
+}
+
+.ui-tabs .ui-tabs-nav {
+	background: none;
+	border: none;
+	border-bottom: 1px solid #CCC;
+	padding-left: 1em;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+}
+
+.ui-tabs .ui-tabs-nav li {
+	border-color: #CCC;
+}
+
+
+
+
+
+
+
+

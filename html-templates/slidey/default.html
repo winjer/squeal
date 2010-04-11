@@ -1,0 +1,595 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Squeal</title>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8" />
+
+    <script type="text/javascript" src="static/js/jquery-1.4.2.js"> </script>
+    <script type="text/javascript" src="static/js/jquery-ui-1.8rc2.custom.min.js"> </script>
+    <script type="text/javascript" src="static/js/squeal.js"> </script>
+
+    <link rel="stylesheet" href="static/css/reset-fonts-grids.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="static/css/smoothness/jquery-ui-1.8rc2.custom.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="static/css/squeal.css" type="text/css" media="screen" />
+
+</head>
+<body>
+    <div id="header" class="yui-ge">
+        <div id="current" class="yui-u first">
+            <h1 id="current-track">Jesus Built My Hotrod</h1>
+            <h2 id="current-artist">Ministry</h2>
+            <h2 id="current-album">Psalm 69</h2>
+            <div id="progress"></div>
+        </div>
+        <div id="controls" class="yui-u">
+            <button id="controls-back">Back</button>
+            <button id="controls-play">Play</button>
+            <button id="controls-next">Next</button>
+            <div id="volume"></div>
+        </div>
+    </div>
+    <div id="main" class="yui-g">
+        <div id="sources" class="yui-u first">
+            <h3 class="title-musiclibrary"><span></span>Music Library</h3>
+            <div id="panel-musiclibrary" class="panel">
+                <form class="search">
+                    <input type="text" class="text" name="q" value="ministry" />
+                    <input type="button" class="button" value="Search" />
+                </form>
+                <dl>
+                    <dt>Artists <span>[1]</span></dt>
+                    <dd>
+                        <ul>
+                            <li><a href="#">Ministry</a></li>
+                        </ul>
+                    </dd>
+                    <dt>Albums <span>[2]</span></dt>
+                    <dd>
+                        <ul>
+                            <li><a href="#">Ministry Cover CD - Danny Howells TechTrance</a></li>
+                            <li><a href="#">Ministry Of Sound - The Annual 2002 [UK] Disc 3</a></li>
+                        </ul>
+                    </dd>
+                    <dt>Tracks <span>[2]</span></dt>
+                    <dd>
+                        <ul>
+                            <li><a href="#">Ministry / Jesus Built My Hotrod (Redline by Various Artists from Hot Wired Monstertrux</a></li>
+                            <li><a href="#">The Mole From The Ministry by The Dukes of Stratosphear from Chips From The Chocolate Fireball</a></li>
+                        </ul>
+                    </dd>
+                </dl>
+            </div>
+            <h3 class="title-spotify"><span></span>Spotify</h3>
+            <div id="panel-spotify" class="panel">
+                <form class="search">
+                    <input type="text" class="text" name="q" value="ministry" />
+                    <input type="button" class="button" value="Search" />
+                </form>
+                <div id="tabs-spotify">
+                    <ul>
+                        <li><a href="#spotify-playlists">Playlists</a></li>
+                        <li><a href="#spotify-search">Search</a></li>
+                    </ul>
+                    <div id="spotify-playlists">
+                        <ul>
+                            <li><a href="#">Various Artists - You Don't Know - Ninja Cuts</a></li>
+                            <li><a href="#">Pixies - Doolittle</a></li>
+                            <li><a href="#">Captain Beefheart & The Magic Band - I'm Going To Do What I Wanna Do: Live At My Father's Place 1978</a></li>
+                            <li><a href="#">Radiohead - Kid A</a></li>
+                            <li><a href="#">Diplo - Decent Work For Decent Pay</a></li>
+                            <li><a href="#">Various Artists - Fabulous Shit</a></li>
+                            <li><a href="#">Sandblasting - DNA Mutations</a></li>
+                            <li><a href="#">Felix Da Housecat - He Was King</a></li>
+                            <li><a href="#">Fairmont - Coloured in Memory</a></li>
+                            <li><a href="#">Various Artists - A Psychedelic Guide to Monsterism Island</a></li>
+                            <li><a href="#">Various Artists - Berlin Calling - The Soundtrack by Paul Kalkbrenner</a></li>
+                            <li><a href="#">Antix - Wanderers</a></li>
+                            <li><a href="#">Fuckpony - Children of Love</a></li>
+                            <li><a href="#">The Crystal Method - Divided By Night</a></li>
+                            <li><a href="#">Ellen Allien - The Other Side - Berlin</a></li>
+                            <li><a href="#">Cloud Cult - Feel Good Ghosts (Tea-Partying Through Tornadoes)</a></li>
+                            <li><a href="#">Bliss - The Art Of Chill 2</a></li>
+                            <li><a href="#">The Klone Orchestra - Praise You Norman - A Tribute To Fatboy Slim</a></li>
+                            <li><a href="#">SteveM's 100 Favouritest 00s Tracks</a></li>
+                            <li><a href="#">Faith - Faith present House Ain't Dead</a></li>
+                            <li><a href="#">Grace Jones - Hurricane</a></li>
+                            <li><a href="#">Massive Attack - Heligoland</a></li>
+                            <li><a href="#">G. Love - Blue Sunshine</a></li>
+                            <li><a href="#">Four Tet - There Is Love In You</a></li>
+                            <li><a href="#">Hexstatic - Rewind</a></li>
+                            <li><a href="#">Efterklang - Magic Chairs</a></li>
+                        </ul>
+                    </div>
+                    <div id="spotify-search">
+                        <dl>
+                            <dt>Artists <span>[27]</span></dt>
+                            <dd>
+                                <ul>
+                                    <li><a href="#">Ministry featuring Jello Biafra</a></li>
+                                    <li><a href="#">Street Ministry</a></li>
+                                    <li><a href="#">State Symphony Orchestra of the Ministry of Culture</a></li>
+                                    <li><a href="#">USSR Ministry of Culture Chamber Choir</a></li>
+                                    <li><a href="#">Black Market Ministry</a></li>
+                                    <li><a href="#">Ministry & Co-Conspirators</a></li>
+                                    <li><a href="#">Ministry Of Style</a></li>
+                                    <li><a href="#">The Government Chorus of Ministry Culture</a></li>
+                                    <li><a href="#">New Beginnings Ministry</a></li>
+                                    <li><a href="#">Ministry Of Primitive Arts</a></li>
+                                    <li><a href="#">The Asaph Ministry</a></li>
+                                    <li><a href="#">Ministry featuring Sgt. Major</a></li>
+                                    <li><a href="#">Emmanuel Worship Ministry</a></li>
+                                    <li><a href="#">Walter Barnes Jr. & Men Of Ministry</a></li>
+                                    <li><a href="#">Backroad Ministry</a></li>
+                                    <li><a href="#">Belmont Church Youth Ministry</a></li>
+                                    <li><a href="#">Men Of Ministry</a></li>
+                                    <li><a href="#">Ministry of War</a></li>
+                                    <li><a href="#">Lincoln Charles Ministry</a></li>
+                                    <li><a href="#">Fireball Ministry</a></li>
+                                    <li><a href="#">The Salvation Music Ministry</a></li>
+                                    <li><a href="#">Ministry</a></li>
+                                    <li><a href="#">Sound Ministry</a></li>
+                                    <li><a href="#">Ministry Of Funk</a></li>
+                                    <li><a href="#">USSR Ministry Of Culture Symphony Orchestra</a></li>
+                                    <li><a href="#">GOD's ARMY Ministry of RAP</a></li>
+                                    <li><a href="#">The Activism Ministry</a></li>
+                                </ul>
+                            </dd>
+                            <dt>Albums <span>[33]</span></dt>
+                            <dd>
+                                <ul>
+                                    <li><a href="#">Ministry of Electro House Vol.03</a></li>
+                                    <li><a href="#">Ministry Of Music Vol. 3</a></li>
+                                    <li><a href="#">Ministry Of Electro House Vol.08</a></li>
+                                    <li><a href="#">The Ministry Of Common Sense</a></li>
+                                    <li><a href="#">Ministry of Electro House Vol.01</a></li>
+                                    <li><a href="#">Ministry Of Music Vol. 4</a></li>
+                                    <li><a href="#">Ministry Of Hardcore, Vol. 4</a></li>
+                                    <li><a href="#">Ministry Of Electro House Vol.10</a></li>
+                                    <li><a href="#">The Ministry of Music</a></li>
+                                    <li><a href="#">Ministry Of Music Vol.5</a></li>
+                                    <li><a href="#">Street Ministry</a></li>
+                                    <li><a href="#">Ministry Of Electro House Vol.11</a></li>
+                                    <li><a href="#">COJO -- Music Ministry</a></li>
+                                    <li><a href="#">Ministry of Electro House Vol.02</a></li>
+                                    <li><a href="#">Ministry Of Music Vol.2</a></li>
+                                    <li><a href="#">The Ministry Of You</a></li>
+                                    <li><a href="#">An Industrial Tribute to Ministry</a></li>
+                                    <li><a href="#">The Ministry of Archers</a></li>
+                                    <li><a href="#">R.O.M. 7 (Reason Of Ministry)</a></li>
+                                    <li><a href="#">Shamash: Resurrection Ministry</a></li>
+                                    <li><a href="#">Ministry Of Electro House Vol.06</a></li>
+                                    <li><a href="#">Ministry Of Dance</a></li>
+                                    <li><a href="#">Ministry Of Electro House Vol.09</a></li>
+                                    <li><a href="#">Ministry Of Sound Vol.1</a></li>
+                                    <li><a href="#">Personal Ministry</a></li>
+                                    <li><a href="#">Ministry of Electro House Vol.04</a></li>
+                                    <li><a href="#">Ministry of Electro House Vol.05</a></li>
+                                    <li><a href="#">Ministry IV</a></li>
+                                    <li><a href="#">Ministry Of Electro House Vol.07</a></li>
+                                    <li><a href="#">Ministry Of Dance</a></li>
+                                    <li><a href="#">Ministry Of Electro House</a></li>
+                                    <li><a href="#">Vol.12</a></li>
+                                    <li><a href="#">Ministry Of Dance</a></li>
+                                </ul>
+                            </dd>
+                            <dt>Tracks <span>[32]</span></dt>
+                            <dd>
+                                <table class="tracklist" border="0" cellpadding="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Track</th>
+                                            <th>Album</th>
+                                            <th>Artist</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Jesus Built My Hotrod</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Space Truckin'</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Hero</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Bang A Gong</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Roadhouse Blues</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>TV II</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Death And Destruction - Remix</td>
+                                            <td>Saw V</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>So What - Remastered Album Version</td>
+                                            <td>The Gothic Collection [w/interactive booklet]</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Let's Go</td>
+                                            <td>The Last Sucker</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Friend Of The Devil - Live</td>
+                                            <td>BRIDGE SCHOOL CONCERTS, VOL. ONE</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ministry Of Saints</td>
+                                            <td>Tinnitus Sanctus - Deluxe Edition</td>
+                                            <td>Edguy</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Lies Lies Lies</td>
+                                            <td>Rio Grande Blood</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>The Land Of Rape And Honey</td>
+                                            <td>The Land of Rape and Honey</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Black Betty</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Señor Peligro</td>
+                                            <td>Rio Grande Blood</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Just One Fix</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Stigmata</td>
+                                            <td>The Land of Rape and Honey</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Scare Crow</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Psalm 69</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rio Grande Blood</td>
+                                            <td>Rio Grande Blood</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Lady Lady Lay</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Supernaut</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Under My Thumb</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>What A Wonderful World</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Radar Love</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Let's Go</td>
+                                            <td>Adios… Puta Madres</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Thieves [12" Remix]</td>
+                                            <td>Box</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>N.W.O.</td>
+                                            <td>ΚΕΦΑΛΗΞΘ</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ministry</td>
+                                            <td>Serpent Saints: The Ten Amendments</td>
+                                            <td>Entombed</td>
+                                        </tr>
+                                        <tr>
+                                            <td>No W</td>
+                                            <td>Adios... Puta Madres</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mississippi Queen</td>
+                                            <td>Cover Up</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                        <tr>
+                                            <td>The Missing</td>
+                                            <td>The Land of Rape and Honey</td>
+                                            <td>Ministry</td>
+                                        </tr>
+                                    </tbody>
+                                </table>        
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <h3 class="title-lastfm"><span></span>Last.fm</h3>
+            <div id="panel-lastfm" class="panel">
+                <form class="search">
+                    <select class="select">
+                        <option>Similar Artists radio</option>
+                        <option>Tag radio</option>
+                        <option>Artist Fan radio</option>
+                        <option>Group radio</option>
+                        <option>Neighbour radio</option>
+                        <option>Personal radio</option>
+                        <option>Loved tracks</option>
+                        <option>Recommended tracks</option>
+                        <option>Playlist</option>                        
+                    </select>
+                    <input type="text" class="text" name="q" value="ministry" />
+                    <input type="button" class="button" value="Search" />
+                </form>
+                <table class="tracklist" border="0" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Track</th>
+                            <th>Album</th>
+                            <th>Artist</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>I Prefer</td>
+                            <td>Ministry</td>
+                            <td>The Land of Rape and Honey</td>
+                        </tr>
+                        <tr>
+                            <td>Bozo Skeleton</td>
+                            <td>Lard</td>
+                            <td>The Last Temptation of Reid</td>
+                        </tr>
+                        <tr>
+                            <td>No Devotion</td>
+                            <td>Revolting Cocks</td>
+                            <td>Big Sexyland</td>
+                        </tr>
+                        <tr>
+                            <td>Better Ways</td>
+                            <td>1000 Homo DJs</td>
+                            <td>Supernaut</td>
+                        </tr>
+                        <tr>
+                            <td>Eggshell</td>
+                            <td>Die Krupps</td>
+                            <td>Odyssey Of The Mind</td>
+                        </tr>
+                        <tr>
+                            <td>Better Ways</td>
+                            <td>1000 Homo DJs</td>
+                            <td>Supernaut</td>
+                        </tr>
+                        <tr>
+                            <td>No Devotion</td>
+                            <td>Revolting Cocks</td>
+                            <td>Big Sexyland</td>
+                        </tr>
+                        <tr>
+                            <td>daL</td>
+                            <td>Skinny Puppy</td>
+                            <td>Mythmaker</td>
+                        </tr>
+                    </tbody>
+                </table>     
+            </div>
+        </div>
+        <div id="playlist" class="yui-u">
+            <h3>Playlist</h3>
+            <div id="panel-playlist" class="panel">
+                <ul>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">N.W.O</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">5:30</span>                       
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Just One Fix</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">5:10</span>                       
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">TV II</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">3:05</span>   
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Hero</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">4:12</span>                               
+                        </p>
+                    </li>
+                    <li class="current">
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Jesus Built My Hotrod</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">4:53</span>                               
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Scare Crow</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">8:22</span>                               
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Psalm 69</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">5:29</span>                               
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Corrosion</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">4:57</span>                               
+                        </p>
+                    </li>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track">Grace</span>
+                            <span class="artist">Ministry</span>
+                            <span class="album">Psalm 69</span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user">bne</a>
+                            <span class="length">3:06</span>                            
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <h3>Users</h3>
+            <div id="panel-users" class="panel">
+                <div class="yui-g">
+                    <div class="yui-u first">
+                        <ul>
+                            <li><a href="#">bne</a></li>
+                            <li><a href="#">caolan</a></li>
+                            <li><a href="#">channam</a></li>
+                            <li><a href="#">CtM</a></li>
+                            <li><a href="#">_David_</a></li>
+                            <li><a href="#">davidb</a></li>
+                            <li><a href="#">dtt101</a></li>
+                            <li><a href="#">elizaxu</a></li>
+                            <li><a href="#">fig</a></li>
+                            <li><a href="#">fuzzpedal</a></li>
+                            <li><a href="#">garym</a></li>
+                            <li><a href="#">_greg_</a></li>
+                            <li><a href="#">gwilym</a></li>
+                            <li><a href="#">Jc2k</a></li>
+                            <li><a href="#">joethedough</a></li>
+                            <li><a href="#">karen</a></li>
+                            <li><a href="#">kirstys</a></li>
+                        </ul>
+                    </div>
+                    <div class="yui-u">
+                        <ul>
+                            <li><a href="#">lith</a></li>
+                            <li><a href="#">manouche</a></li>
+                            <li><a href="#">marts</a></li>
+                            <li><a href="#">mitchell</a></li>
+                            <li><a href="#">mrben</a></li>
+                            <li><a href="#">mtarbit</a></li>
+                            <li><a href="#">offmessage</a></li>
+                            <li><a href="#">sarann</a></li>
+                            <li><a href="#">slimbot</a></li>
+                            <li><a href="#">SteveM</a></li>
+                            <li><a href="#">tepic</a></li>
+                            <li><a href="#">tomds</a></li>
+                            <li><a href="#">toomuchinformation</a></li>
+                            <li><a href="#">twom</a></li>
+                            <li><a href="#">waldo</a></li>
+                            <li><a href="#">wazzm</a></li>
+                            <li><a href="#">winjer</a></li>
+                            <li><a href="#">worthydolt</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <h3>Players</h3>
+            <div id="panel-players" class="panel">
+                <p>Etiam lacinia mollis dictum. Mauris et eleifend nibh. Nulla facilisi. Donec ipsum quam, ullamcorper vel sagittis ut, venenatis sed sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque et rutrum neque. Pellentesque id enim sed quam luctus luctus. Donec eu faucibus dolor. Vestibulum massa orci, gravida eu ullamcorper id, luctus sit amet lacus. In nibh leo, malesuada sit amet aliquam vel, congue eget justo. Praesent nec eleifend tellus. Proin quis sagittis lectus. Phasellus posuere dui at libero suscipit vel tincidunt quam bibendum. Sed luctus, neque ac laoreet condimentum, velit elit lobortis eros, non tristique mi sem ac velit. Vestibulum sagittis mattis ante, in viverra urna gravida vitae. Nulla imperdiet aliquet lacus a lobortis.</p>
+            </div>
+        </div>
+    </div>
+    <div id="footer"></div>
+    <div id="play-actions"><span class="ui-icon ui-icon-play"></span><span class="ui-icon ui-icon-seek-end"></span></div>
+</body>
+</html>

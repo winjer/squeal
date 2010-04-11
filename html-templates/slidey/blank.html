@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Squeal</title>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8" />
+
+    <script type="text/javascript" src="static/js/jquery-1.4.2.js"> </script>
+    <script type="text/javascript" src="static/js/jquery-ui-1.8rc2.custom.min.js"> </script>
+    <script type="text/javascript" src="static/js/squeal.js"> </script>
+
+    <link rel="stylesheet" href="static/css/reset-fonts-grids.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="static/css/smoothness/jquery-ui-1.8rc2.custom.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="static/css/squeal.css" type="text/css" media="screen" />
+
+</head>
+<body>
+    <div id="header" class="yui-ge">
+        <div id="current" class="yui-u first">
+            <h1 id="current-track"></h1>
+            <h2 id="current-artist"></h2>
+            <h2 id="current-album"></h2>
+            <div id="progress"></div>
+        </div>
+        <div id="controls" class="yui-u">
+            <button id="controls-back">Back</button>
+            <button id="controls-play">Play</button>
+            <button id="controls-next">Next</button>
+            <div id="volume"></div>
+        </div>
+    </div>
+    <div id="main" class="yui-g">
+        <div id="sources" class="yui-u first">
+            <h3 class="title-musiclibrary"><span></span>Music Library</h3>
+            <div id="panel-musiclibrary" class="panel">
+                <form class="search">
+                    <input type="text" class="text" name="q" value="" />
+                    <input type="button" class="button" value="Search" />
+                </form>
+                <dl>
+                    <dt>Artists <span>[]</span></dt>
+                    <dd>
+                        <ul>
+                            <li><a href="#"></a></li>
+                        </ul>
+                    </dd>
+                    <dt>Albums <span>[]</span></dt>
+                    <dd>
+                        <ul>
+                            <li><a href="#"></a></li>
+                        </ul>
+                    </dd>
+                    <dt>Tracks <span>[]</span></dt>
+                    <dd>
+                        <ul>
+                            <li><a href="#"></a></li>
+                        </ul>
+                    </dd>
+                </dl>
+            </div>
+            <h3 class="title-spotify"><span></span>Spotify</h3>
+            <div id="panel-spotify" class="panel">
+                <form class="search">
+                    <input type="text" class="text" name="q" value="" />
+                    <input type="button" class="button" value="Search" />
+                </form>
+                <div id="tabs-spotify">
+                    <ul>
+                        <li><a href="#spotify-playlists">Playlists</a></li>
+                        <li><a href="#spotify-search">Search</a></li>
+                    </ul>
+                    <div id="spotify-playlists">
+                        <ul>
+                            <li><a href="#"></a></li>
+                        </ul>
+                    </div>
+                    <div id="spotify-search">
+                        <dl>
+                            <dt>Artists <span>[]</span></dt>
+                            <dd>
+                                <ul>
+                                    <li><a href="#"></a></li>
+                                </ul>
+                            </dd>
+                            <dt>Albums <span>[]</span></dt>
+                            <dd>
+                                <ul>
+                                    <li><a href="#"></a></li>
+                                </ul>
+                            </dd>
+                            <dt>Tracks <span>[]</span></dt>
+                            <dd>
+                                <table class="tracklist" border="0" cellpadding="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Track</th>
+                                            <th>Album</th>
+                                            <th>Artist</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>        
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="playlist" class="yui-u">
+            <h3>Playlist</h3>
+            <div id="panel-playlist" class="panel">
+                <ul>
+                    <li>
+                        <p class="track">
+                            <span class="cover-art"></span>
+                            <span class="track"></span>
+                            <span class="artist"></span>
+                            <span class="album"></span>
+                        </p>
+                        <p class="info">                            
+                            <a href="#" class="user"></a>
+                            <span class="length"></span>                       
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <h3>Users</h3>
+            <div id="panel-users" class="panel">
+                <div class="yui-g">
+                    <ul>
+                        <li><a href="#"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <h3>Players</h3>
+            <div id="panel-players" class="panel">
+            </div>
+        </div>
+    </div>
+    <div id="footer"></div>
+    <div id="play-actions"><span class="ui-icon ui-icon-play"></span><span class="ui-icon ui-icon-seek-end"></span></div>
+</body>
+</html>
