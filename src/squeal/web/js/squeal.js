@@ -117,7 +117,7 @@ Squeal.Setup.methods(
     },
 
     function closeClick(self) {
-        $('.setup-pane').hide(500);
+        alert("closeclick");
     }
 
 );

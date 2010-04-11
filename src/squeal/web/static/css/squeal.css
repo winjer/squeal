@@ -170,7 +170,7 @@ table.tracklist tbody td {
 table.tracklist tbody tr:hover {
     background: #EEE;
 }
- 
+
 /*
   -----------------------------------------------
   Music Library
@@ -196,7 +196,7 @@ table.tracklist tbody tr:hover {
 }
 
 #main #panel-spotify form.search {
-    
+
 }
 
 #spotify-playlists ul li {
@@ -247,11 +247,11 @@ table.tracklist tbody tr:hover {
     display: block;
     height: 3em;
     width: 3em;
-        
+
     float: left;
     margin-right: 0.25em;
     background: #FFF url(../images/jesus.jpg) no-repeat;
-    
+
     background-size: auto 100%;
     -moz-background-size: auto 100%;
     -o-background-size: auto 100%;

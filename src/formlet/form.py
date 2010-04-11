@@ -32,6 +32,7 @@ class FormElement(athena.LiveElement):
 
     @athena.expose
     def process(self, kw):
+        print "++++++++++++++++++++++++ PROCESS"
         # todo - check the method being called is exposed
         action = str(kw.pop('formlet.action'))
         kw = dict((str(a), b) for (a,b) in kw.items() if a)

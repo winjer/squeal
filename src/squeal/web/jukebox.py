@@ -43,9 +43,32 @@ from formlet import field
 
 from twisted.python import log
 
-class Source(base.BaseElement):
+class Setup(base.BaseElement):
+    jsClass = u"Squeal.Setup"
+    docFactory = base.xmltemplate("setup.html")
+
+    @property
+    def plugin_manager(self):
+        for s in self.store.powerupsFor(isqueal.IPluginManager):
+            return s
+
+    @page.renderer
+    def install(self, request, tag):
+        def installer(i):
+            p = PluginInstaller(i)
+            p.setFragmentParent(self)
+            return p
+        return tag[(installer(i) for i in self.plugin_manager.installable)]
+
+
+
+class Source(base.BaseElementContainer, base.BaseElement):
     jsClass = u"Squeal.Source"
     docFactory = base.xmltemplate("source.html")
+
+    contained = {
+        'setup': Setup,
+    }
 
     @page.renderer
     def sources(self, request, tag):
@@ -204,23 +227,6 @@ class PluginInstaller(base.BaseElement):
         s = pm.install(args=kw, **self.original)
         s.setServiceParent(self.plugin_manager.parent)
 
-class Setup(base.BaseElement):
-    jsClass = u"Squeal.Setup"
-    docFactory = base.xmltemplate("setup.html")
-
-    @property
-    def plugin_manager(self):
-        for s in self.store.powerupsFor(isqueal.IPluginManager):
-            return s
-
-    @page.renderer
-    def install(self, request, tag):
-        def installer(i):
-            p = PluginInstaller(i)
-            p.setFragmentParent(self)
-            return p
-        return tag[(installer(i) for i in self.plugin_manager.installable)]
-
 class Connected(base.BaseElement):
     jsClass = u"Squeal.Connected"
     docFactory = base.xmltemplate("connected.html")
@@ -266,7 +272,6 @@ class Jukebox(base.BasePageContainer):
         'playing': Playing,
         'queue': Queue,
         'connected': Connected,
-        'setup': Setup,
     }
 
     def __init__(self, service):
