@@ -44,10 +44,16 @@ Spot.Playlists.methods(
     },
 
     function render(self, playlists) {
+        var t = $.template('<li><a href="#" id="playlist-${id}">${name}</a></li>');
+        var ul = self.nodeById("playlists");
+        $(ul).html("");
+        _.each(playlists, function(p) {
+            $(ul).append(t, p);
+        });
     },
 
     function reload(self) {
-        self.callRemote("playlists").addCallback(self.render);
+        self.callRemote("playlists").addCallback(function(x) {self.render(x);});
     }
 
 );

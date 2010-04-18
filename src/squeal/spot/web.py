@@ -54,21 +54,17 @@ class Playlists(base.BaseElement):
         for spotify in self.store.powerupsFor(ispotify.ISpotifyService):
             return spotify
 
-    @page.renderer
-    def playlists(self, request, tag):
-        def _(request, tag):
-            for p in self.spotify_service.playlists():
-                yield Playlist(p)
-        return tag[_]
-
     @athena.expose
     def playlists(self):
-        return []
-        #return self.spotify_service.playlists()
+        return map(adaptivejson.simplify, self.spotify_service.playlists())
+
+    def reload(self, ev):
+        self.callRemote("reload");
 
     @athena.expose
     def goingLive(self):
         self.callRemote("reload");
+        self.evreactor.subscribe(self.reload, ispotify.ISpotifyMetadataUpdatedEvent)
 
 class Search(base.BaseElement):
     jsClass = u"Spot.Search"
