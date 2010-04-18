@@ -236,7 +236,7 @@ class Connected(base.BaseElement):
 
 ### this is really confusing
 ### we're mixing Elements and Pages, and they do
-### stuff quite differently
+### stuff quite differently.  the following is a page!
 
 class Jukebox(base.BasePageContainer):
 
