@@ -114,7 +114,7 @@ class Tracks(LibraryElement):
                 yield Track(t)
         return tag[_]
 
-class Main(base.BaseElement, base.BaseElementContainer):
+class Main(base.BaseElementContainer):
     jsClass = u"Library.Main"
     docFactory = xmltemplate("main.html")
 

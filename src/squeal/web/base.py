@@ -79,7 +79,7 @@ class BaseElement(athena.LiveElement):
         na = map(_simplify, args)
         return athena.LiveElement.callRemote(self, method, *na)
 
-class BaseElementContainer(athena.LiveElement):
+class BaseElementContainer(BaseElement):
 
     """ Provides a simple method of providing default fragment instantiation """
 
