@@ -195,11 +195,11 @@ table.tracklist tbody tr:hover {
     background-image: url(../images/ico_spotify.png);
 }
 
-#main #panel-spotify form.search {
+#main .panel-spotify form.search {
 
 }
 
-#spotify-playlists ul li {
+div.spotify-playlists ul li {
     text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
