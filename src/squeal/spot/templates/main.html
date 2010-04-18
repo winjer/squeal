@@ -1,12 +1,21 @@
-<div n:render="liveElement" xmlns="http://www.w3.org/1999/xhtml" xmlns:n="http://nevow.com/ns/nevow/0.1">
-    <div class="yui-gc">
-        <div n:render="search" id="search" class="yui-u first">
-        </div>
-        <div n:render="options" id="options" class="yui-u">
+<div n:render="liveElement"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:n="http://nevow.com/ns/nevow/0.1">
+
+    <h3 class="title-spotify"><span></span>Spotify</h3>
+    <div class="panel panel-spotify">
+        <form class="search">
+            <input type="text" class="text" name="q" />
+            <input type="button" class="button" value="Search" />
+        </form>
+        <div id="tabs-spotify" class="tabs-spotify">
+            <ul>
+                <li><a id="tab-playlists">Playlists</a></li>
+                <li><a id="tab-search">Search</a></li>
+            </ul>
+            <div id="content-playlists" n:render="playlists" />
+            <div id="content-search" n:render="search" />
         </div>
     </div>
-    <div class="yui-gf">
-        <div n:render="playlists" id="playlists" class="yui-u first" />
-        <div n:render="document" id="document" class="yui-u" />
-    </div>
+
 </div>

@@ -44,38 +44,6 @@ template_dir = sibpath(__file__, 'templates')
 def xmltemplate(s):
     return base.xmltemplate(s, template_dir)
 
-class SearchEvent(object):
-    def __init__(self, query):
-        self.query = query
-
-class Search(base.BaseElement):
-    jsClass = u"Spot.Search"
-    docFactory = xmltemplate("search.html")
-
-    @athena.expose
-    def search(self, query):
-        e = self.evreactor
-        spotify = self.store.powerupsFor(ispotify.ISpotifyService).next()
-        e.fireEvent(SearchEvent(query), ijukebox.ISearchStartedEvent)
-        spotify.search(query)
-
-class Options(base.BaseElement):
-    jsClass = u"Spot.Options"
-    docFactory = xmltemplate("options.html")
-
-class Playlist(page.Element):
-    docFactory = loaders.stan(
-        T.li(render=T.directive("link")))
-
-    def __init__(self, original):
-        self.original = original
-
-    @page.renderer
-    def link(self, request, tag):
-        return tag[
-            T.a(href="#", id="playlist-%s" % str(Link.from_playlist(self.original)))[self.original.name()]
-        ]
-
 class Playlists(base.BaseElement):
     jsClass = u"Spot.Playlists"
     docFactory = xmltemplate("playlists.html")
@@ -93,67 +61,25 @@ class Playlists(base.BaseElement):
                 yield Playlist(p)
         return tag[_]
 
-class Document(base.BaseElement):
-    jsClass = u"Spot.Document"
-    docFactory = xmltemplate("document.html")
-
-    @property
-    def spotify_service(self):
-        """ Return the one and only one spotify service running on the store """
-        for spotify in self.store.powerupsFor(ispotify.ISpotifyService):
-            return spotify
-
-    def subscribe(self):
-        e = self.evreactor
-        e.subscribe(self.handle_search_start, ijukebox.ISearchStartedEvent)
-        e.subscribe(self.handle_search_results, ispotify.ISpotifySearchResultsEvent)
-
-    def handle_search_start(self, ev):
-        self.callRemote("startThrobber")
-
-    def human_duration(self, d):
-        mins = int(d/60000)
-        secs = int((d - (mins*60000)) / 1000)
-        return u"%dm %ds" % (mins, secs)
+    @athena.expose
+    def playlists(self):
+        return []
+        #return self.spotify_service.playlists()
 
     @athena.expose
-    def playlist_info(self, pid):
-        return adaptivejson.simplify(self.spotify_service.get_playlist(pid))
+    def goingLive(self):
+        self.callRemote("reload");
 
-    def handle_search_results(self, ev):
-        artists = {}
-        albums = {}
-        tracks = {}
-        for a in ev.results.artists():
-            k = unicode(Link.from_artist(a))
-            artists[k] = {
-                u'name': a.name().decode("utf-8"),
-                u'link': k,
-            }
-        for a in ev.results.albums():
-            k = unicode(Link.from_album(a))
-            albums[k] = {
-                u'name': a.name().decode("utf-8"),
-                u'link': k,
-            }
-        for a in ev.results.tracks():
-            k = unicode(Link.from_track(a, 0))
-            tracks[k] = {
-                u'name': a.name().decode("utf-8"),
-                u'link': k,
-                u'album_name': a.album().name().decode("utf-8"),
-                u'artist_name': ", ".join([x.name() for x in a.artists()]).decode("utf-8"),
-                u'duration': self.human_duration(a.duration()),
-            }
-        self.callRemote("searchResults", artists, albums, tracks)
+class Search(base.BaseElement):
+    jsClass = u"Spot.Search"
+    docFactory = xmltemplate("search.html")
 
 class Main(base.BaseElementContainer):
     docFactory = xmltemplate("main.html")
+    jsClass = u"Spot.Main"
 
     contained = {
         'search': Search,
-        'options': Options,
-        'document': Document,
         'playlists': Playlists,
     }
 

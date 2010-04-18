@@ -68,7 +68,4 @@ $(function() {
 	    $(this).prepend('<span class="toggle">[+]</span>');
 	});
 
-	$("#tabs-spotify").tabs({
-		selected: 1
-	});
 });

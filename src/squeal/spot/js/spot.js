@@ -34,110 +34,29 @@ Spot.Widget.methods(
 
 
 Spot.Main = Spot.Widget.subclass("Spot.Main");
-Spot.Search = Spot.Widget.subclass("Spot.Search");
-Spot.Options = Spot.Widget.subclass("Spot.Options");
-Spot.Document = Spot.Widget.subclass("Spot.Document");
 Spot.Playlists = Spot.Widget.subclass("Spot.Playlists");
+Spot.Search = Spot.Widget.subclass("Spot.Search");
 
 Spot.Playlists.methods(
-    function click(self, node, ev) {
-        ev.preventDefault();
-        var tid = ev.target.id;
-        if(tid.substring(0, 8) == "playlist") {
-            var pid = tid.substring(9);
-            Spot.W.document.loadPlaylist(pid);
-        };
-    }
-)
-
-Spot.Search.methods(
-    function searchButton(self, node) {
-        var field = self.nodeById("search-query");
-        var query = field.value;
-        self.callRemote("search", query);
-    },
 
     function registerW(self) {
-        Spot.W.search = self;
+        Spot.W.playlists = self;
+    },
+
+    function render(self, playlists) {
+    },
+
+    function reload(self) {
+        self.callRemote("playlists").addCallback(self.render);
     }
+
 );
 
-Spot.Document.methods(
-    function startThrobber(self) {
-        $.throbberShow({parent: self.node,
-                        image: "/static/throbber.gif",
-                        ajax: false});
-    },
-
-    function registerW(self) {
-        Spot.W.document = self;
-    },
-
-    function queuePlaylistById(self, pid) {
-        self.callRemote("playlist_info", pid).addCallback(function (playlist) {
-            self.queuePlaylistByInfo(playlist);
-        });
-    },
-
-    function queuePlaylistByInfo(self, playlist) {
-        for(t in playlist['tracks']) {
-            var track = playlist['tracks'][t];
-            Squeal.W.queue.queueTrack('spotify', track.id);
-        }
-    },
-
-    function renderPlaylist(self, playlist) {
-        $(self.node).html("<h1>Playlist: " + playlist.name + "</h1>");
-        $(self.node).append('<a href="javascript:Spot.W.document.queuePlaylistById(\'' + playlist.id + '\');">Queue</a>');
-        for(t in playlist['tracks']) {
-            var track = playlist['tracks'][t];
-            $(self.node).append(track.name + "<br />");
-        }
-    },
-
-    function loadPlaylist(self, pid) {
-        self.callRemote("playlist_info", pid).addCallback(function(playlist) {
-            self.renderPlaylist(playlist);
-        });
-    },
-
-    function searchResults(self, artists, albums, tracks) {
-        var t = $.template('<a href="${url}">${name}</a>, ');
-        $.throbberHide();
-        $(self.node).html("<h1>Search Results:</h1>");
-        $(self.node).append("<h2>Artists:</h2>")
-        for(k in artists) {
-            $(self.node).append(t, {url: artists[k]['link'], name: artists[k]['name']})
-        }
-        $(self.node).append("<h2>Albums:</h2>")
-        for(k in albums) {
-            $(self.node).append(t, {url: albums[k]['link'], name: albums[k]['name']})
-        }
-        $(self.node).append("<h2>Tracks:</h2>")
-        $(self.node).append('<table cellpadding="0" cellspacing="0" border="0" class="display" id="tracks-datatable"></table>')
-        var trackData = [];
-        for(k in tracks) {
-            var t = tracks[k];
-            trackData.push([t['link'], t['name'], t['album_name'], t['artist_name'], t['duration']]);
-        }
-        $('#tracks-datatable').dataTable({
-            "aaData": trackData,
-            "aoColumns": [
-                {'bVisible': false},
-                {'sTitle': "Track",
-                  'fnRender': function(obj) {
-                    return '<a href="#">' + obj.aData[1] + '</a> (<a href="javascript:Squeal.W.queue.queueTrack(\'spotify\', \'' + obj.aData[0] + '\')">queue</a>)';
-                  }},
-                {'sTitle': "Album",
-                  'fnRender': function(obj) {
-                    return '<a href="#">' + obj.aData[2] + '</a> (<a href="#">queue</a>)';
-                  }},
-                {'sTitle': 'Artist',
-                  'fnRender': function(obj) {
-                    return '<a href="#">' + obj.aData[3] + '</a>';
-                  }},
-                {'sTitle': 'Time'}
-            ]});
+Spot.Main.methods(
+    function __init__(self, widgetNode) {
+        Spot.Main.upcall(self, "__init__", widgetNode);
+        $(self.nodeById("tab-playlists")).attr('href', "#" + $(self.nodeById("content-playlists")).attr('id'));
+        $(self.nodeById("tab-search")).attr('href', "#" + $(self.nodeById("content-search")).attr('id'));
+        $(self.nodeById("tabs-spotify")).tabs();
     }
-
 );
