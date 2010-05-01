@@ -257,6 +257,10 @@ class Connected(base.BaseElement):
     def players(self, request, tag):
         return tag[self.player_content()]
 
+class PlayActions(base.BaseElement):
+    jsClass = u"Squeal.PlayActions"
+    docFactory = base.xmltemplate("playactions.html")
+
 ### this is really confusing
 ### we're mixing Elements and Pages, and they do
 ### stuff quite differently.  the following is a page!
@@ -267,6 +271,7 @@ class Jukebox(base.BasePageContainer):
 
     contained = {
         'header': Header,
+        'play_actions': PlayActions,
         #'account': Account,
         #'main': Main,
         #'playing': Playing,

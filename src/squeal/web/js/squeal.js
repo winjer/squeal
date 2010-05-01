@@ -43,6 +43,18 @@ Squeal.Queue = Squeal.Widget.subclass("Squeal.Queue");
 Squeal.Connected = Squeal.Widget.subclass("Squeal.Connected");
 Squeal.Setup = Squeal.Widget.subclass("Squeal.Setup");
 Squeal.PluginInstaller = Squeal.Widget.subclass("Squeal.PluginInstaller");
+Squeal.PlayActions = Squeal.Widget.subclass("Squeal.PlayActions");
+
+Squeal.PlayActions.methods(
+
+    function play(self) {
+        alert("Not yet implemented: Squeal.PlayActions.play");
+    },
+
+    function append(self) {
+        alert("Not yet implemented: Squeal.PlayActions.append");
+    }
+);
 
 Squeal.PluginInstaller.methods(
 
