@@ -30,23 +30,23 @@ a:hover {
     color: #CCC;
 }
 
-h2#current-album {
+h2.current-album {
     border-left: 0.1em solid #999;
     margin-left: 0.5em;
     padding-left: 0.7em;
 }
 
-#progress {
+.progress {
     margin-top: 0.5em;
 }
 
-#controls {
+.controls {
     position: relative;
     height: 6em;
     padding-top: 1.5em;
 }
 
-#controls #volume {
+.controls .volume {
     position: absolute;
     bottom: 0.5em;
     left: 0;

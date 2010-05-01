@@ -68,9 +68,9 @@ class Account(base.BaseElement):
     def credentials(self, request, tag):
         return tag['You are not logged in']
 
-class Playing(base.BaseElement):
-    jsClass = u"Squeal.Playing"
-    docFactory = base.xmltemplate("playing.html")
+class Header(base.BaseElement):
+    jsClass = u"Squeal.Header"
+    docFactory = base.xmltemplate("header.html")
 
     @athena.expose
     def goingLive(self):
@@ -89,29 +89,52 @@ class Playing(base.BaseElement):
         self.reload()
 
     def reload(self):
-        self.callRemote("reload", unicode(flatten(self.playtag())))
+        self.callRemote("reload", unicode(flatten(self.playdata())))
 
-    def playtag(self):
+    def playdata(self):
         current = self.playlist_service.get_current_track()
         if current is None:
-            return "Nothing"
+            return None
+        elif not current.is_loaded:
+            return {
+                'image': '',
+                'title': 'Loading...',
+                'artist': 'Loading...',
+                'album': 'Loading...'
+            }
+        else:
+            return {
+                'image': current.image_uri(),
+                'title': current.title,
+                'artist': current.artist,
+                'album': current.album
+            }
+
+    def current_renderer(self, attr):
+        current = self.playlist_service.get_current_track()
+        if current is None:
+            return "-"
         elif not current.is_loaded:
             return "Loading..."
         else:
-            return (
-                T.img(src=current.image_uri(), width="100px"),
-                T.br,
-                "Now playing ",
-                T.a(href="")[current.title],
-                " by ",
-                T.a(href="")[current.artist],
-                " on ",
-                T.a(href="")[current.album]
-            )
+            return getattr(current, attr)
 
     @page.renderer
-    def playing(self, request, tag):
-        return tag[self.playtag()]
+    def current_track(self, request, tag):
+        return self.current_renderer('title')
+
+    @page.renderer
+    def current_artist(self, request, tag):
+        return self.current_renderer('artist')
+
+    @page.renderer
+    def current_album(self, request, tag):
+        return self.current_renderer('album')
+
+    @page.renderer
+    def progress(self, request, tag):
+        return tag
+
 
 class Queue(base.BaseElement):
     jsClass = u"Squeal.Queue"
@@ -243,12 +266,13 @@ class Jukebox(base.BasePageContainer):
     docFactory = base.xmltemplate("jukebox.html")
 
     contained = {
-        'account': Account,
-        'main': Main,
-        'playing': Playing,
-        'queue': Queue,
-        'connected': Connected,
-        'setup': Setup,
+        'header': Header,
+        #'account': Account,
+        #'main': Main,
+        #'playing': Playing,
+        #'queue': Queue,
+        #'connected': Connected,
+        #'setup': Setup,
     }
 
     def __init__(self, service):

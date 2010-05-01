@@ -1,0 +1,27 @@
+<div id="header" class="yui-ge"
+     xmlns="http://www.w3.org/1999/xhtml"
+     n:render="liveElement"
+     xmlns:n="http://nevow.com/ns/nevow/0.1"
+     xmlns:athena="http://divmod.org/ns/athena/0.7">
+    <div class="current yui-u first">
+        <h1 class="current-track" n:render="current_track" />
+        <h2 class="current-artist" n:render="current_artist" />
+        <h2 class="current-album" n:render="current_album" />
+        <div class="progress" n:render="progress" />
+    </div>
+    <div class="controls yui-u">
+        <button class="controls-back">
+            <athena:handler event="onclick" handler="back" />
+            Back
+        </button>
+        <button class="controls-play">
+            <athena:handler event="onclick" handler="play" />
+            Play
+        </button>
+        <button class="controls-next">
+            <athena:handler event="onclick" handler="next" />
+            Next
+        </button>
+        <div class="volume"></div>
+    </div>
+</div>

@@ -38,7 +38,7 @@ Squeal.Jukebox = Squeal.Widget.subclass("Squeal.Jukebox");
 Squeal.Source = Squeal.Widget.subclass("Squeal.Source");
 Squeal.Account = Squeal.Widget.subclass("Squeal.Account");
 Squeal.Main = Squeal.Widget.subclass("Squeal.Main");
-Squeal.Playing = Squeal.Widget.subclass("Squeal.Playing");
+Squeal.Header = Squeal.Widget.subclass("Squeal.Header");
 Squeal.Queue = Squeal.Widget.subclass("Squeal.Queue");
 Squeal.Connected = Squeal.Widget.subclass("Squeal.Connected");
 Squeal.Setup = Squeal.Widget.subclass("Squeal.Setup");
@@ -122,10 +122,23 @@ Squeal.Setup.methods(
 
 );
 
-Squeal.Playing.methods(
+Squeal.Header.methods(
     function reload(self, tag) {
         self.nodeById("playing").innerHTML = tag;
+    },
+
+    function back(self) {
+        alert("Not yet implemented: Squeal.Header.back");
+    },
+
+    function play(self) {
+        alert("Not yet implemented: Squeal.Header.play");
+    },
+
+    function next(self) {
+        alert("Not yet implemented: Squeal.Header.next");
     }
+
 );
 
 Squeal.Main.methods(

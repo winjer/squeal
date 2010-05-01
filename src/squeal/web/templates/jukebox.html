@@ -20,20 +20,7 @@
 
 </head>
 <body>
-    <div id="header" class="yui-ge">
-        <div id="current" class="yui-u first">
-            <h1 id="current-track">Jesus Built My Hotrod</h1>
-            <h2 id="current-artist">Ministry</h2>
-            <h2 id="current-album">Psalm 69</h2>
-            <div id="progress"></div>
-        </div>
-        <div id="controls" class="yui-u">
-            <button id="controls-back">Back</button>
-            <button id="controls-play">Play</button>
-            <button id="controls-next">Next</button>
-            <div id="volume"></div>
-        </div>
-    </div>
+    <div id="header" class="yui-ge" n:render="header" />
     <div id="main" class="yui-g">
         <div id="sources" class="yui-u first" n:render="sources" />
         <div id="playlist" class="yui-u">
