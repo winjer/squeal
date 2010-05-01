@@ -66,6 +66,14 @@ class Playlists(base.BaseElement):
         self.callRemote("reload");
         self.evreactor.subscribe(self.reload, ispotify.ISpotifyMetadataUpdatedEvent)
 
+    @athena.expose
+    def play(self, trackID):
+        log.msg("Playing %s" % trackID, system="squeal.spot.web.Playlists")
+
+    @athena.expose
+    def append(self, trackID):
+        log.msg("Appending %s" % trackID, system="squeal.spot.web.Playlists")
+
 class Search(base.BaseElement):
     jsClass = u"Spot.Search"
     docFactory = xmltemplate("search.html")

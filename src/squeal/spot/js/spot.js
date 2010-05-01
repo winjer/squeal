@@ -43,15 +43,29 @@ Spot.Playlists.methods(
         Spot.W.playlists = self;
     },
 
+    // called by the playactions proxy
+    function play(self, node, ev) {
+        trackID = $(ev.target).parents('.playable').find("a").attr("id");
+        self.callRemote("play", trackID);
+    },
+
+    // called by the playactions proxy
+    function append(self, node, ev) {
+        trackID = $(ev.target).parents('.playable').find("a").attr("id");
+        self.callRemote("append", trackID);
+    },
+
     function render(self, playlists) {
-        var t = $.template('<li class="playable"><a href="#" id="playlist-${id}">${name}</a></li>');
+        var t = $.template('<li class="playable"><a href="#" id="${id}">${name}</a></li>');
         var ul = self.nodeById("playlists");
         $(ul).html("");
         _.each(playlists, function(p) {
             $(ul).append(t, p);
         });
-        $('li.playable').hover(
+        $(ul).find('li').hover(
             function(){
+                // this is how the proxy finds us
+                Squeal.W.playactions.proxy_to = self;
                 $(this).append($('#play-actions'));
             },
             function(){

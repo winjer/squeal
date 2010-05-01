@@ -47,12 +47,16 @@ Squeal.PlayActions = Squeal.Widget.subclass("Squeal.PlayActions");
 
 Squeal.PlayActions.methods(
 
-    function play(self) {
-        alert("Not yet implemented: Squeal.PlayActions.play");
+    function registerW(self) {
+        Squeal.W.playactions = self;
     },
 
-    function append(self) {
-        alert("Not yet implemented: Squeal.PlayActions.append");
+    function play(self, node, ev) {
+        self.proxy_to.play(node, ev);
+    },
+
+    function append(self, node, ev) {
+        self.proxy_to.append(node, ev);
     }
 );
 
