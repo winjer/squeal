@@ -43,7 +43,7 @@ class LibraryElement(base.BaseElement):
 
 class Artist(page.Element):
     docFactory = loaders.stan(
-        T.li(render=T.directive("link")))
+        T.li(class_="playable", render=T.directive("link")))
 
     def __init__(self, original):
         self.original = original
@@ -57,7 +57,7 @@ class Artist(page.Element):
 
 class Album(page.Element):
     docFactory = loaders.stan(
-        T.li(render=T.directive("link")))
+        T.li(class_="playable", render=T.directive("link")))
 
     def __init__(self, original):
         self.original = original
@@ -70,7 +70,7 @@ class Album(page.Element):
 
 class Track(page.Element):
     docFactory = loaders.stan(
-        T.li(render=T.directive("link")))
+        T.li(class_="playable", render=T.directive("link")))
 
     def __init__(self, original):
         self.original = original

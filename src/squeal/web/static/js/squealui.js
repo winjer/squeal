@@ -43,7 +43,7 @@ $(function() {
         min: 0,
         max: 100});
 
-    $('#main div.panel dl dd ul li').hover(
+    $('li.playable').hover(
         function(){
             $(this).append($('#play-actions'));
         },

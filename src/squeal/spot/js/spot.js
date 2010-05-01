@@ -44,12 +44,20 @@ Spot.Playlists.methods(
     },
 
     function render(self, playlists) {
-        var t = $.template('<li><a href="#" id="playlist-${id}">${name}</a></li>');
+        var t = $.template('<li class="playable"><a href="#" id="playlist-${id}">${name}</a></li>');
         var ul = self.nodeById("playlists");
         $(ul).html("");
         _.each(playlists, function(p) {
             $(ul).append(t, p);
         });
+        $('li.playable').hover(
+            function(){
+                $(this).append($('#play-actions'));
+            },
+            function(){
+                $(this).find('div.actions:last').remove();
+            }
+        );
     },
 
     function reload(self) {

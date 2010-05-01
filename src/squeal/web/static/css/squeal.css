@@ -107,7 +107,7 @@ h2.current-album {
     padding-left: 1em;
 }
 
-#main div.panel dl dd ul li {
+li.playable {
     line-height: 1.5em;
     font-size: 1em;
     padding: 0 30px 0 0;
@@ -127,11 +127,11 @@ h2.current-album {
     display: inline-block;
 }
 
-#main div.panel dl dd ul li a {
+li.playable a {
     text-decoration: none;
 }
 
-#main div.panel dl dd ul li:hover {
+li.playable:hover {
     background: #EEE;
     cursor: pointer;
 }
