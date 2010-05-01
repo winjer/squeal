@@ -168,13 +168,10 @@ class ITrack(Interface):
     title = Attribute(""" The name of the track, as a unicode string """)
     artist = Attribute(""" The name of the artist, as a unicode string """)
     album = Attribute(""" The name of the album, as a unicode string """)
+    image_uri = Attribute(""" The URI from which the image can be requested """)
 
     def player_uri():
         """ The URI from which the track data can be requested by the squeezebox. """
-
-    def image_uri():
-        """ The URI from which the image can be requested """
-
 
 class IUserConfigurable(Interface):
 

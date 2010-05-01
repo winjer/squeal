@@ -243,14 +243,14 @@ div.spotify-playlists ul li {
     padding-left: 0.4em;
 }
 
-#panel-playlist ul li p.track span.cover-art {
+span.cover-art {
     display: block;
     height: 3em;
     width: 3em;
 
     float: left;
     margin-right: 0.25em;
-    background: #FFF url(../images/jesus.jpg) no-repeat;
+    background: #FFF no-repeat;
 
     background-size: auto 100%;
     -moz-background-size: auto 100%;

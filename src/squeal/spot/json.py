@@ -1,6 +1,7 @@
 from zope.interface import implements
 from twisted.python.components import Adapter, registerAdapter
 from squeal.adaptivejson import IJsonAdapter, simplify
+from squeal import isqueal
 from spotify import Link
 import spotify
 from track import SpotifyTrack
@@ -28,11 +29,8 @@ class PlaylistJSON(Adapter):
 class SpotifyTrackJSON(Adapter):
     implements(IJsonAdapter)
     def encode(self):
-        return {
-            u'id': unicode(Link.from_track(self.original, 0)),
-            u'name': unicode(self.original.name(), 'utf-8'),
-            u'isLoaded': self.original.is_loaded(),
-        }
+        st = isqueal.ITrack(self.original)
+        return IJsonAdapter(st).encode()
 
 
 registerAdapter(PlaylistJSON, spotify.Playlist, IJsonAdapter)

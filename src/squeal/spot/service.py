@@ -146,11 +146,11 @@ class Spotify(Item, service.Service):
 
     def get_track(self, tid):
         track = Link.from_string(tid).as_track()
-        return SpotifyTrack(self, track)
+        return SpotifyTrack(track, self)
 
     def wrap_tracks(self, *tracks):
         for t in tracks:
-            yield SpotifyTrack(self, t)
+            yield SpotifyTrack(t, self)
 
 
     #isqueal.IRootResourceExtension

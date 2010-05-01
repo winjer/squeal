@@ -104,7 +104,7 @@ class Header(base.BaseElement):
             }
         else:
             return {
-                'image': current.image_uri(),
+                'image': current.image_uri,
                 'title': current.title,
                 'artist': current.artist,
                 'album': current.album
@@ -136,9 +136,9 @@ class Header(base.BaseElement):
         return tag
 
 
-class Queue(base.BaseElement):
-    jsClass = u"Squeal.Queue"
-    docFactory = base.xmltemplate("queue.html")
+class Playlist(base.BaseElement):
+    jsClass = u"Squeal.Playlist"
+    docFactory = base.xmltemplate("playlist.html")
 
     @athena.expose
     def goingLive(self):
@@ -272,6 +272,7 @@ class Jukebox(base.BasePageContainer):
     contained = {
         'header': Header,
         'play_actions': PlayActions,
+        'playlist': Playlist,
         #'account': Account,
         #'main': Main,
         #'playing': Playing,

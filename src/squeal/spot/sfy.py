@@ -27,6 +27,9 @@ from nevow import inevow
 from squeal.isqueal import *
 import ispotify
 
+import Image
+from StringIO import StringIO
+
 class SpotifyTransfer(object):
 
     """ Implements the streaming interface between spotify and a web request. """
@@ -113,14 +116,22 @@ class SpotifyStreamer(rend.Page):
 
 class SpotifyImage(rend.Page):
 
-    def __init__(self, original, image_id):
+    def __init__(self, original, image_id, size=None):
         self.original = original
         self.image_id = image_id
+        self.size = size
 
     def renderHTTP(self, ctx):
         request = inevow.IRequest(ctx)
         def _(image):
             request.setHeader("content-type", "image/jpeg")
+            if self.size is not None:
+                s = StringIO(image.data())
+                i = Image.open(s)
+                i.thumbnail([int(self.size), int(self.size)], Image.ANTIALIAS)
+                s2 = StringIO()
+                i.save(s2, "JPEG")
+                return s2.getvalue()
             return str(image.data())
         for service in self.original.store.powerupsFor(ispotify.ISpotifyService):
             d = service.image(self.image_id)

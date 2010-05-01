@@ -39,7 +39,7 @@ Squeal.Source = Squeal.Widget.subclass("Squeal.Source");
 Squeal.Account = Squeal.Widget.subclass("Squeal.Account");
 Squeal.Main = Squeal.Widget.subclass("Squeal.Main");
 Squeal.Header = Squeal.Widget.subclass("Squeal.Header");
-Squeal.Queue = Squeal.Widget.subclass("Squeal.Queue");
+Squeal.Playlist = Squeal.Widget.subclass("Squeal.Playlist");
 Squeal.Connected = Squeal.Widget.subclass("Squeal.Connected");
 Squeal.Setup = Squeal.Widget.subclass("Squeal.Setup");
 Squeal.PluginInstaller = Squeal.Widget.subclass("Squeal.PluginInstaller");
@@ -79,9 +79,9 @@ Squeal.Source.methods(
     }
 );
 
-Squeal.Queue.methods(
+Squeal.Playlist.methods(
     function registerW(self) {
-        Squeal.W.queue = self;
+        Squeal.W.playlist = self;
     },
 
     function clear(self) {
@@ -93,24 +93,30 @@ Squeal.Queue.methods(
         var current = data['current'];
         var ctr = self.nodeById("queue-items");
         ctr.innerHTML = "";
-        for(k in items) {
-            var item = items[k];
-            var name = "Loading...";
-            if(item.isLoaded) {
-                name = item['name'];
-            }
-            if(k == current) {
-                $(ctr).append("> " + name + "<br />");
+        var t = $.template('<li ${class}> \
+                            <p class="track"> \
+                                <span class="cover-art" style="background-image: url(${image_uri}&size=${size})"></span>\
+                                <span class="track">${title}</span>\
+                                <span class="artist">${artist}</span>\
+                                <span class="album">${album}</span>\
+                            </p>\
+                            <p class="info">\
+                              <a href="#" class="user">${user}</a>\
+                              <span class="length">${length}</span>\
+                            </p>\
+                            </li>');
+        _.each(items, function (p) {
+            if(p.position == current) {
+                p.class = 'class="current"';
+                p.size = 65;
             } else {
-                $(ctr).append(k + ":"+ name + "<br/>");
+                p.class = '';
+                p.size = 50;
             }
-        }
-    },
-
-    function queueTrack(self, provider, tid) {
-        console.log("Squeal.Queue.queueTrack(" + provider +", " + tid + ") called")
-        return self.callRemote("queueTrack", provider, tid);
+            $(ctr).append(t, p);
+        });
     }
+
 );
 
 Squeal.Connected.methods(

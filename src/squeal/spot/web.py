@@ -113,4 +113,5 @@ class Root(rend.Page):
     def child_image(self, ctx):
         #log.msg("Request for spotify image %s received" % ctx.arg('image'), system="squeal.web.service.Root")
         image_id = ctx.arg('image')
-        return SpotifyImage(self.original, image_id)
+        size = ctx.arg('size')
+        return SpotifyImage(self.original, image_id, size)

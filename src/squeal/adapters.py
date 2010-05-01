@@ -7,8 +7,13 @@ class TrackJSON(Adapter):
     implements(IJsonAdapter)
     def encode(self):
         return {
-            u'id': unicode(self.original.track_id),
-            u'name': self.original.title,
+            u'id': self.original.track_id,
+            u'title': self.original.title,
+            u'artist': self.original.artist,
+            u'album': self.original.album,
+            u'image_uri': self.original.image_uri,
+            u'user': u'', #TODO
+            u'length': u'', #TODO
             u'isLoaded': self.original.is_loaded,
         }
 

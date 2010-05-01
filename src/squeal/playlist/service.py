@@ -173,6 +173,7 @@ class Playlist(Item, service.Service):
             track = ITrack(track)
             log.msg("enqueing %r first at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
             pt.append(PlayTrack(store=self.store, position=self.current + i, tid=track.track_id, provider=track.provider))
+        self.maxposition += len(tracks)
         self.load(pt[0])
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=pt))
