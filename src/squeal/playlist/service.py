@@ -148,12 +148,32 @@ class Playlist(Item, service.Service):
         for r in self.store.powerupsFor(IEventReactor):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
-    def enqueue(self, track):
+    def enqueue(self, *tracks):
         """ Add a track to the end of the queue. Track must be conformable to
         ITrack. """
-        track = ITrack(track)
-        log.msg("enqueing %r at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
-        pt = PlayTrack(store=self.store, position=self.maxposition, tid=track.track_id, provider=track.provider)
-        self.maxposition += 1
+        pt = []
+        for track in tracks:
+            track = ITrack(track)
+            log.msg("enqueing %r at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
+            pt.append(PlayTrack(store=self.store, position=self.maxposition, tid=track.track_id, provider=track.provider))
+            self.maxposition += 1
         for r in self.store.powerupsFor(IEventReactor):
-            r.fireEvent(PlaylistChangeEvent(added=[pt]))
+            r.fireEvent(PlaylistChangeEvent(added=pt))
+
+    def playfirst(self, *tracks):
+        """ Replace the currently playing track with this new one, but keep
+        the rest of the queue the same """
+        pt = []
+        for current in self.store.query(PlayTrack, PlayTrack.position==self.current):
+            current.delete()
+        # bump existing tracks up the queue
+        for existing in self.store.query(PlayTrack, PlayTrack.position > self.current):
+            existing.position += len(tracks)
+        for i, track in enumerate(tracks):
+            track = ITrack(track)
+            log.msg("enqueing %r first at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
+            pt.append(PlayTrack(store=self.store, position=self.current + i, tid=track.track_id, provider=track.provider))
+        self.load(pt[0])
+        for r in self.store.powerupsFor(IEventReactor):
+            r.fireEvent(PlaylistChangeEvent(added=pt))
+

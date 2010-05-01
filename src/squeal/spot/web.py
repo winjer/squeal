@@ -54,6 +54,11 @@ class Playlists(base.BaseElement):
         for spotify in self.store.powerupsFor(ispotify.ISpotifyService):
             return spotify
 
+    @property
+    def playlist_service(self):
+        for p in self.store.powerupsFor(isqueal.IPlaylist):
+            return p
+
     @athena.expose
     def playlists(self):
         return map(adaptivejson.simplify, self.spotify_service.playlists())
@@ -67,12 +72,16 @@ class Playlists(base.BaseElement):
         self.evreactor.subscribe(self.reload, ispotify.ISpotifyMetadataUpdatedEvent)
 
     @athena.expose
-    def play(self, trackID):
-        log.msg("Playing %s" % trackID, system="squeal.spot.web.Playlists")
+    def play(self, playlistID):
+        log.msg("Playing %s" % playlistID, system="squeal.spot.web.Playlists")
+        playlist = self.spotify_service.getPlaylistByLink(playlistID)
+        self.playlist_service.playfirst(*self.spotify_service.wrap_tracks(*playlist))
 
     @athena.expose
-    def append(self, trackID):
-        log.msg("Appending %s" % trackID, system="squeal.spot.web.Playlists")
+    def append(self, playlistID):
+        log.msg("Appending %s" % playlistID, system="squeal.spot.web.Playlists")
+        playlist = self.spotify_service.getPlaylistByLink(playlistID)
+        self.playlist_service.enqueue(*self.spotify_service.wrap_tracks(*playlist))
 
 class Search(base.BaseElement):
     jsClass = u"Spot.Search"

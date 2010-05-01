@@ -124,6 +124,21 @@ class Spotify(Item, service.Service):
         l = Link.from_string(link)
         return l.as_track()
 
+    def getPlaylistByLink(self, link):
+        """
+        Pass link as the string representation.
+
+        This is a bit evil, there's no other way to do this, and if we
+        list other people's playlists we'll need to do even more weird stuff.
+        See
+        http://getsatisfaction.com/spotify/topics/libspotify_does_not_provide_a_sp_link_as_playlist
+        """
+        for p in self.mgr.ctr:
+            l = str(Link.from_playlist(p))
+            if l == link:
+                return p
+        log.msg("Cannot find playlist for %s" % link, system="squeal.spot.service.Spotify")
+
     def main_widget(self):
         return web.Main()
 
@@ -132,6 +147,10 @@ class Spotify(Item, service.Service):
     def get_track(self, tid):
         track = Link.from_string(tid).as_track()
         return SpotifyTrack(self, track)
+
+    def wrap_tracks(self, *tracks):
+        for t in tracks:
+            yield SpotifyTrack(self, t)
 
 
     #isqueal.IRootResourceExtension
