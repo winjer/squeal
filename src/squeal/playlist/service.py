@@ -27,14 +27,15 @@ from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer, timestamp
 
 from squeal.event import EventReactor
-from squeal.isqueal import *
 from squeal.adaptivejson import IJsonAdapter
-from squeal import adapters
+from squeal import adapters, isqueal
 
 class PlayTrack(Item):
 
     """ A track that is queued to play. The track identifier is known to the
     provider, and the provider will deliver a Track object on request. """
+
+    implements(isqueal.ITrack)
 
     position = integer(default=0)
     added = timestamp()
@@ -47,11 +48,51 @@ class PlayTrack(Item):
 
     @property
     def track(self):
+        # caching this locally in memory may or may not be a good idea
         return self.provider.get_track(self.tid)
+
+    # these are the ITrack interface. __getattr__ does weird shit with Axiom,
+    # so I opted for simple-but-lots-of-typing
+    @property
+    def track_type(self):
+        return self.track.track_type
+
+    @property
+    def track_id(self):
+        return self.tid
+
+    @property
+    def is_loaded(self):
+        return self.track.is_loaded
+
+    @property
+    def title(self):
+        return self.track.title
+
+    @property
+    def artist(self):
+        return self.track.artist
+
+    @property
+    def album(self):
+        return self.track.album
+
+    @property
+    def duration(self):
+        return self.track.duration
+
+    @property
+    def image_uri(self):
+        return self.track.image_uri
+
+    @property
+    def player_uri(self):
+        return self.track.player_uri
+
 
 class PlayTrackJSON(Adapter):
     def encode(self):
-        encoded = IJsonAdapter(ITrack(self.original.track)).encode()
+        encoded = IJsonAdapter(isqueal.ITrack(self.original.track)).encode()
         encoded.update({
             u'position': self.original.position,
             u'added': self.original.added,
@@ -63,7 +104,7 @@ registerAdapter(PlayTrackJSON, PlayTrack, IJsonAdapter)
 
 class PlaylistChangeEvent(object):
 
-    implements(IPlaylistChangeEvent)
+    implements(isqueal.IPlaylistChangeEvent)
 
     def __init__(self, added=(), removed=(), changed=(), playing=None):
         self.added = added
@@ -77,8 +118,8 @@ class Playlist(Item, service.Service):
     players. Right now there may only be one of these, and if there is more
     than one player they are assumed to be synchronised. """
 
-    implements(IPlaylist)
-    powerupInterfaces = (IPlaylist,)
+    implements(isqueal.IPlaylist)
+    powerupInterfaces = (isqueal.IPlaylist,)
 
     playing = inmemory()
     current = integer(default=-1) # currently playing
@@ -93,8 +134,8 @@ class Playlist(Item, service.Service):
 
     def activate(self):
         self.playing = False
-        self.evreactor.subscribe(self.playerState, IPlayerStateChange)
-        self.evreactor.subscribe(self.buttonPressed, IRemoteButtonPressedEvent)
+        self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
+        self.evreactor.subscribe(self.buttonPressed, isqueal.IRemoteButtonPressedEvent)
 
     def playerState(self, ev):
         """ Called by the event system in response to player state change events. """
@@ -123,7 +164,7 @@ class Playlist(Item, service.Service):
             log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
 
     def stop(self):
-        for p in self.store.powerupsFor(ISlimPlayerService):
+        for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
             p.stop()
         self.playing = False
 
@@ -132,12 +173,12 @@ class Playlist(Item, service.Service):
 
     def get_current_track(self):
         for p in self.store.query(PlayTrack, PlayTrack.position == self.current):
-            return p.track
+            return p
 
     def load(self, playtrack):
         """ Load the specified track on the player. """
         log.msg("Loading %r" % playtrack.track, system="squeal.playlist.service.Playlist")
-        for p in self.store.powerupsFor(ISlimPlayerService):
+        for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
             log.msg("Slim player service located")
             if p.players:
                 p.play(playtrack.track)
@@ -145,7 +186,7 @@ class Playlist(Item, service.Service):
                 self.playing = True
             else:
                 log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
-        for r in self.store.powerupsFor(IEventReactor):
+        for r in self.store.powerupsFor(isqueal.IEventReactor):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 
     def enqueue(self, *tracks):
@@ -153,11 +194,11 @@ class Playlist(Item, service.Service):
         ITrack. """
         pt = []
         for track in tracks:
-            track = ITrack(track)
+            track = isqueal.ITrack(track)
             log.msg("enqueing %r at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
             pt.append(PlayTrack(store=self.store, position=self.maxposition, tid=track.track_id, provider=track.provider))
             self.maxposition += 1
-        for r in self.store.powerupsFor(IEventReactor):
+        for r in self.store.powerupsFor(isqueal.IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=pt))
 
     def playfirst(self, *tracks):
@@ -170,11 +211,11 @@ class Playlist(Item, service.Service):
         for existing in self.store.query(PlayTrack, PlayTrack.position > self.current):
             existing.position += len(tracks)
         for i, track in enumerate(tracks):
-            track = ITrack(track)
+            track = isqueal.ITrack(track)
             log.msg("enqueing %r first at %d" % (track.track_id, self.maxposition), system="squeal.playlist.service.Playlist")
             pt.append(PlayTrack(store=self.store, position=self.current + i, tid=track.track_id, provider=track.provider))
         self.maxposition += len(tracks)
         self.load(pt[0])
-        for r in self.store.powerupsFor(IEventReactor):
+        for r in self.store.powerupsFor(isqueal.IEventReactor):
             r.fireEvent(PlaylistChangeEvent(added=pt))
 

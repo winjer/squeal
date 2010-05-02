@@ -54,6 +54,13 @@ class SpotifyTrack(object):
             return u"Loading..."
 
     @property
+    def duration(self):
+        if self.is_loaded:
+            return self.track.duration()
+        else:
+            return 0
+
+    @property
     def image_uri(self):
         if self.is_loaded:
             return u"/spotify/image?%s" % (urllib.urlencode({"image": self.track.album().cover()}))

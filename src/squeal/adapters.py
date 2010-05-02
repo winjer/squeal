@@ -13,8 +13,15 @@ class TrackJSON(Adapter):
             u'album': self.original.album,
             u'image_uri': self.original.image_uri,
             u'user': u'', #TODO
-            u'length': u'', #TODO
+            u'duration': self.original.duration,
+            u'length': self.length(),
             u'isLoaded': self.original.is_loaded,
         }
+
+    def length(self):
+        """ Return a human representation of a length in seconds """
+        minutes = self.original.duration / 60000
+        seconds = (self.original.duration - (minutes * 60000))/1000
+        return u"%d:%02d" % (minutes, seconds)
 
 registerAdapter(TrackJSON, isqueal.ITrack, IJsonAdapter)

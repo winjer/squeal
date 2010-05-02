@@ -76,10 +76,10 @@ class Header(base.BaseElement):
     def goingLive(self):
         self.subscribe()
 
+
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
-        self.reload()
 
     @property
     def playlist_service(self):
@@ -102,7 +102,7 @@ class Header(base.BaseElement):
                 u'title': u'Loading...',
                 u'artist': u'Loading...',
                 u'album': u'Loading...',
-                u'length': 0
+                u'duration': 0
             }
         else:
             return {
@@ -110,7 +110,7 @@ class Header(base.BaseElement):
                 u'title': current.title,
                 u'artist': current.artist,
                 u'album': current.album,
-                u'length': 360
+                u'duration': current.duration,
             }
 
     def current_renderer(self, attr):
