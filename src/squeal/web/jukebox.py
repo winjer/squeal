@@ -79,6 +79,7 @@ class Header(base.BaseElement):
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
+        self.reload()
 
     @property
     def playlist_service(self):
@@ -89,7 +90,7 @@ class Header(base.BaseElement):
         self.reload()
 
     def reload(self):
-        self.callRemote("reload", unicode(flatten(self.playdata())))
+        self.callRemote("reload", self.playdata())
 
     def playdata(self):
         current = self.playlist_service.get_current_track()
@@ -97,17 +98,19 @@ class Header(base.BaseElement):
             return None
         elif not current.is_loaded:
             return {
-                'image': '',
-                'title': 'Loading...',
-                'artist': 'Loading...',
-                'album': 'Loading...'
+                u'image': u'',
+                u'title': u'Loading...',
+                u'artist': u'Loading...',
+                u'album': u'Loading...',
+                u'length': 0
             }
         else:
             return {
-                'image': current.image_uri,
-                'title': current.title,
-                'artist': current.artist,
-                'album': current.album
+                u'image': current.image_uri,
+                u'title': current.title,
+                u'artist': current.artist,
+                u'album': current.album,
+                u'length': 360
             }
 
     def current_renderer(self, attr):
@@ -121,20 +124,15 @@ class Header(base.BaseElement):
 
     @page.renderer
     def current_track(self, request, tag):
-        return self.current_renderer('title')
+        return tag[self.current_renderer('title')]
 
     @page.renderer
     def current_artist(self, request, tag):
-        return self.current_renderer('artist')
+        return tag[self.current_renderer('artist')]
 
     @page.renderer
     def current_album(self, request, tag):
-        return self.current_renderer('album')
-
-    @page.renderer
-    def progress(self, request, tag):
-        return tag
-
+        return tag[self.current_renderer('album')]
 
 class Playlist(base.BaseElement):
     jsClass = u"Squeal.Playlist"

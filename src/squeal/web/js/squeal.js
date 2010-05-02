@@ -145,8 +145,45 @@ Squeal.Setup.methods(
 );
 
 Squeal.Header.methods(
-    function reload(self, tag) {
-        self.nodeById("playing").innerHTML = tag;
+
+    function reload(self, o) {
+        self.nodeById("track").innerHTML = o.title;
+        self.nodeById("artist").innerHTML = o.artist;
+        self.nodeById("album").innerHTML = o.album;
+        if(o.length) {
+            self.start_progress(0, o.length);
+        }
+    },
+
+    // played - the seconds played so far (0 if just starting)
+    // total - the length of the track in seconds
+    function start_progress(self, played, total) {
+        self.played = played;
+        self.total = total;
+        self.display_progress();
+        if(self.interval) {
+            self.halt_progress();
+        }
+        self.interval = setInterval(_.bind(self.update_progress, self), 1000);
+    },
+
+    function update_progress(self) {
+        self.played += 1;
+        self.display_progress();
+    },
+
+    function display_progress(self) {
+        var percent = self.played / self.total * 100;
+        var progress = self.nodeById("progress");
+        $(progress).progressbar({value: percent});
+        if(percent >= 100) {
+            self.halt_progress();
+        }
+    },
+
+    function halt_progress(self) {
+        clearInterval(self.interval);
+        self.interval = null;
     },
 
     function back(self) {

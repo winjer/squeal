@@ -35,7 +35,7 @@ $(function() {
     });
 
     $(".progress").progressbar({
-        value: 33
+        value: 0
     });
 
     $('.volume').slider({
