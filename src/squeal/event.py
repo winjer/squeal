@@ -61,7 +61,7 @@ __author__ = 'Doug Winter <doug.winter@isotoma.com>'
 __docformat__ = 'restructuredtext en'
 __version__ = '$Revision$'[11:-2]
 
-from zope.interface import Interface, implements, alsoProvides
+from zope.interface import Interface, implements, alsoProvides, providedBy
 from twisted.application import service
 from twisted.internet import defer
 from twisted.internet import reactor
@@ -72,6 +72,7 @@ from axiom.attributes import reference, inmemory, text, integer
 from squeal.isqueal import *
 
 import copy
+import os
 
 class EventSubscription(object):
 
@@ -109,7 +110,8 @@ class EventReactor(Item, service.Service):
     def _fireEvent(self, event, *interfaces):
         """ Fire the specified event. You can optionally provide additional
         interfaces that will be added to the event before firing. """
-        #log.msg("Firing Event: %s [%s]" % (event.__class__.__name__, ",".join(x.__name__ for x in interfaces)), system="squeal.event.EventReactor")
+        if 'SQUEAL_DEBUG' in os.environ:
+            log.msg("Firing Event: %s [%s] [%s]" % (event.__class__.__name__, ",".join(x.__name__ for x in providedBy(event)), ",".join(x.__name__ for x in interfaces)), system="squeal.event.EventReactor")
         if interfaces:
             event = copy.copy(event)
             alsoProvides(event, *interfaces)

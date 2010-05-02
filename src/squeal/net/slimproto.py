@@ -196,7 +196,6 @@ class Player(protocol.Protocol):
         request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_uri(),)
         data = data + request.encode("utf-8")
         self.send_frame('strm', data)
-        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
         self.displayTrack(track)
 
     def displayTrack(self, track):
@@ -295,12 +294,15 @@ class Player(protocol.Protocol):
 
     def stat_STMp(self, data):
         log.msg("Pause confirmed", system="squeal.net.slimproto.Player")
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
 
     def stat_STMr(self, data):
         log.msg("Resume confirmed", system="squeal.net.slimproto.Player")
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
 
     def stat_STMs(self, data):
         log.msg("Player status message: playback of new track has started", system="squeal.net.slimproto.Player")
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
 
     def stat_STMt(self, data):
         """ Timer heartbeat """

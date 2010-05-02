@@ -30,6 +30,7 @@ from nevow import page
 from nevow import athena
 from nevow.flat import flatten
 import urllib
+import os
 
 import base
 
@@ -80,6 +81,18 @@ class Header(base.BaseElement):
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
+        self.evreactor.subscribe(self.playerChange, isqueal.IPlayerStateChange)
+
+    def playerChange(self, ev):
+        current = self.playlist_service.get_current_track()
+        if ev.state == ev.State.PLAYING:
+            if 'SQUEAL_DEBUG' in os.environ:
+                log.msg("Player is playing, starting progress", system="squeal.web.jukebox.Header")
+            self.callRemote('start_progress', 0, current.duration)
+        elif ev.state == ev.State.PAUSED:
+            self.callRemote('halt_progress')
+            if 'SQUEAL_DEBUG' in os.environ:
+                log.msg("Player is playing, halting progress", system="squeal.web.jukebox.Header")
 
     @property
     def playlist_service(self):
@@ -90,7 +103,9 @@ class Header(base.BaseElement):
         self.reload()
 
     def reload(self):
-        self.callRemote("reload", self.playdata())
+        p = self.playdata()
+        if p is not None:
+            self.callRemote("reload", p)
 
     def playdata(self):
         current = self.playlist_service.get_current_track()
@@ -146,7 +161,6 @@ class Playlist(base.BaseElement):
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
-
     @property
     def playlist_service(self):
         for queue in self.store.powerupsFor(isqueal.IPlaylist):

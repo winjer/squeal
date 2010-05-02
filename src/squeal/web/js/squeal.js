@@ -146,6 +146,13 @@ Squeal.Setup.methods(
 
 Squeal.Header.methods(
 
+    function __init__(self, widgetNode) {
+        Squeal.Header.upcall(self, "__init__", widgetNode);
+        self.interval = null;
+        self.played = 0;
+        self.total = 100; // no div by zero
+    },
+
     function reload(self, o) {
         self.nodeById("track").innerHTML = o.title;
         self.nodeById("artist").innerHTML = o.artist;
@@ -168,7 +175,7 @@ Squeal.Header.methods(
     },
 
     function update_progress(self) {
-        self.played += 1;
+        self.played += 1000;
         self.display_progress();
     },
 
