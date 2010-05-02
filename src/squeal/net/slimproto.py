@@ -170,7 +170,7 @@ class Player(protocol.Protocol):
     def send_frame(self, command, data):
         packet = struct.pack('!H', len(data) + 4) + command + data
         #print "Sending packet %r" % packet
-        self.transport.write(packet)
+        return self.transport.write(packet)
 
     def send_version(self):
         self.send_frame('vers', '7.0')
@@ -231,8 +231,9 @@ class Player(protocol.Protocol):
         og = self.volume.old_gain()
         ng = self.volume.new_gain()
         log.msg("Volume set to %d (%d/%d)" % (self.volume.volume, og, ng), system="squeal.net.slimproto.Player")
-        self.send_frame("audg", struct.pack("!LLBBLL", og, og, 1, 255, ng, ng))
+        d = self.send_frame("audg", struct.pack("!LLBBLL", og, og, 1, 255, ng, ng))
         self.service.evreactor.fireEvent(VolumeChanged(self, self.volume))
+        return d
 
     def setBrightness(self, level=4):
         assert 0 <= level <= 4

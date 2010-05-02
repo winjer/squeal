@@ -151,6 +151,16 @@ Squeal.Header.methods(
         self.interval = null;
         self.played = 0;
         self.total = 100; // no div by zero
+        var slider = self.nodeById("volume");
+        $(slider).bind("slidechange", function(event, ui) {
+            self.slide_change(event, ui);
+        });
+    },
+
+    function slide_change(self, event, ui) {
+        if(event.originalEvent) {
+            self.callRemote("set_volume", ui.value);
+        }
     },
 
     function reload(self, o) {

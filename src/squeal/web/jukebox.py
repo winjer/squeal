@@ -43,6 +43,7 @@ from formlet import form
 from formlet import field
 
 from twisted.python import log
+from twisted.internet import defer
 
 class Setup(base.BaseElement):
     jsClass = u"Squeal.Setup"
@@ -73,10 +74,13 @@ class Header(base.BaseElement):
     jsClass = u"Squeal.Header"
     docFactory = base.xmltemplate("header.html")
 
+    def __init__(self, *a, **kw):
+        super(Header, self).__init__(*a, **kw)
+        self.ignore_volume_change = False
+
     @athena.expose
     def goingLive(self):
         self.subscribe()
-
 
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
@@ -84,8 +88,18 @@ class Header(base.BaseElement):
         self.evreactor.subscribe(self.player_change, isqueal.IPlayerStateChange)
         self.evreactor.subscribe(self.volume_change, isqueal.IVolumeChangeEvent)
 
+    @athena.expose
+    @defer.inlineCallbacks
+    def set_volume(self, value):
+        self.ignore_volume_change = True
+        for p in self.slim_service.players:
+            p.volume.volume = value
+            yield p.send_volume()
+        self.ignore_volume_change = False
+
     def volume_change(self, ev):
-        self.callRemote("volume_change", ev.volume.volume)
+        if not self.ignore_volume_change:
+            self.callRemote("volume_change", ev.volume.volume)
 
     def player_change(self, ev):
         current = self.playlist_service.get_current_track()
@@ -102,6 +116,11 @@ class Header(base.BaseElement):
     def playlist_service(self):
         for queue in self.store.powerupsFor(isqueal.IPlaylist):
             return queue
+
+    @property
+    def slim_service(self):
+        for s in self.store.powerupsFor(isqueal.ISlimPlayerService):
+            return s
 
     def queueChange(self, ev):
         self.reload()
@@ -165,6 +184,7 @@ class Playlist(base.BaseElement):
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
+
     @property
     def playlist_service(self):
         for queue in self.store.powerupsFor(isqueal.IPlaylist):
