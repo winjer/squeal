@@ -81,9 +81,13 @@ class Header(base.BaseElement):
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)
         self.evreactor.subscribe(self.queueChange, isqueal.IMetadataChangeEvent)
-        self.evreactor.subscribe(self.playerChange, isqueal.IPlayerStateChange)
+        self.evreactor.subscribe(self.player_change, isqueal.IPlayerStateChange)
+        self.evreactor.subscribe(self.volume_change, isqueal.IVolumeChangeEvent)
 
-    def playerChange(self, ev):
+    def volume_change(self, ev):
+        self.callRemote("volume_change", ev.volume.volume)
+
+    def player_change(self, ev):
         current = self.playlist_service.get_current_track()
         if ev.state == ev.State.PLAYING:
             if 'SQUEAL_DEBUG' in os.environ:

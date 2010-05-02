@@ -203,6 +203,12 @@ Squeal.Header.methods(
 
     function next(self) {
         alert("Not yet implemented: Squeal.Header.next");
+    },
+
+    // called by the server to display the volume
+    function volume_change(self, volume) {
+        var n = self.nodeById("volume");
+        $(n).slider({value: volume});
     }
 
 );
