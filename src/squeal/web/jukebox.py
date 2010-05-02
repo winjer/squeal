@@ -81,6 +81,16 @@ class Header(base.BaseElement):
     @athena.expose
     def goingLive(self):
         self.subscribe()
+        # need to work out what the logic is here if there
+        # is more than one player - i guess the UI binds to
+        # a single player
+        for p in self.slim_service.players:
+            self.callRemote("volume_change", p.volume.volume)
+            break
+        if self.playlist_service.playing:
+            current = self.playlist_service.get_current_track()
+            played = self.playlist_service.time_played()
+            self.callRemote('start_progress', played, current.duration)
 
     def subscribe(self):
         self.evreactor.subscribe(self.queueChange, isqueal.IPlaylistChangeEvent)

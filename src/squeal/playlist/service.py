@@ -30,6 +30,8 @@ from squeal.event import EventReactor
 from squeal.adaptivejson import IJsonAdapter
 from squeal import adapters, isqueal
 
+import time
+
 class PlayTrack(Item):
 
     """ A track that is queued to play. The track identifier is known to the
@@ -127,6 +129,14 @@ class Playlist(Item, service.Service):
     running = inmemory()
     name = inmemory()
     parent = inmemory()
+    previous_playtime = inmemory()
+    last_started = inmemory()
+
+    def time_played(self):
+        if self.playing:
+            return (self.previous_playtime + time.time() - self.last_started) * 1000
+        else:
+            return self.previous_playtime * 1000
 
     @property
     def evreactor(self):
@@ -159,6 +169,8 @@ class Playlist(Item, service.Service):
         log.msg("Playing", system="squeal.playlist.service.Playlist")
         for p in self.store.query(PlayTrack, PlayTrack.position == self.current + 1):
             self.load(p)
+            self.previous_playtime = 0
+            self.last_started = time.time()
             break
         else:
             log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
@@ -167,6 +179,7 @@ class Playlist(Item, service.Service):
         for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
             p.stop()
         self.playing = False
+        self.previous_playtime += time.time() - self.last_started
 
     def __iter__(self):
         return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))
