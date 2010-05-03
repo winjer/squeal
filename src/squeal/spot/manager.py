@@ -137,18 +137,21 @@ class SpotifyManager(SpotifySessionManager):
     ### IProducer interface
 
     def stopProducing(self):
-        log.msg("stopProducing", system="squeal.spot.service.SpotifyManager")
+        if 'SQUEAL_DEBUG' in os.environ:
+            log.msg("stopProducing", system="squeal.spot.service.SpotifyManager")
         self.session.play(0)
         self.playing = False
         self.consumer = None
 
     def resumeProducing(self):
-        log.msg("resumeProducing", system="squeal.spot.service.SpotifyManager")
+        if 'SQUEAL_DEBUG' in os.environ:
+            log.msg("resumeProducing", system="squeal.spot.service.SpotifyManager")
         self.session.play(1)
         self.playing = True
 
     def pauseProducing(self):
-        log.msg("pauseProducing", system="squeal.spot.service.SpotifyManager")
+        if 'SQUEAL_DEBUG' in os.environ:
+            log.msg("pauseProducing", system="squeal.spot.service.SpotifyManager")
         self.session.play(0)
         self.playing = False
 
