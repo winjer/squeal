@@ -14,5 +14,5 @@ sudo aptitude install \
     python-twisted \
     python-imaging \
     python-spotify \
-    pyton-virtualenv
+    python-virtualenv
 
