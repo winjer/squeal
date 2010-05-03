@@ -218,7 +218,7 @@ class Playlist(Item, service.Service):
         the rest of the queue the same """
         pt = []
         for current in self.store.query(PlayTrack, PlayTrack.position==self.current):
-            current.delete()
+            current.deleteFromStore()
         # bump existing tracks up the queue
         for existing in self.store.query(PlayTrack, PlayTrack.position > self.current):
             existing.position += len(tracks)
