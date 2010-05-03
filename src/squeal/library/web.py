@@ -18,6 +18,7 @@ __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
 
 from twisted.python.util import sibpath
+from twisted.python import log
 
 from nevow import page
 from nevow import loaders
@@ -155,3 +156,11 @@ class Main(base.BaseElementContainer):
     def track_count(self, request, tag):
         return "[%d]" % self.library.tracks().count()
 
+
+    @athena.expose
+    def play(self, itemID):
+        log.msg("Playing %s" % itemID, system="squeal.library.web.Main")
+
+    @athena.expose
+    def append(self, itemID):
+        log.msg("Appending %s" % itemID, system="squeal.library.web.Main")

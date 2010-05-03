@@ -43,15 +43,6 @@ $(function() {
         min: 0,
         max: 100});
 
-    $('li.playable').hover(
-        function(){
-            $(this).append($('#play-actions'));
-        },
-        function(){
-            $(this).find('div.actions:last').remove();
-        }
-    );
-
     $('#main div.panel dl dt').click(function(){
         if($(this).next().is(':visible')) {
             $(this).next().hide();

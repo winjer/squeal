@@ -35,8 +35,32 @@ Library.Widget.methods(
 Library.Main = Library.Widget.subclass("Library.Main");
 Library.Artists = Library.Widget.subclass("Library.Artists");
 Library.Albums = Library.Widget.subclass("Library.Albums");
+Library.Tracks = Library.Widget.subclass("Library.Tracks");
 
 Library.Main.methods(
+
+    function __init__(self, widgetNode) {
+        Library.Main.upcall(self, "__init__", widgetNode);
+        $(widgetNode).find('li.playable').hover(
+            function(){
+                Squeal.W.playactions.proxy_to = self;
+                $(this).append($('#play-actions'));
+            },
+            function(){
+                $(this).find('div.actions:last').remove();
+            }
+        );
+    },
+
+    function play(self, node, ev) {
+        var itemID = $(ev.target).parents('.playable').find("a").attr("id");
+        self.callRemote("play", itemID);
+    },
+
+    function append(self, node, ev) {
+        var itemID = $(ev.target).parents('.playable').find("a").attr("id");
+        self.callRemote("append", itemID);
+    },
 
     function registerW(self) {
         Library.W.main = self;
