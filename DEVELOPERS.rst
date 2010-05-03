@@ -15,12 +15,6 @@ Install distribute::
 
     venv/bin/python distribute_setup.py
 
-Install libspotify::
-
-    ./bin/getlibspotify.sh venv
-
-Note that this amends the activate script, to also export LD_LIBRARY_PATH
-
 Activate our environment::
 
     source ./venv/bin/activate

@@ -23,7 +23,6 @@ setup(
     install_requires = [
         'setuptools',
         'isotoma.recipe.gocaptain',
-        'spotify',
         'simplejson',
         'netaddr',
         'pysqlite',

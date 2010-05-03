@@ -12,5 +12,7 @@ sudo aptitude install \
     libsqlite3-dev \
     python-zopeinterface \
     python-twisted \
-    python-imaging
+    python-imaging \
+    python-spotify \
+    pyton-virtualenv
 
