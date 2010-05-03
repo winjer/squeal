@@ -45,14 +45,14 @@ Spot.Playlists.methods(
 
     // called by the playactions proxy
     function play(self, node, ev) {
-        trackID = $(ev.target).parents('.playable').find("a").attr("id");
-        self.callRemote("play", trackID);
+        var itemID = $(ev.target).parents('.playable').find("a").attr("id");
+        self.callRemote("play", itemID);
     },
 
     // called by the playactions proxy
     function append(self, node, ev) {
-        trackID = $(ev.target).parents('.playable').find("a").attr("id");
-        self.callRemote("append", trackID);
+        var itemID = $(ev.target).parents('.playable').find("a").attr("id");
+        self.callRemote("append", itemID);
     },
 
     function render(self, playlists) {
