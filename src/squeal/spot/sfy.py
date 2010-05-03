@@ -65,11 +65,13 @@ class SpotifyTransfer(object):
         self.paused = False
 
     def pauseProducing(self):
-        log.msg("pauseProducing", system="squeal.spot.sfy.SpotifyTransfer")
+        if 'SQUEAL_DEBUG' in os.environ:
+            log.msg("pauseProducing", system="squeal.spot.sfy.SpotifyTransfer")
         self.paused = True
 
     def stopProducing(self):
-        log.msg("stopProducing", system="squeal.spot.sfy.SpotifyTransfer")
+        if 'SQUEAL_DEBUG' in os.environ:
+            log.msg("stopProducing", system="squeal.spot.sfy.SpotifyTransfer")
         #self.producer.stopProducing()
         #self.request = None
 
@@ -78,11 +80,13 @@ class SpotifyTransfer(object):
 
         if not self.request:
             self.stopProducing()
-            log.msg("overrun: writing to a closed request", system="squeal.spot.sfy.SpotifyTransfer")
+            if 'SQUEAL_DEBUG' in os.environ:
+                log.msg("overrun: writing to a closed request", system="squeal.spot.sfy.SpotifyTransfer")
             return
         self.written += len(data)
-        if self.written % (1024*1024) == 0:
-            log.msg("%d written" % self.written,  system="squeal.spot.sfy.SpotifyTransfer")
+        if 'SQUEAL_DEBUG' in os.environ:
+            if self.written % (1024*1024) == 0:
+                log.msg("%d written" % self.written,  system="squeal.spot.sfy.SpotifyTransfer")
         if self.paused:
             # you'd think just returning 0 here would work, but it causes
             # the sound to skip
