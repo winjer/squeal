@@ -52,7 +52,7 @@ class StandardNamingPolicy(Item):
         def normalise(s):
             return s.replace("_", " ")
         segments = pathname.split("/")
-        parts = segments.pop(-1).split("-")
+        parts = segments.pop(-1).split(".", 1)[0].split("-")
         details = dict(zip(self.tags, cycle([None])))
         if len(parts) == 1:
             details['track'] = None
@@ -61,8 +61,9 @@ class StandardNamingPolicy(Item):
             try:
                 details['track'] = int(parts[0])
             except ValueError:
+                # assume it's the artist at 0
                 details['track'] = None
-            details['title'] = "-".join(parts)
+            details['title'] = normalise(parts[1])
         if len(segments) == 0:
             pass
         elif len(segments) == 1:

@@ -105,14 +105,17 @@ class Collection(Item):
                     mtype = 'flac'
                 elif 'mp3' in mtype:
                     mtype = 'mp3'
+                elif 'mpeg' in mtype:
+                    mtype = 'mp3'
                 elif 'wave' in mtype:
                     mtype = 'wav'
                 else:
                     mtype = None
                 log.msg("Found file %s of type %s" % (pathname, mtype), system="squeal.library.record.Collection")
                 ftype = self.filetypes.get(mtype, None)
-                details = policy.details(self, pathname)
-                self.update(pathname, ftype, details)
+                if ftype is not None:
+                    details = policy.details(self, pathname)
+                    self.update(pathname, ftype, details)
             reactor.callLater(0, _process)
         reactor.callLater(0, _process)
 
