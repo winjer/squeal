@@ -144,6 +144,8 @@ class Playlist(Item, service.Service):
 
     def activate(self):
         self.playing = False
+        self.previous_playtime = 0
+        self.last_started = 0
         self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
         self.evreactor.subscribe(self.buttonPressed, isqueal.IRemoteButtonPressedEvent)
 
