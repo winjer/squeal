@@ -25,6 +25,9 @@ from nevow import loaders
 from nevow import tags as T
 from nevow import athena
 
+from nevow import rend
+from nevow import static
+
 from squeal.web import base
 from squeal import isqueal
 
@@ -52,7 +55,7 @@ class Artist(page.Element):
     @page.renderer
     def link(self, request, tag):
         return tag[
-            T.a(href="#", id="artist-%s" % self.original.storeID)[
+            T.a(href="#", id="%s" % self.original.storeID)[
                 self.original.name
             ]]
 
@@ -66,7 +69,7 @@ class Album(page.Element):
     @page.renderer
     def link(self, request, tag):
         return tag[
-            T.a(href="#", id="album-%s" % self.original.storeID)[self.original.name],
+            T.a(href="#", id="%s" % self.original.storeID)[self.original.name],
         ]
 
 class Track(page.Element):
@@ -79,7 +82,7 @@ class Track(page.Element):
     @page.renderer
     def link(self, request, tag):
         return tag[
-            T.a(href="#", id="track-%s" % self.original.storeID)[self.original.title],
+            T.a(href="#", id=self.original.storeID)[self.original.title],
         ]
 
 class Artists(LibraryElement):
@@ -156,11 +159,39 @@ class Main(base.BaseElementContainer):
     def track_count(self, request, tag):
         return "[%d]" % self.library.tracks().count()
 
-
     @athena.expose
     def play(self, itemID):
         log.msg("Playing %s" % itemID, system="squeal.library.web.Main")
+        item = self.store.getItemByID(int(itemID))
+        self.playlist_service.playfirst(*item.tracks())
 
     @athena.expose
     def append(self, itemID):
         log.msg("Appending %s" % itemID, system="squeal.library.web.Main")
+        item = self.store.getItemByID(int(itemID))
+        self.playlist_service.enqueue(*item.tracks())
+
+class Root(rend.Page):
+
+    """ This hangs from /library at the root of the server. See
+    IRootResourceExtension """
+
+    def renderHTTP(self, ctx):
+        request = inevow.IRequest(ctx)
+        request.redirect(request.URLPath().child('jukebox'))
+        return ''
+
+    def child_stream(self, ctx):
+        log.msg("Request for library track %s received" % ctx.arg('tid'), system="squeal.web.service.Root")
+        tid = ctx.arg('tid')
+        track = self.original.store.getItemByID(int(tid))
+        if not isinstance(track, record.Track):
+            raise KeyError("Not a track")
+        return static.File(track.pathname)
+
+    def child_image(self, ctx):
+        image_id = ctx.arg("image")
+        size = ctx.arg("size")
+        #TODO
+        return 404
+

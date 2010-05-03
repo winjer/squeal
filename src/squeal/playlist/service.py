@@ -44,17 +44,14 @@ class PlayTrack(Item):
     tid = text()
     provider = reference()
 
-    def player_uri(self):
-        """ Return the URL of the track on the player """
-        return "/play?id=%s" % self.storeID
-
     @property
     def track(self):
         # caching this locally in memory may or may not be a good idea
-        return self.provider.get_track(self.tid)
+        return isqueal.ITrack(self.provider.get_track(self.tid))
 
     # these are the ITrack interface. __getattr__ does weird shit with Axiom,
     # so I opted for simple-but-lots-of-typing
+
     @property
     def track_type(self):
         return self.track.track_type

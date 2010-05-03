@@ -120,10 +120,21 @@ class Collection(Item):
 class Artist(Item):
     name = text()
 
+    def tracks(self):
+        """ This is how the web part knows which tracks to play when this item
+        is selected """
+        return self.store.query(Track,
+                                AND(Track.artist==self, Track.album==Album.storeID),
+                                sort=(Album.name.ascending, Track.track.ascending))
+
 class Album(Item):
     name = text()
     artist = reference()
 
+    def tracks(self):
+        """ This is how the web part knows which tracks to play when this item
+        is selected """
+        return self.store.query(Track, Track.album==self, sort=Track.track.ascending)
 
 class Track(Item):
 
@@ -136,6 +147,12 @@ class Track(Item):
     title = text()
     year = text()
     genre = text()
+    duration = integer() # milliseconds
+
+    def tracks(self):
+        """ This is how the web part knows which tracks to play when this item
+        is selected """
+        return [self]
 
     @classmethod
     def create(self, collection, pathname, ftype, details):
@@ -153,6 +170,7 @@ class Track(Item):
                      title=details['title'],
                      year=details['year'],
                      genre=details['genre'],
+                     duration=details['duration'],
                      )
         for r in track.store.powerupsFor(IEventReactor):
             r.fireEvent(LibraryChangeEvent(added=[track]))
@@ -186,8 +204,6 @@ class Track(Item):
         self.title = details['title']
         self.year = details['year']
         self.genre = details['genre']
-
-
 
 class TrackJSON(Adapter):
 
@@ -236,6 +252,18 @@ class TrackITrackAdapter(Adapter):
     @property
     def album(self):
         return self.original.album.name
+
+    @property
+    def image_uri(self):
+        return u"/library/image?image=%s" % self.original.storeID
+
+    @property
+    def player_uri(self):
+        return u"/library/stream?tid=%s" % self.original.storeID
+
+    @property
+    def duration(self):
+        return self.original.duration
 
 registerAdapter(TrackITrackAdapter, Track, ITrack)
 

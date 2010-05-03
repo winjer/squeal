@@ -170,9 +170,7 @@ class ITrack(Interface):
     album = Attribute(""" The name of the album, as a unicode string """)
     duration = Attribute(""" The length of time for which the track will run """)
     image_uri = Attribute(""" The URI from which the image can be requested """)
-
-    def player_uri():
-        """ The URI from which the track data can be requested by the squeezebox. """
+    player_uri = Attribute(""" The URI from which the track data can be requested by the squeezebox. """)
 
 class IUserConfigurable(Interface):
 

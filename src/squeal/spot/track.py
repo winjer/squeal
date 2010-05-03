@@ -67,6 +67,7 @@ class SpotifyTrack(object):
         else:
             return u''
 
+    @property
     def player_uri(self):
         return u"/spotify/stream?tid=%s" % self.track_id
 

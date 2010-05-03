@@ -29,6 +29,7 @@ from axiom.attributes import reference, inmemory
 import web
 from record import *
 from ilibrary import *
+from squeal import isqueal
 
 from formlet import form
 from formlet import field
@@ -39,7 +40,7 @@ field.SubmitButton(form=setup_form, name="submit", label="Configure library")
 
 class Library(Item, service.Service):
     implements(ILibrary, IMusicSource)
-    powerupInterfaces = (ILibrary, IMusicSource)
+    powerupInterfaces = (ILibrary, IMusicSource, isqueal.IRootResourceExtension)
 
     collections = reference()
     running = inmemory()
@@ -84,3 +85,7 @@ class Library(Item, service.Service):
     def get_track(self, tid):
         return self.store.getItemByID(int(tid))
 
+    #isqueal.IRootResourceExtension
+
+    def add_resources(self, root):
+        root.putChild("library", web.Root(self))

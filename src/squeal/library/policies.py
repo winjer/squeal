@@ -46,7 +46,7 @@ class StandardNamingPolicy(Item):
 
     wins = text(default=u'path') # who wins.  "path" or "tags"
 
-    tags = ['artist', 'album', 'comment', 'genre', 'title', 'track', 'year']
+    tags = ['artist', 'album', 'comment', 'genre', 'title', 'track', 'year', 'duration']
 
     def detailsFromPath(self, pathname):
         def normalise(s):
@@ -88,6 +88,7 @@ class StandardNamingPolicy(Item):
             'title': t.title,
             'track': t.track,
             'year': unicode(t.year),
+            'duration': f.file().audioProperties().length * 1000,
             }
 
     def details(self, collection, pathname):
