@@ -24,6 +24,7 @@ from nevow import page
 from nevow import loaders
 from nevow import tags as T
 from nevow import athena
+from nevow import inevow
 
 from nevow import rend
 from nevow import static
@@ -33,6 +34,8 @@ from squeal import isqueal
 
 import record
 import ilibrary
+import Image
+from StringIO import StringIO
 
 template_dir = sibpath(__file__, 'templates')
 
@@ -171,6 +174,26 @@ class Main(base.BaseElementContainer):
         item = self.store.getItemByID(int(itemID))
         self.playlist_service.enqueue(*item.tracks())
 
+class Artwork(rend.Page):
+
+    def __init__(self, original, trackID, size):
+        self.original = original
+        self.trackID = trackID
+        self.size = size
+
+    def renderHTTP(self, ctx):
+        request = inevow.IRequest(ctx)
+        request.setHeader("content-type", "image/png")
+        data = open(sibpath(__file__, 'music.png')).read()
+        if self.size is not None:
+            s = StringIO(data)
+            image = Image.open(s)
+            image.thumbnail([int(self.size), int(self.size)], Image.ANTIALIAS)
+            s2 = StringIO()
+            image.save(s2, "PNG")
+            return s2.getvalue()
+        return data
+
 class Root(rend.Page):
 
     """ This hangs from /library at the root of the server. See
@@ -192,6 +215,5 @@ class Root(rend.Page):
     def child_image(self, ctx):
         image_id = ctx.arg("image")
         size = ctx.arg("size")
-        #TODO
-        return 404
+        return Artwork(self.original, image_id, size)
 

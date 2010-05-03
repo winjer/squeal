@@ -182,6 +182,24 @@ class Header(base.BaseElement):
     def current_album(self, request, tag):
         return tag[self.current_renderer('album')]
 
+    @athena.expose
+    def back(self):
+        """ Go back a track in the playlist """
+
+    @athena.expose
+    def playpause(self):
+        """ Either play or pause, depending on the current state of the
+        players """
+        if self.playlist_service.playing:
+            self.playlist_service.pause()
+        else:
+            self.playlist_service.play()
+
+    @athena.expose
+    def next(self):
+        """ Skip to the next track in the playlist """
+
+
 class Playlist(base.BaseElement):
     jsClass = u"Squeal.Playlist"
     docFactory = base.xmltemplate("playlist.html")

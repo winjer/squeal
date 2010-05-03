@@ -166,19 +166,33 @@ class Playlist(Item, service.Service):
 
     def play(self):
         log.msg("Playing", system="squeal.playlist.service.Playlist")
-        for p in self.store.query(PlayTrack, PlayTrack.position == self.current + 1):
-            self.load(p)
-            self.previous_playtime = 0
+        if self.previous_playtime != 0:
+            # we're paused
+            for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
+                p.unpause()
             self.last_started = time.time()
-            break
         else:
-            log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
+            for p in self.store.query(PlayTrack, PlayTrack.position == self.current + 1):
+                self.load(p)
+                self.previous_playtime = 0
+                self.last_started = time.time()
+                break
+            else:
+                log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
+
+    def pause(self):
+        for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
+            p.pause()
+        self.playing = False
+        self.previous_playtime += time.time() - self.last_started
+        self.last_started = 0
 
     def stop(self):
         for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
             p.stop()
         self.playing = False
-        self.previous_playtime += time.time() - self.last_started
+        self.previous_playtime = 0
+        self.last_started = 0
 
     def __iter__(self):
         return iter(self.store.query(PlayTrack, sort=PlayTrack.position.ascending))

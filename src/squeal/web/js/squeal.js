@@ -196,23 +196,31 @@ Squeal.Header.methods(
         if(percent >= 100) {
             self.halt_progress();
         }
+        var playbutton = self.nodeById("controls-play");
+        $(playbutton).button('option', {
+            icons: { primary: 'ui-icon-pause' }
+        });
     },
 
     function halt_progress(self) {
         clearInterval(self.interval);
         self.interval = null;
+        var playbutton = self.nodeById("controls-play");
+        $(playbutton).button('option', {
+            icons: { primary: 'ui-icon-play' }
+        });
     },
 
     function back(self) {
-        alert("Not yet implemented: Squeal.Header.back");
+        self.callRemote("back");
     },
 
-    function play(self) {
-        alert("Not yet implemented: Squeal.Header.play");
+    function playpause(self) {
+        self.callRemote("playpause");
     },
 
     function next(self) {
-        alert("Not yet implemented: Squeal.Header.next");
+        self.callRemote("next");
     },
 
     // called by the server to display the volume

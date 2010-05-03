@@ -6,15 +6,7 @@ $(function() {
 
     $('.controls-play').button({
         text: false,
-        icons: { primary: 'ui-icon-play' }
-    }).click(function() {
-        var options;
-        if ($(this).text() == 'Play') {
-            options = { label: 'Stop', icons: { primary: 'ui-icon-stop' } };
-        } else {
-            options = { label: 'Play', icons: { primary: 'ui-icon-play' } };
-        }
-        $(this).button('option', options);
+        icons: { primary: 'ui-icon-pause' }
     });
 
     $('.controls-next').button({

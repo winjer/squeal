@@ -73,7 +73,7 @@ class StateChanged(object):
         STOPPED = 2
         PAUSED = 3
         PLAYING = 4
-        UNDERRUN = 5
+        UNDERRUN = 5 # end of playback, not an error
         READY = 6
 
     def __init__(self, player, state):
@@ -116,6 +116,14 @@ class SlimService(Item, service.Service):
         log.msg("Playing %r" % track, system="squeal.net.slimproto.SlimService")
         for p in self.players:
             p.play(track)
+
+    def pause(self):
+        for p in self.players:
+            p.pause()
+
+    def unpause(self):
+        for p in self.players:
+            p.unpause()
 
     def stop(self):
         for p in self.players:
@@ -184,6 +192,22 @@ class Player(protocol.Protocol):
     def stop_streaming(self):
         data = self.pack_stream("q", autostart="0", flags=0)
         self.send_frame("strm", data)
+
+    def pause(self):
+        data = self.pack_stream("p")
+        self.send_frame("strm", data)
+        log.msg("Sending pause request", system="squeal.net.slimproto.Player")
+        # we don't seem to get reliable confirmations that the action has taken place
+        # so we have to do this here :/
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
+
+    def unpause(self):
+        data = self.pack_stream("u")
+        self.send_frame("strm", data)
+        log.msg("Sending unpause request", system="squeal.net.slimproto.Player")
+        # we don't seem to get reliable confirmations that the action has taken place
+        # so we have to do this here :/
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
 
     def stop(self):
         self.stop_streaming()
@@ -294,8 +318,8 @@ class Player(protocol.Protocol):
         log.msg("Output Underrun", system="squeal.net.slimproto.Player")
 
     def stat_STMp(self, data):
-        log.msg("Pause confirmed", system="squeal.net.slimproto.Player")
-        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
+        log.msg("Pause confirmed?", system="squeal.net.slimproto.Player")
+        #self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
 
     def stat_STMr(self, data):
         log.msg("Resume confirmed", system="squeal.net.slimproto.Player")
@@ -310,7 +334,8 @@ class Player(protocol.Protocol):
         self.last_heartbeat = time.time()
 
     def stat_STMu(self, data):
-        log.msg("Underrun", system="squeal.net.slimproto.Player")
+        log.msg("End of playback", system="squeal.net.slimproto.Player")
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.UNDERRUN))
 
     def process_BYE(self, data):
         log.msg("BYE received", system="squeal.net.slimproto.Player")
