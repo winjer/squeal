@@ -35,6 +35,9 @@ from track import SpotifyTrack
 from manager import SpotifyManager
 from spotify import Link
 import json
+import sys
+import os
+import signal
 
 from formlet import form
 from formlet import field
@@ -87,7 +90,13 @@ class Spotify(Item, service.Service):
     def activate(self):
         self.playing = None
 
+    def sigint(self, handler, frame):
+        # filthy hack!
+        os.kill(os.getpid(), signal.SIGQUIT)
+
     def startService(self):
+        # interrupts go nasty when we have spotify running in a thread
+        signal.signal(signal.SIGINT, self.sigint)
         self.mgr = SpotifyManager(self)
         reactor.callInThread(self.mgr.connect)
         return service.Service.startService(self)
