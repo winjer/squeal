@@ -215,7 +215,7 @@ class Player(protocol.Protocol):
     def play(self, track):
         command = 's'
         autostart = '1'
-        formatbyte = self.typeMap[track.track_type]
+        formatbyte = self.typeMap[track.type]
         data = self.pack_stream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
         request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_uri,)
         data = data + request.encode("utf-8")
