@@ -27,6 +27,8 @@ from nevow import inevow
 from squeal.isqueal import *
 import ispotify
 
+import os
+
 import Image
 from StringIO import StringIO
 
