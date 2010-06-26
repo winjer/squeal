@@ -26,17 +26,22 @@ import stat
 from zope.interface import Interface, implements
 
 from twisted.internet import reactor
+from twisted.internet import defer
 from twisted.python.components import Adapter, registerAdapter
 from twisted.python import log
 
 from axiom.item import Item
-from axiom.attributes import text, timestamp, path, reference, integer, AND
+from axiom.attributes import text, timestamp, path, reference, integer, AND, inmemory
 from epsilon.extime import Time
 
 from squeal.isqueal import *
 from squeal.adaptivejson import IJsonAdapter
 
 from ilibrary import *
+
+# we only need one magic database, and here it is
+magicdb = magic.open(magic.MAGIC_NONE)
+magicdb.load()
 
 class LibraryChangeEvent(object):
 
@@ -54,8 +59,12 @@ class Collection(Item):
 
     implements(ICollection)
 
+    # the pathname to the root of the collection
     pathname = text()
+    # the date of the last update run
     last = timestamp()
+    # number of files to process before yielding to the reactor loop
+    files_per_loop = 20
 
     filetypes = {
         'ogg': 0,
@@ -65,6 +74,8 @@ class Collection(Item):
     }
 
     def update(self, pathname, ftype, details):
+        """ Update a track in the database, based on it's filetype and the
+        details we can extract from it's path or tags. """
         for track in self.store.query(Track, Track.pathname == pathname):
             # we should make updating an option
             #track.update(details)
@@ -77,47 +88,61 @@ class Collection(Item):
         for l in self.store.powerupsFor(ILibrary):
             return l
 
+    def _generate_changed_paths(self):
+        """ Generator of all pathnames within this collection that have been
+        created or updated since the collection was last updated. """
+        for (dirpath, dirnames, filenames) in os.walk(self.pathname):
+            for filename in filenames:
+                pathname = os.path.join(dirpath, filename)
+                if self.is_new_file(pathname):
+                    yield pathname
+
+    def file_type(self, pathname):
+        """ Return our internal representation of the music file type for the
+        file at pathname. """
+        mtype = magicdb.file(pathname.encode('utf-8')).lower()
+        if 'ogg' in mtype:
+            mtype = 'ogg'
+        elif 'flac' in mtype:
+            mtype = 'flac'
+        elif 'mp3' in mtype:
+            mtype = 'mp3'
+        elif 'mpeg' in mtype:
+            mtype = 'mp3'
+        elif 'audio file with id3' in mtype:
+            mtype = 'mp3'
+        elif 'wave' in mtype:
+            mtype = 'wav'
+        else:
+            mtype = None
+        log.msg("Found file %s of type %s" % (pathname, mtype), system="squeal.library.record.Collection")
+        return self.filetypes.get(mtype, None)
+
+    def is_new_file(self, pathname):
+        """ Is this file newer than the last time the collection was scanned? """
+        if self.last is not None:
+            timestamp = self.last.asPOSIXTimestamp()
+            if os.stat(pathname)[stat.ST_MTIME] < timestamp:
+                return False
+        return True
+
+    def update_path(self, pathname):
+        """ Update a database entry for a specified pathname. """
+        ftype = self.file_type(pathname)
+        if ftype is not None:
+            details = self.library.naming_policy.details(self, pathname)
+            self.update(pathname, ftype, details)
+
     def scan(self):
         """ Loop through every file in the collection and update the metadata
         stored against the track from it's tags and/or name """
         log.msg("Scanning collection %s" % self.pathname, system="squeal.library.record.Collection")
-        m = magic.open(magic.MAGIC_NONE)
-        m.load()
-        scanning = enumerate(os.walk(self.pathname))
-        if self.last is not None:
-            timestamp = self.last.asPOSIXTimestamp()
-        policy = self.library.naming_policy
-        def _process():
-            try:
-                i, (dirpath, dirnames, filenames) = scanning.next()
-            except StopIteration:
-                self.last = Time()
-                return
-            for f in filenames:
-                pathname = os.path.join(dirpath, f)
-                if self.last is not None:
-                    if os.stat(pathname)[stat.ST_MTIME] < timestamp:
-                        continue
-                mtype = m.file(pathname.encode('utf-8')).lower()
-                if 'ogg' in mtype:
-                    mtype = 'ogg'
-                elif 'flac' in mtype:
-                    mtype = 'flac'
-                elif 'mp3' in mtype:
-                    mtype = 'mp3'
-                elif 'mpeg' in mtype:
-                    mtype = 'mp3'
-                elif 'wave' in mtype:
-                    mtype = 'wav'
-                else:
-                    mtype = None
-                log.msg("Found file %s of type %s" % (pathname, mtype), system="squeal.library.record.Collection")
-                ftype = self.filetypes.get(mtype, None)
-                if ftype is not None:
-                    details = policy.details(self, pathname)
-                    self.update(pathname, ftype, details)
-            reactor.callLater(0, _process)
-        reactor.callLater(0, _process)
+        for i, pathname in enumerate(self._generate_changed_paths()):
+            self.update_path(pathname)
+            if i % self.files_per_loop == 0:
+                # allow other things to happen
+                reactor.iterate()
+        self.last = Time()
 
 
 class Artist(Item):
