@@ -32,7 +32,7 @@ from axiom.attributes import text
 
 from ilibrary import INamingPolicy
 
-class StandardNamingPolicy(Item):
+class StandardPolicyMixin:
 
     """ Extracts details from tags and from the pathname assuming the path is of the form:
 
@@ -42,13 +42,11 @@ class StandardNamingPolicy(Item):
         than the tags, as long as the pathname is of that form, or similar.
         """
 
-    implements(INamingPolicy)
-
-    wins = text(default=u'path') # who wins.  "path" or "tags"
-
     tags = ['artist', 'album', 'comment', 'genre', 'title', 'track', 'year', 'duration']
 
     def detailsFromPath(self, pathname):
+        if type(pathname) is not unicode:
+            pathname = pathname.decode("utf-8")
         def normalise(s):
             return s.replace("_", " ")
         segments = pathname.split("/")
@@ -92,6 +90,12 @@ class StandardNamingPolicy(Item):
             'duration': f.file().audioProperties().length * 1000,
             }
 
+class StandardNamingPolicy(Item, StandardPolicyMixin):
+
+    implements(INamingPolicy)
+
+    wins = text(default=u'path') # who wins.  "path" or "tags"
+
     def details(self, collection, pathname):
         pathd = self.detailsFromPath(os.path.join(collection.pathname, pathname))
         try:
@@ -115,4 +119,3 @@ class StandardNamingPolicy(Item):
             else:
                 raise NotImplementedError
         return details
-
