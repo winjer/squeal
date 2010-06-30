@@ -11,7 +11,7 @@ from twisted.application.service import IService
 
 from squeal.web.service import WebService
 from squeal.net.slimproto import SlimService
-from squeal.net.discovery import DiscoveryService
+#from squeal.net.discovery import DiscoveryService
 from squeal.playlist.service import Playlist
 from squeal.event import EventReactor
 from squeal.extension import PluginManager
@@ -24,7 +24,7 @@ services = (
     EventReactor,
     WebService,
     SlimService,
-    DiscoveryService,
+    #DiscoveryService,
     Playlist,
     PluginManager,
 )
