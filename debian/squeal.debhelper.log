@@ -1,0 +1,10 @@
+dh_prep
+dh_installdirs
+dh_pysupport
+dh_installman
+dh_compress
+dh_fixperms
+dh_installdeb
+dh_gencontrol
+dh_md5sums
+dh_builddeb
