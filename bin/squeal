@@ -1,0 +1,105 @@
+#! /usr/bin/env python
+
+""" Provide command line access to do stuff with the squealserver server. """
+
+usage = """%prog [options] [command]
+
+Command:
+  start      Start the squeal server, if it is not already running
+  stop       Stop the squeal server, if it is running
+  status     Report on the status of the squeal server
+  wipe       Wipe the squealserver database completely, and reinitialise it
+  debug      Start in debug mode, with a python prompt
+  fg         Run in the foreground, writing the log to the screen
+"""
+
+import pwd
+import os
+import sys
+import optparse
+import subprocess
+from itertools import chain
+
+class SquealManager:
+
+    def __init__(self, database, pidfile, logfile, user):
+        self.database = database
+        self.pidfile = pidfile
+        self.logfile = logfile
+        self.uid = pwd.getpwnam(user).pw_uid
+        self.username = user
+
+    def axiomatic(self, *args):
+        from axiom.scripts import axiomatic
+        axiomatic.main(list(chain(["--dbdir", self.database], args)))
+
+    def start(self, foreground=False):
+        if not os.path.exists(self.database):
+            self.create_db()
+        #self.axiomatic("start", "--pidfile", self.pidfile, "--logfile", self.logfile, "--uid", self.uid)
+        self.axiomatic("start", "--logfile", self.logfile, "--uid", self.uid)
+
+    def stop(self):
+        self.axiomatic("stop")
+
+    def create_db(self):
+        from axiom.store import Store
+        from twisted.application.service import IService
+        from squeal.web.service import WebService
+        from squeal.net.slimproto import SlimService
+        from squeal.playlist.service import Playlist
+        from squeal.event import EventReactor
+        from squeal.extension import PluginManager
+        store = Store(self.database)
+
+        services = (
+            EventReactor,
+            WebService,
+            SlimService,
+            Playlist,
+            PluginManager,
+        )
+
+        for srv in services:
+            s = srv(store=store)
+            for iface in s.powerupInterfaces:
+                store.powerUp(s, iface)
+                store.powerUp(s, IService)
+        os.system("chown -R %s: %s" % (self.username, self.database))
+
+
+if __name__ == "__main__":
+
+    p = optparse.OptionParser(usage=usage)
+    p.add_option("-d", "--database", help="Specify database location", default="/var/lib/squeal/db")
+    p.add_option("-p", "--pidfile", help="Pid file location", default="/var/run/squeal.pid")
+    p.add_option("-l", "--logfile", help="Log file location", default="/var/log/squeal.log")
+    p.add_option("-L", "--libpath", help="path to the squeal libs", default="/usr/share/squeal")
+    p.add_option("-u", "--user", help="user to run as", default="squeal")
+    opts, args = p.parse_args()
+
+    if len(args) != 1:
+        p.print_help()
+        raise SystemExit
+
+    sys.path.insert(0, opts.libpath)
+    mgr = SquealManager(database=opts.database, logfile=opts.logfile, pidfile=opts.pidfile, user=opts.user)
+
+    command = args[0]
+    if command == "start":
+        mgr.start()
+    elif command == "fg":
+        mgr.start(foreground=True)
+    elif command == "stop":
+        mgr.stop()
+    elif command == "wipe":
+        mgr.wipe()
+    elif command == "status":
+        mgr.status()
+    elif command == "debug":
+        mgr.debug()
+    else:
+        p.print_help()
+        raise SystemExit
+
+
