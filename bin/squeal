@@ -22,11 +22,11 @@ from itertools import chain
 
 class SquealManager:
 
-    def __init__(self, database, pidfile, logfile, user):
+    def __init__(self, database, logfile, user):
         self.database = database
-        self.pidfile = pidfile
         self.logfile = logfile
         self.uid = pwd.getpwnam(user).pw_uid
+        self.gid = pwd.getpwnam(user).pw_gid
         self.username = user
 
     def axiomatic(self, *args):
@@ -36,8 +36,7 @@ class SquealManager:
     def start(self, foreground=False):
         if not os.path.exists(self.database):
             self.create_db()
-        #self.axiomatic("start", "--pidfile", self.pidfile, "--logfile", self.logfile, "--uid", self.uid)
-        self.axiomatic("start", "--logfile", self.logfile, "--uid", self.uid)
+        self.axiomatic("start", "--logfile", self.logfile, "--uid", self.uid, "--gid", self.gid)
 
     def stop(self):
         self.axiomatic("stop")
@@ -72,7 +71,6 @@ if __name__ == "__main__":
 
     p = optparse.OptionParser(usage=usage)
     p.add_option("-d", "--database", help="Specify database location", default="/var/lib/squeal/db")
-    p.add_option("-p", "--pidfile", help="Pid file location", default="/var/run/squeal.pid")
     p.add_option("-l", "--logfile", help="Log file location", default="/var/log/squeal.log")
     p.add_option("-L", "--libpath", help="path to the squeal libs", default="/usr/share/squeal")
     p.add_option("-u", "--user", help="user to run as", default="squeal")
@@ -83,7 +81,7 @@ if __name__ == "__main__":
         raise SystemExit
 
     sys.path.insert(0, opts.libpath)
-    mgr = SquealManager(database=opts.database, logfile=opts.logfile, pidfile=opts.pidfile, user=opts.user)
+    mgr = SquealManager(database=opts.database, logfile=opts.logfile, user=opts.user)
 
     command = args[0]
     if command == "start":

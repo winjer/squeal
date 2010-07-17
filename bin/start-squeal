@@ -1,7 +1,0 @@
-#! /bin/sh
-[ -d db ] || {
-    echo Database does not exist - creating default services
-    ./bin/create.py
-}
-
-axiomatic -d db start -n

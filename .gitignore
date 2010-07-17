@@ -11,3 +11,11 @@ _trial_temp
 core
 setuptools*
 wingdbstub.py
+build-stamp
+configure-stamp
+debian/squeal
+distribute-0.6.10.tar.gz
+libspotify
+src/squeal.egg-info
+venv
+

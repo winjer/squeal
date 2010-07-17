@@ -1,5 +1,21 @@
 install:
+	cp bin/squeal $(DESTDIR)/usr/bin/
 	mkdir -p $(DESTDIR)/usr/share/squeal
+	mkdir -p $(DESTDIR)/usr/share/squeal/twisted
+	mkdir -p $(DESTDIR)/usr/share/squeal/twisted/plugins
+	cp -r src/twisted/plugins/*.py $(DESTDIR)/usr/share/squeal/twisted/plugins/
+	mkdir -p $(DESTDIR)/usr/share/squeal/formless
+	mkdir -p $(DESTDIR)/usr/share/squeal/formless/test
+	cp -r src/formless/*.py $(DESTDIR)/usr/share/squeal/formless/
+	cp -r src/formless/test/*.py $(DESTDIR)/usr/share/squeal/formless/test/
+	mkdir -p $(DESTDIR)/usr/share/squeal/epsilon
+	mkdir -p $(DESTDIR)/usr/share/squeal/epsilon/hotfixes
+	mkdir -p $(DESTDIR)/usr/share/squeal/epsilon/test
+	mkdir -p $(DESTDIR)/usr/share/squeal/epsilon/scripts
+	cp -r src/epsilon/*.py $(DESTDIR)/usr/share/squeal/epsilon/
+	cp -r src/epsilon/hotfixes/*.py $(DESTDIR)/usr/share/squeal/epsilon/hotfixes/
+	cp -r src/epsilon/test/*.py $(DESTDIR)/usr/share/squeal/epsilon/test/
+	cp -r src/epsilon/scripts/*.py $(DESTDIR)/usr/share/squeal/epsilon/scripts/
 	mkdir -p $(DESTDIR)/usr/share/squeal/axiom
 	mkdir -p $(DESTDIR)/usr/share/squeal/axiom/plugins
 	mkdir -p $(DESTDIR)/usr/share/squeal/axiom/scripts
@@ -42,6 +58,7 @@ install:
 	cp -r src/squeal/web/js $(DESTDIR)/usr/share/squeal/squeal/web/
 	cp -r src/squeal/web/templates $(DESTDIR)/usr/share/squeal/squeal/web/
 	cp -r src/squeal/spot/*.py $(DESTDIR)/usr/share/squeal/squeal/spot/
+	cp -r src/squeal/spot/appkey.key $(DESTDIR)/usr/share/squeal/squeal/spot/
 	cp -r src/squeal/spot/js $(DESTDIR)/usr/share/squeal/squeal/spot/
 	cp -r src/squeal/spot/templates $(DESTDIR)/usr/share/squeal/squeal/spot/
 	cp -r src/squeal/player/*.py $(DESTDIR)/usr/share/squeal/squeal/player/

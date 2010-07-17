@@ -1,5 +1,5 @@
 Source: squeal
-Section: unknown
+Section: sound
 Priority: extra
 Maintainer: Doug Winter <doug@isotoma.com>
 Build-Depends: debhelper (>= 7), python-support (>=0.90), python-all-dev
@@ -8,6 +8,6 @@ Homepage: http://squealserver.com
 
 Package: squeal
 Architecture: any
-Depends: ${misc:Depends}, ${python:Depends}, python-crypto, python-tagpy, python-magic, libsqlite3-dev, python-zopeinterface, python-twisted, python-imaging, python-spotify
+Depends: ${misc:Depends}, ${python:Depends}, python-crypto, python-tagpy, python-magic, libsqlite3-dev, python-zopeinterface, python-twisted, python-imaging, python-spotify, python-pysqlite2, python-simplejson, python-netaddr
 Description: <insert up to 60 chars description>
  <insert long description, indented with spaces>

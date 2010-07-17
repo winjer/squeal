@@ -1,6 +1,7 @@
 
 
 import traceback
+import os
 
 from twisted.internet import reactor, defer
 from twisted.internet.interfaces import IPushProducer, IProducer
@@ -22,9 +23,9 @@ class SpotifyManager(SpotifySessionManager):
 
     appkey_file = sibpath(__file__, 'appkey.key')
 
-
     def __init__(self, service):
         self.service = service
+        self.cache_location = self.service.store.dbdir.child("temp").path
         SpotifySessionManager.__init__(self, service.username, service.password)
         self.ctr = None
         self.playing = False
