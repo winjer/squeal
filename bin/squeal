@@ -36,7 +36,11 @@ class SquealManager:
     def start(self, foreground=False):
         if not os.path.exists(self.database):
             self.create_db()
-        self.axiomatic("start", "--logfile", self.logfile, "--uid", self.uid, "--gid", self.gid)
+        if foreground:
+            args = ["start", "-n"]
+        else:
+            args = ["start", "--logfile", self.logfile, "--uid", self.uid, "--gid", self.gid]
+        self.axiomatic(*args)
 
     def stop(self):
         self.axiomatic("stop")
@@ -80,7 +84,9 @@ if __name__ == "__main__":
         p.print_help()
         raise SystemExit
 
-    sys.path.insert(0, opts.libpath)
+    if opts.libpath:
+        print "Inserting", opts.libpath, "onto PYTHONPATH"
+        sys.path.insert(0, opts.libpath)
     mgr = SquealManager(database=opts.database, logfile=opts.logfile, user=opts.user)
 
     command = args[0]

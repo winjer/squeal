@@ -25,4 +25,5 @@ Run the develop script::
 
 Start squeal::
 
-    bin/start-squeal
+    bin/squeal -d db -L "" fg
+
