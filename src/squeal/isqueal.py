@@ -62,6 +62,16 @@ class IEventReactor(Interface):
 # Events
 ################################################################################
 
+class IPlayMusic(Interface):
+
+    """ A device that needs to know when music is to be played. For example,
+    the service that manages collections of squeezeboxes, or the spotify
+    service which needs to go load a track. """
+
+    def play(track):
+        """ Play the specified track """
+
+
 # Player events
 
 class IPlayerEvent(Interface):
@@ -170,7 +180,9 @@ class ITrack(Interface):
     album = Attribute(""" The name of the album, as a unicode string """)
     duration = Attribute(""" The length of time for which the track will run """)
     image_uri = Attribute(""" The URI from which the image can be requested """)
-    player_uri = Attribute(""" The URI from which the track data can be requested by the squeezebox. """)
+    def player_uri(player_id):
+        """ The URI from which the track data can be requested by the squeezebox. """
+
 
 class IUserConfigurable(Interface):
 

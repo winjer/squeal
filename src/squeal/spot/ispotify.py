@@ -63,7 +63,7 @@ class ISpotifyService(Interface):
     def play(tid):
         """ Play the track specified by this track id """
 
-    def registerConsumer(consumer, tid):
+    def registerConsumer(consumer, track):
         pass
 
     def playlists():

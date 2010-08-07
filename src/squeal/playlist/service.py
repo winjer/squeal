@@ -84,9 +84,8 @@ class PlayTrack(Item):
     def image_uri(self):
         return self.track.image_uri
 
-    @property
-    def player_uri(self):
-        return self.track.player_uri
+    def player_uri(self, player_id):
+        return self.track.player_uri(player_id)
 
 
 class PlayTrackJSON(Adapter):
@@ -143,7 +142,7 @@ class Playlist(Item, service.Service):
         self.playing = False
         self.previous_playtime = 0
         self.last_started = 0
-        self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
+        #self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
         self.evreactor.subscribe(self.buttonPressed, isqueal.IRemoteButtonPressedEvent)
 
     def playerState(self, ev):
@@ -203,15 +202,15 @@ class Playlist(Item, service.Service):
 
     def load(self, playtrack):
         """ Load the specified track on the player. """
+        connected = 0
         log.msg("Loading %r" % playtrack.track, system="squeal.playlist.service.Playlist")
-        for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
-            log.msg("Slim player service located")
-            if p.players:
-                p.play(playtrack.track)
-                self.current = playtrack.position
-                self.playing = True
-            else:
-                log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
+        for p in self.store.powerupsFor(isqueal.IPlayMusic):
+            connected += p.play(playtrack.track)
+        if connected != 0:
+            self.current = playtrack.position
+            self.playing = True
+        else:
+            log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
         for r in self.store.powerupsFor(isqueal.IEventReactor):
             r.fireEvent(PlaylistChangeEvent(playing=[playtrack]))
 

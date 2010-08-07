@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Controllers specific to spotify. Will probably be pulled out into a
-spotify plugin in some form. """
+""" Streaming from spotify to squeezeboxes.  Here be dragons. """
 
 __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
 __version__ = "$Revision$"[11:-2]
 
 from zope.interface import implements
-from twisted.internet.interfaces import IConsumer, IProducer, IPushProducer
 from twisted.python import log
 from nevow import rend
 from nevow import inevow
@@ -32,92 +30,16 @@ import os
 import Image
 from StringIO import StringIO
 
-class SpotifyTransfer(object):
+class SpotifyStreamingPage(rend.Page):
 
-    """ Implements the streaming interface between spotify and a web request. """
-
-    implements(IConsumer, IProducer, IPushProducer)
-
-    request = None
-
-    def __init__(self, tid, service, request):
-        log.msg("Initiating transfer", system="squeal.spot.sfy.SpotifyTransfer")
-        self.tid = tid
-        self.request = request
-        self.service = service
-        self.data = []
-        self.paused = False
-        self.finished = False
-        self.written = 0
-        request.registerProducer(self, 1)
-        self.service.registerConsumer(self, tid)
-
-    def resumeProducing(self):
-        log.msg("resumeProducing", system="squeal.spot.sfy.SpotifyTransfer")
-        if not self.request:
-            return
-        if self.data:
-            # calling write multiple times causes a slew of pauses to come back
-            self.request.write("".join(self.data))
-            self.data = []
-        if self.finished:
-            self.request.unregisterProducer()
-            self.request.finish()
-            self.request = None
-        self.paused = False
-
-    def pauseProducing(self):
-        if 'SQUEAL_DEBUG' in os.environ:
-            log.msg("pauseProducing", system="squeal.spot.sfy.SpotifyTransfer")
-        self.paused = True
-
-    def stopProducing(self):
-        if 'SQUEAL_DEBUG' in os.environ:
-            log.msg("stopProducing", system="squeal.spot.sfy.SpotifyTransfer")
-        #self.producer.stopProducing()
-        #self.request = None
-
-    def write(self, data):
-        """ Called by spotify to queue data to send to the squeezebox  """
-
-        if not self.request:
-            self.stopProducing()
-            if 'SQUEAL_DEBUG' in os.environ:
-                log.msg("overrun: writing to a closed request", system="squeal.spot.sfy.SpotifyTransfer")
-            return
-        self.written += len(data)
-        if 'SQUEAL_DEBUG' in os.environ:
-            if self.written % (1024*1024) == 0:
-                log.msg("%d written" % self.written,  system="squeal.spot.sfy.SpotifyTransfer")
-        if self.paused:
-            # you'd think just returning 0 here would work, but it causes
-            # the sound to skip
-            self.data.append(data)
-        else:
-            self.request.write(data)
-
-    def registerProducer(self, producer, streaming):
-        log.msg("registerProducer", system="squeal.spot.sfy.SpotifyTransfer")
-        self.producer = producer
-
-    def unregisterProducer(self):
-        """ Called by the spotify service when the end of track is reached. We
-        may stop receiving data long before we stop sending it of course, so
-        the request remains active. """
-        log.msg("unregisterProducer", system="squeal.spot.sfy.SpotifyTransfer")
-        self.producer = None
-        self.finished = True
-
-class SpotifyStreamer(rend.Page):
-
-    def __init__(self, original, tid):
+    def __init__(self, original, pid):
         self.original = original
-        self.tid = tid
+        self.pid = pid
 
     def renderHTTP(self, ctx):
         for service in self.original.store.powerupsFor(ispotify.ISpotifyService):
             request = inevow.IRequest(ctx)
-            SpotifyTransfer(self.tid, service, request)
+            service.squeezebox_request(request, self.pid)
             return request.deferred
 
 class SpotifyImage(rend.Page):

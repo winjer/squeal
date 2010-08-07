@@ -285,9 +285,8 @@ class TrackITrackAdapter(Adapter):
     def image_uri(self):
         return u"/library/image?image=%s" % self.original.storeID
 
-    @property
-    def player_uri(self):
-        return u"/library/stream?tid=%s" % self.original.storeID
+    def player_uri(self, player_id):
+        return u"/library/stream?tid=%s&pid=%s" % (self.original.storeID, player_id)
 
     @property
     def duration(self):

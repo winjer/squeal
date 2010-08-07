@@ -83,7 +83,9 @@ class StateChanged(object):
 class SlimService(Item, service.Service):
 
     implements(ISlimPlayerService)
-    powerupInterfaces = (ISlimPlayerService,)
+    powerupInterfaces = (ISlimPlayerService,
+                         IPlayMusic,
+                         )
 
     listen = text(default=u"tcp:3483")
     parent = inmemory()
@@ -116,6 +118,7 @@ class SlimService(Item, service.Service):
         log.msg("Playing %r" % track, system="squeal.net.slimproto.SlimService")
         for p in self.players:
             p.play(track)
+        return len(self.players)
 
     def pause(self):
         for p in self.players:
@@ -217,9 +220,10 @@ class Player(protocol.Protocol):
         autostart = '1'
         formatbyte = self.typeMap[track.type]
         data = self.pack_stream(command, autostart=autostart, flags=0x00, formatbyte=formatbyte)
-        request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_uri,)
+        request = "GET %s HTTP/1.0\r\n\r\n" % (track.player_uri(id(self)),)
         data = data + request.encode("utf-8")
         self.send_frame('strm', data)
+        log.msg("Requesting play from squeezebox %s" % (id(self),), system="squeal.net.slimproto.Player")
         self.displayTrack(track)
 
     def displayTrack(self, track):

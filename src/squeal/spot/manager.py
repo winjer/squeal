@@ -34,13 +34,12 @@ class SpotifyManager(SpotifySessionManager):
     def fireEvent(self, *a, **kw):
         return self.service.evreactor.fireEvent(*a, **kw)
 
-    def load(self, tid):
-        log.msg("load %r" % tid, system="squeal.spot.service.SpotifyManager")
+    def load(self, track):
+        """ Pass this a SpotifyTrack """
+        log.msg("load %r" % track.track_id, system="squeal.spot.service.SpotifyManager")
         if self.playing:
             self.session.play(0)
-        link = Link.from_string(tid)
-        track = link.as_track()
-        self.session.load(track)
+        self.session.load(track.track)
 
     def play(self, consumer=None):
         log.msg("play", system="squeal.spot.service.SpotifyManager")

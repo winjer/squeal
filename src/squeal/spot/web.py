@@ -37,7 +37,7 @@ from squeal import adaptivejson
 import ispotify
 
 from spotify import Link
-from sfy import SpotifyStreamer, SpotifyImage
+from sfy import SpotifyStreamingPage, SpotifyImage
 
 template_dir = sibpath(__file__, 'templates')
 
@@ -106,9 +106,9 @@ class Root(rend.Page):
         return ''
 
     def child_stream(self, ctx):
-        log.msg("Request for spotify track %s received" % ctx.arg('tid'), system="squeal.web.service.Root")
-        tid = ctx.arg('tid')
-        return SpotifyStreamer(self.original, tid)
+        pid = ctx.arg('pid')
+        log.msg("Request for spotify stream received from sb %s" % pid, system="squeal.web.service.Root")
+        return SpotifyStreamingPage(self.original, pid)
 
     def child_image(self, ctx):
         #log.msg("Request for spotify image %s received" % ctx.arg('image'), system="squeal.web.service.Root")

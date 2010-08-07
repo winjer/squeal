@@ -67,8 +67,7 @@ class SpotifyTrack(object):
         else:
             return u''
 
-    @property
-    def player_uri(self):
-        return u"/spotify/stream?tid=%s" % self.track_id
+    def player_uri(self, player_id):
+        return u"/spotify/stream?tid=%s&pid=%s" % (self.track_id, player_id)
 
 registerAdapter(SpotifyTrack, Track, isqueal.ITrack)
