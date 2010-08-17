@@ -46,6 +46,13 @@ from squeal.player.remote import Remote
 from squeal.player.visualisation import NoVisualisation, SpectrumAnalyser
 from squeal.isqueal import *
 
+devices = {
+    2: 'squeezebox',
+    3: 'softsqueeze',
+    4: 'squeezebox2',
+    5: 'transporter',
+    6: 'softsqueeze3'}
+
 class RemoteButtonPressed(object):
 
     """ Someone has pressed a button on a remote control. """
@@ -186,31 +193,27 @@ class Player(protocol.Protocol):
     def send_version(self):
         self.send_frame('vers', '7.0')
 
-    def pack_stream(self, command, autostart="1", formatbyte = 'o', pcmargs = '1321', threshold = 255, spdif = 0, transDuration = 0, transType = '0', flags = 0x40, outputThreshold = 0, replayGain = 0, serverPort = 9000, serverIp = 0):
-        return struct.pack("!ccc4sBBBcBBBLHL",
+    def pack_stream(self, command, autostart="1", formatbyte = 'o', pcmargs = '1321', threshold = 255,
+                    spdif = '0', transDuration = 0, transType = '0', flags = 0x40, outputThreshold = 0,
+                    replayGainHigh = 0, replayGainLow = 0, serverPort = 9000, serverIp = 0):
+        return struct.pack("!ccc4sBcBcBBBHHHL",
                            command, autostart, formatbyte, pcmargs,
                            threshold, spdif, transDuration, transType,
-                           flags, outputThreshold, 0, replayGain, serverPort, serverIp)
+                           flags, outputThreshold, 0, replayGainHigh, replayGainLow, serverPort, serverIp)
 
     def stop_streaming(self):
         data = self.pack_stream("q", autostart="0", flags=0)
         self.send_frame("strm", data)
 
     def pause(self):
-        data = self.pack_stream("p")
+        data = self.pack_stream("p", autostart="0", flags=0)
         self.send_frame("strm", data)
         log.msg("Sending pause request", system="squeal.net.slimproto.Player")
-        # we don't seem to get reliable confirmations that the action has taken place
-        # so we have to do this here :/
-        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
 
     def unpause(self):
-        data = self.pack_stream("u")
+        data = self.pack_stream("u", autostart="0", flags=0)
         self.send_frame("strm", data)
         log.msg("Sending unpause request", system="squeal.net.slimproto.Player")
-        # we don't seem to get reliable confirmations that the action has taken place
-        # so we have to do this here :/
-        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PLAYING))
 
     def stop(self):
         self.stop_streaming()
@@ -230,7 +233,6 @@ class Player(protocol.Protocol):
         self.render("%s by %s" % (track.title, track.artist))
 
     def process_HELO(self, data):
-        devices = {2: 'squeezebox', 3: 'softsqueeze', 4: 'squeezebox2', 5: 'transporter', 6: 'softsqueeze3'}
         #(devId, rev, mac, wlan, bytes) = struct.unpack('BB6sHL', data[:16])
         (devId, rev, mac) = struct.unpack('BB6s', data[:8])
         (mac,) = struct.unpack(">q", '00'+mac)
@@ -249,7 +251,7 @@ class Player(protocol.Protocol):
         self.send_frame("setd", struct.pack("B", 4))
         self.enableAudio()
         self.send_volume()
-        self.send_frame("strm", self.pack_stream('t', autostart="1", flags=0, replayGain=int(time.time() * 1000 % 0xffffffff)))
+        self.send_frame("strm", self.pack_stream('t', autostart="1", flags=0, replayGainHigh=int(time.time() * 1000)))
         self.connectionEstablished()
 
     def enableAudio(self):
@@ -322,8 +324,8 @@ class Player(protocol.Protocol):
         log.msg("Output Underrun", system="squeal.net.slimproto.Player")
 
     def stat_STMp(self, data):
-        log.msg("Pause confirmed?", system="squeal.net.slimproto.Player")
-        #self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
+        log.msg("Pause confirmed", system="squeal.net.slimproto.Player")
+        self.service.evreactor.fireEvent(StateChanged(self, StateChanged.State.PAUSED))
 
     def stat_STMr(self, data):
         log.msg("Resume confirmed", system="squeal.net.slimproto.Player")
@@ -367,7 +369,7 @@ class Player(protocol.Protocol):
         (time, code) = struct.unpack("!IxxI", data)
         command = Remote.codes.get(code, None)
         if command is not None:
-            #log.msg("IR received: %r, %r" % (time, command), system="squeal.net.slimproto.Player")
+            log.msg("IR received: %r, %r" % (code, command), system="squeal.net.slimproto.Player")
             self.service.evreactor.fireEvent(RemoteButtonPressed(self, command))
         else:
             log.msg("Unknown IR received: %r, %r" % (time, code), system="squeal.net.slimproto.Player")

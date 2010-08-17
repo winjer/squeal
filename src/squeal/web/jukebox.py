@@ -199,6 +199,33 @@ class Header(base.BaseElement):
     def next(self):
         """ Skip to the next track in the playlist """
 
+class Players(base.BaseElement):
+    jsClass = u"Squeal.Players"
+    docFactory = base.xmltemplate("players.html")
+
+    def subscribe(self):
+        self.evreactor.subscribe(self.playerChange, isqueal.IPlayerStateChange)
+
+    def playerChange(self, ev):
+        pass # self.reload()
+
+    @property
+    def slimservice(self):
+        """ Return the slimservice if we can locate it, else return None """
+        for s in self.store.powerupsFor(isqueal.ISlimPlayerService):
+            return s
+
+    @property
+    def players(self):
+        """ Return the player list from the slim service """
+        s = self.slimservice
+        return s.players
+
+    @page.renderer
+    def items(self, request, tag):
+        """ Renderer for the item list, called on first rendering """
+        for p in self.players:
+            yield T.li["%s (%s)" % (p.mac_address, p.device_type)]
 
 class Playlist(base.BaseElement):
     jsClass = u"Squeal.Playlist"
@@ -337,6 +364,7 @@ class Jukebox(base.BasePageContainer):
         'header': Header,
         'play_actions': PlayActions,
         'playlist': Playlist,
+        'players': Players,
         #'account': Account,
         #'main': Main,
         #'playing': Playing,

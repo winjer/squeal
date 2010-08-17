@@ -142,19 +142,22 @@ class Playlist(Item, service.Service):
         self.playing = False
         self.previous_playtime = 0
         self.last_started = 0
-        #self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
+        self.evreactor.subscribe(self.playerState, isqueal.IPlayerStateChange)
         self.evreactor.subscribe(self.buttonPressed, isqueal.IRemoteButtonPressedEvent)
 
     def playerState(self, ev):
         """ Called by the event system in response to player state change events. """
-        if ev.state == ev.State.ESTABLISHED: # just connected
-            self.play()
-        elif ev.state == ev.State.READY: # finished playing previous track
-            self.play()
+        # TODO: this should wait till we've heard from all players that we believe are still connected
+        if ev.state == ev.State.PAUSED:
+            self.players_paused()
+        elif ev.state == ev.State.PLAYING:
+            self.players_playing()
 
     def buttonPressed(self, ev):
         if ev.button == 'play' and not self.playing:
             self.play()
+        if ev.button == 'pause' and self.playing:
+            self.pause()
 
     def clear(self):
         log.msg("Clear", system="squeal.playlist.service.Playlist")
@@ -173,15 +176,24 @@ class Playlist(Item, service.Service):
         else:
             for p in self.store.query(PlayTrack, PlayTrack.position == self.current + 1):
                 self.load(p)
-                self.previous_playtime = 0
-                self.last_started = time.time()
                 break
             else:
                 log.msg("No PlayTracks found",  system="squeal.playlist.service.Playlist")
 
+    def players_playing(self):
+        log.msg("All players playing", system="squeal.playlist.service.Playlist")
+        self.playing = True
+        self.previous_playtime = 0
+        self.last_started = time.time()
+
     def pause(self):
+        log.msg("Pausing", system="squeal.playlist.service.Playlist")
         for p in self.store.powerupsFor(isqueal.ISlimPlayerService):
             p.pause()
+
+    def players_paused(self):
+        """ Called when we receive notification that we have paused """
+        log.msg("All players paused", system="squeal.playlist.service.Playlist")
         self.playing = False
         self.previous_playtime += time.time() - self.last_started
         self.last_started = 0
@@ -208,7 +220,6 @@ class Playlist(Item, service.Service):
             connected += p.play(playtrack.track)
         if connected != 0:
             self.current = playtrack.position
-            self.playing = True
         else:
             log.msg("Not playing - no players connected", system="squeal.playlist.service.Playlist")
         for r in self.store.powerupsFor(isqueal.IEventReactor):
