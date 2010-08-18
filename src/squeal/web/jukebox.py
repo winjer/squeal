@@ -200,14 +200,26 @@ class Header(base.BaseElement):
         """ Skip to the next track in the playlist """
 
 class Players(base.BaseElement):
+
+    """ Page element that shows information about the players that are connected. """
+
     jsClass = u"Squeal.Players"
     docFactory = base.xmltemplate("players.html")
+
+    @athena.expose
+    def goingLive(self):
+        self.subscribe()
 
     def subscribe(self):
         self.evreactor.subscribe(self.playerChange, isqueal.IPlayerStateChange)
 
     def playerChange(self, ev):
-        pass # self.reload()
+        log.msg("Player state change noted", system="squeal.web.jukebox.Players")
+        self.reload()
+
+    def reload(self):
+        """ Send the html markup required to reload the element """
+        self.callRemote("reload", unicode(flatten(self._items())))
 
     @property
     def slimservice(self):
@@ -224,6 +236,9 @@ class Players(base.BaseElement):
     @page.renderer
     def items(self, request, tag):
         """ Renderer for the item list, called on first rendering """
+        return self._items()
+
+    def _items(self):
         for p in self.players:
             yield T.li["%s (%s)" % (p.mac_address, p.device_type)]
 

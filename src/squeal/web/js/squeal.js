@@ -44,6 +44,7 @@ Squeal.Connected = Squeal.Widget.subclass("Squeal.Connected");
 Squeal.Setup = Squeal.Widget.subclass("Squeal.Setup");
 Squeal.PluginInstaller = Squeal.Widget.subclass("Squeal.PluginInstaller");
 Squeal.PlayActions = Squeal.Widget.subclass("Squeal.PlayActions");
+Squeal.Players = Squeal.Widget.subclass("Squeal.Players");
 
 Squeal.PlayActions.methods(
 
@@ -247,4 +248,10 @@ Squeal.Main.methods(
         Squeal.W.main = self;
     }
 
+);
+
+Squeal.Players.methods(
+    function reload(self, markup) {
+        self.node.innerHTML = "<ul>" + markup + "</ul>";
+    }
 );
