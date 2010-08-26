@@ -81,6 +81,10 @@ class Account(base.BaseElement):
     def subscribe(self):
         self.evreactor.subscribe(self.update_users, isqueal.ILogin)
         self.evreactor.subscribe(self.update_users, isqueal.ILogout)
+        # our own session isn't recorded until we're live
+        # so our own status is absent from the list of logged in users
+        # this fixes this, a bit kludgy but ok
+        self.update_users(None)
 
     @page.renderer
     def credentials(self, request, tag):
