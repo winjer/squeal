@@ -62,8 +62,8 @@ Squeal.PlayActions.methods(
 
 Squeal.PluginInstaller.methods(
 
-    function install(self, node, ev) {
-        self.callRemote("install");
+    function reload(self) {
+        alert("you should reload the page, to see your new module");
     }
 );
 

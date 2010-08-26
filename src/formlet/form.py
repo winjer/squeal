@@ -35,7 +35,7 @@ class FormElement(athena.LiveElement):
         # todo - check the method being called is exposed
         action = str(kw.pop('formlet.action'))
         kw = dict((str(a), b) for (a,b) in kw.items() if a)
-        getattr(self.fragmentParent, action)(**kw)
+        return getattr(self.fragmentParent, action)(**kw)
 
 class Form(object):
 

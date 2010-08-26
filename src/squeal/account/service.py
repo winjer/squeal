@@ -72,6 +72,7 @@ class AccountService(Item, service.Service):
             return s
 
     def login(self, username, password):
+        """ Log in to squeal, returns the avatar and triggers appropriate events. """
         log.msg("Attempt to login as %s" % username, system="squeal.web.jukebox.Account")
         # we only ever use the domain "default" for real users
         username = "%s@default" % username.split("@", 1)[0]
@@ -83,10 +84,12 @@ class AccountService(Item, service.Service):
         return avatar
 
     def users(self):
+        """ Return a sorted list of the users connected. No matter how many
+        connections a user has, they will be shown only once """
         u = set()
         for p in self.sessions:
             if p.avatar is None:
                 u.add("Anonymous")
             else:
                 u.add(p.avatar.username)
-        return u
+        return sorted(u)

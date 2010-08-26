@@ -368,9 +368,12 @@ class PluginInstaller(base.BaseElement):
 
     @athena.expose
     def install(self, **kw):
+        log.msg("Beginning plugin installation", system="squeal.web.jukebox.PluginInstaller")
         pm = self.plugin_manager
         s = pm.install(args=kw, **self.original)
         s.setServiceParent(self.plugin_manager.parent)
+        log.msg("Plugin installation completed", system="squeal.web.jukebox.PluginInstaller")
+        return self.callRemote("reload")
 
 class Connected(base.BaseElement):
     jsClass = u"Squeal.Connected"
