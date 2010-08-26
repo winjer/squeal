@@ -45,9 +45,6 @@ from formlet import field
 from twisted.python import log
 from twisted.internet import defer
 
-from twisted.cred.checkers import ICredentialsChecker
-from twisted.cred.credentials import UsernamePassword
-
 from axiom.errors import NoSuchUser, BadCredentials
 
 class Setup(base.BaseElement):
@@ -78,26 +75,17 @@ class Account(base.BaseElement):
 
     @page.renderer
     def users(self, request, tag):
-        return T.ul[
-            T.li["foo"],
-            T.li["bar"],
-            ]
+        return T.ul[(T.li[x] for x in self.account_service.users())]
 
     @property
-    def checker(self):
-        for s in self.store.powerupsFor(ICredentialsChecker):
+    def account_service(self):
+        for s in self.store.powerupsFor(isqueal.IAccountService):
             return s
 
     @athena.expose
     def login(self, username, password):
-        log.msg("Attempt to login as %s" % username, system="squeal.web.jukebox.Account")
-        # we only ever use the domain "default" for real users
-        username = "%s@default" % username.split("@", 1)[0]
-        credentials = UsernamePassword(username, password)
         try:
-            avatarID = self.checker.requestAvatarId(credentials)
-            # Interface is a bit of a cheat here!
-            avatar = self.checker.requestAvatar(avatarID, None, isqueal.ISquealAccount)
+            avatar = self.account_service.login(username, password)
             self.logged_in(avatar)
         except NoSuchUser:
             self.callRemote("noSuchUser")
@@ -105,14 +93,15 @@ class Account(base.BaseElement):
             self.callRemote("badCredentials")
 
     def logged_in(self, avatar):
+        self.page.avatar = avatar
         log.msg("Logged in as %s" % repr(avatar), system="squeal.web.jukebox.Account")
 
     @page.renderer
     def credentials(self, request, tag):
-        if self.page.user_store is None:
+        if self.page.avatar is None:
             return tag[login_form.element(self)]
         else:
-            return tag['You are logged in']
+            return tag['You are logged in as %s' % self.avatar.username]
 
 class Header(base.BaseElement):
     jsClass = u"Squeal.Header"
@@ -437,7 +426,7 @@ class Jukebox(base.BasePageContainer):
     def __init__(self, service):
         super(Jukebox, self).__init__()
         self.service = service
-        self.user_store = None
+        self.avatar = None
 
     # this is called by Header.goingLive above
     def goingLive(self):
