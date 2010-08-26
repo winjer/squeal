@@ -45,6 +45,11 @@ from formlet import field
 from twisted.python import log
 from twisted.internet import defer
 
+from twisted.cred.checkers import ICredentialsChecker
+from twisted.cred.credentials import UsernamePassword
+
+from axiom.errors import NoSuchUser, BadCredentials
+
 class Setup(base.BaseElement):
     jsClass = u"Squeal.Setup"
     docFactory = base.xmltemplate("setup.html")
@@ -77,6 +82,24 @@ class Account(base.BaseElement):
             T.li["foo"],
             T.li["bar"],
             ]
+
+    @property
+    def checker(self):
+        for s in self.store.powerupsFor(ICredentialsChecker):
+            return s
+
+    @athena.expose
+    def login(self, username, password):
+        log.msg("Attempt to login as %s" % username, system="squeal.web.jukebox.Account")
+        username = "%s@domain" % username # funny domain thing userbase does
+        credentials = UsernamePassword(username, password)
+        try:
+            avatarID = self.checker.requestAvatarId(credentials)
+            self.callRemote("login", username)
+        except NoSuchUser:
+            self.callRemote("noSuchUser")
+        except BadCredentials:
+            self.callRemote("badCredentials")
 
     @page.renderer
     def credentials(self, request, tag):

@@ -18,4 +18,7 @@ distribute-0.6.10.tar.gz
 libspotify
 src/squeal.egg-info
 venv
+squeal.log
+src/squeal/spot/old-templates/
+src/twisted/plugins/dropin.cache
 

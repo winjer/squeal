@@ -255,3 +255,24 @@ Squeal.Players.methods(
         self.node.innerHTML = "<ul>" + markup + "</ul>";
     }
 );
+
+Squeal.Account.methods(
+
+    function displayMessage(self, message) {
+        var msg = self.nodeById("message");
+        msg.innerHTML = message;
+    },
+
+    function noSuchUser(self) {
+        self.displayMessage("No such user");
+    },
+
+    function badCredentials(self) {
+        self.displayMessage("Bad credentials");
+    },
+
+    function login(self, username) {
+        self.displayMessage("Logged in as " + username);
+    }
+);
+
