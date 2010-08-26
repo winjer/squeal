@@ -270,7 +270,11 @@ Squeal.Account.methods(
         self.displayMessage("Bad credentials");
     },
 
-    function login(self, username) {
-        self.displayMessage("Logged in as " + username);
+    function updateUsers(self, users) {
+        self.nodeById("items").innerHTML = "<li>" + users.join("</li><li>") + "</li>";
+    },
+
+    function loggedIn(self, name, username) {
+        self.nodeById("credentials").innerHTML = "You are logged in as " + name + " (" + username + ")";
     }
 );

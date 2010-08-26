@@ -75,7 +75,7 @@ class Account(base.BaseElement):
 
     @page.renderer
     def users(self, request, tag):
-        return T.ul[(T.li[x] for x in self.account_service.users())]
+        return tag[(T.li[x] for x in self.account_service.users())]
 
     @property
     def account_service(self):
@@ -94,7 +94,9 @@ class Account(base.BaseElement):
 
     def logged_in(self, avatar):
         self.page.avatar = avatar
-        log.msg("Logged in as %s" % repr(avatar), system="squeal.web.jukebox.Account")
+        log.msg("Logged in as %s" % avatar.username, system="squeal.web.jukebox.Account")
+        self.callRemote("updateUsers", list(self.account_service.users()))
+        self.callRemote("loggedIn", avatar.name, avatar.username)
 
     @page.renderer
     def credentials(self, request, tag):
