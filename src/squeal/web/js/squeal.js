@@ -274,7 +274,12 @@ Squeal.Account.methods(
         self.nodeById("items").innerHTML = "<li>" + users.join("</li><li>") + "</li>";
     },
 
-    function loggedIn(self, name, username) {
+    function setAuthCookie(self, username, password) {
+        $.cookie("auth", username + ":" + password, { expires: 365 });
+    },
+
+    function loggedIn(self, name, username, password) {
         self.nodeById("credentials").innerHTML = "You are logged in as " + name + " (" + username + ")";
+        self.setAuthCookie(username, password);
     }
 );
