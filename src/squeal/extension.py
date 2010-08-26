@@ -26,7 +26,7 @@ class InstalledPlugin(Item):
 class PluginManager(Item, service.Service):
 
     implements(isqueal.IPluginManager)
-    powerupInterfaces = (isqueal.IPluginManager,)
+    powerupInterfaces = (isqueal.IPluginManager, service.IService)
 
     dummy = text()
     running = inmemory()

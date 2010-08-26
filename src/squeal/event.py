@@ -95,7 +95,7 @@ class EventSubscription(object):
 
 class EventReactor(Item, service.Service):
     implements(IEventReactor)
-    powerupInterfaces = (IEventReactor,)
+    powerupInterfaces = (IEventReactor, service.IService)
 
     dummy = integer()
     running = inmemory()

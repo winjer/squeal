@@ -92,6 +92,7 @@ class SlimService(Item, service.Service):
     implements(ISlimPlayerService)
     powerupInterfaces = (ISlimPlayerService,
                          IPlayMusic,
+                         service.IService,
                          )
 
     listen = text(default=u"tcp:3483")

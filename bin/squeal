@@ -53,6 +53,8 @@ class SquealManager:
         from squeal.playlist.service import Playlist
         from squeal.event import EventReactor
         from squeal.extension import PluginManager
+        from axiom.userbase import LoginSystem
+
         store = Store(self.database)
 
         services = (
@@ -61,15 +63,14 @@ class SquealManager:
             SlimService,
             Playlist,
             PluginManager,
+            LoginSystem
         )
 
         for srv in services:
             s = srv(store=store)
-            for iface in s.powerupInterfaces:
-                store.powerUp(s, iface)
-                store.powerUp(s, IService)
-        os.system("chown -R %s: %s" % (self.username, self.database))
+            store.powerUp(s)
 
+        os.system("chown -R %s: %s" % (self.username, self.database))
 
 if __name__ == "__main__":
 

@@ -50,7 +50,7 @@ import jukebox
 class WebService(Item, service.Service):
 
     implements(IWebService)
-    powerupInterfaces = (IWebService,)
+    powerupInterfaces = (IWebService, service.IService)
 
     listen = text(default=u"tcp:9000")
     parent = inmemory()

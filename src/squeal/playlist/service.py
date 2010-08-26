@@ -117,7 +117,7 @@ class Playlist(Item, service.Service):
     than one player they are assumed to be synchronised. """
 
     implements(isqueal.IPlaylist)
-    powerupInterfaces = (isqueal.IPlaylist,)
+    powerupInterfaces = (isqueal.IPlaylist, service.IService)
 
     playing = inmemory()
     current = integer(default=-1) # currently playing
