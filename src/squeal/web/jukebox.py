@@ -62,13 +62,28 @@ class Setup(base.BaseElement):
             return p
         return tag[(installer(i) for i in self.plugin_manager.installable)]
 
+login_form = form.Form("login", action="login")
+field.StringField(form=login_form, name="username", label="Username")
+field.StringField(form=login_form, type_="password", name="password", label="Password")
+field.SubmitButton(form=login_form, name="submit", label="Login")
+
 class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
     docFactory = base.xmltemplate("account.html")
 
     @page.renderer
+    def users(self, request, tag):
+        return T.ul[
+            T.li["foo"],
+            T.li["bar"],
+            ]
+
+    @page.renderer
     def credentials(self, request, tag):
-        return tag['You are not logged in']
+        if self.page.user_store is None:
+            return tag[login_form.element(self)]
+        else:
+            return tag['You are logged in']
 
 class Header(base.BaseElement):
     jsClass = u"Squeal.Header"
@@ -380,7 +395,7 @@ class Jukebox(base.BasePageContainer):
         'play_actions': PlayActions,
         'playlist': Playlist,
         'players': Players,
-        #'account': Account,
+        'account': Account,
         #'main': Main,
         #'playing': Playing,
         #'queue': Queue,
@@ -391,6 +406,7 @@ class Jukebox(base.BasePageContainer):
     def __init__(self, service):
         super(Jukebox, self).__init__()
         self.service = service
+        self.user_store = None
 
     def render_sources(self, ctx, data):
         sources = []
