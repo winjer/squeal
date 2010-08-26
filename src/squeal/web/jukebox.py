@@ -45,7 +45,7 @@ from formlet import field
 from twisted.python import log
 from twisted.internet import defer
 
-from axiom.errors import NoSuchUser, BadCredentials
+from axiom.errors import UnauthorizedLogin
 
 class Setup(base.BaseElement):
     jsClass = u"Squeal.Setup"
@@ -98,10 +98,8 @@ class Account(base.BaseElement):
         try:
             avatar = self.account_service.login(username, password)
             self.logged_in(avatar, username, password)
-        except NoSuchUser:
-            self.callRemote("noSuchUser")
-        except BadCredentials:
-            self.callRemote("badCredentials")
+        except UnauthorizedLogin:
+            self.callRemote("unauthorized")
 
     def logged_in(self, avatar, username, password):
         self.page.avatar = avatar
@@ -446,9 +444,12 @@ class Jukebox(base.BasePageContainer):
         cookie = request.getCookie("auth")
         if cookie:
             cookie = urllib.unquote(cookie)
-            log.msg("cookie received: %r" % cookie)
             username, hashed = cookie.split(":", 1)
-            self.avatar = self.account_service.hashed_login(username, hashed)
+            try:
+                self.avatar = self.account_service.hashed_login(username, hashed)
+            except UnauthorizedLogin:
+                # otherwise ignored, the user will just have to log in manually
+                log.err(None, "Cookie login failed", system="squeal.web.jukebox.Jukebox")
 
     # this is called by Header.goingLive above
     def goingLive(self):

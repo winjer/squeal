@@ -262,12 +262,8 @@ Squeal.Account.methods(
         msg.innerHTML = message;
     },
 
-    function noSuchUser(self) {
-        self.displayMessage("No such user");
-    },
-
-    function badCredentials(self) {
-        self.displayMessage("Bad credentials");
+    function unauthorized(self) {
+        self.displayMessage("Unauthorized!");
     },
 
     function updateUsers(self, users) {
