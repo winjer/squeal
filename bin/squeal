@@ -20,8 +20,7 @@ import optparse
 import subprocess
 from itertools import chain
 
-from squeal.account.user import UserDetails
-from twisted.cred.portal import IRealm
+from squeal import isqueal
 
 class SquealManager:
 
@@ -51,17 +50,12 @@ class SquealManager:
         self.axiomatic("stop")
 
     @property
-    def realm(self):
-        for r in self.store.powerupsFor(IRealm):
+    def account_service(self):
+        for r in self.store.powerupsFor(isqueal.IAccountService):
             return r
 
     def create_manager(self):
-        # magic "default" domain, also used in jukebox.py
-        # TODO: this ought to be run within a transaction
-        la = self.realm.addAccount("manager", "default", "password")
-        ss = la.avatars.open()
-        ud = UserDetails(store=ss, username=u"manager", name=u"Manager")
-        ss.powerUp(ud)
+        self.account_service.add_account(u"Manager", u"manager", u"password")
 
     def create_db(self):
         from axiom.store import Store

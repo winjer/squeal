@@ -87,7 +87,7 @@ class Account(base.BaseElement):
         if self.page.avatar is None:
             return tag[login_form.element(self)]
         else:
-            return tag['You are logged in as %s' % self.avatar.username]
+            return tag['You are logged in as %s' % self.page.avatar.username]
 
     @page.renderer
     def users(self, request, tag):
@@ -106,7 +106,8 @@ class Account(base.BaseElement):
     def logged_in(self, avatar, username, password):
         self.page.avatar = avatar
         log.msg("Logged in as %s" % avatar.username, system="squeal.web.jukebox.Account")
-        self.callRemote("loggedIn", avatar.name, username, password)
+        hashed = self.account_service.hash_password(password)
+        self.callRemote("loggedIn", avatar.name, username, hashed)
 
     def update_users(self, ev):
         self.callRemote("updateUsers", list(self.account_service.users()))
@@ -443,7 +444,11 @@ class Jukebox(base.BasePageContainer):
         """ Perform a cookie-based login, if we can. """
         request = inevow.IRequest(ctx)
         cookie = request.getCookie("auth")
-        log.msg("cookie received: %r" % cookie)
+        if cookie:
+            cookie = urllib.unquote(cookie)
+            log.msg("cookie received: %r" % cookie)
+            username, hashed = cookie.split(":", 1)
+            self.avatar = self.account_service.hashed_login(username, hashed)
 
     # this is called by Header.goingLive above
     def goingLive(self):

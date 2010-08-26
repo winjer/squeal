@@ -22,13 +22,19 @@ from zope.interface import implements
 from twisted.python import log
 from twisted.application import service
 from twisted.cred.checkers import ICredentialsChecker
-from twisted.cred.credentials import UsernamePassword
+from twisted.cred.portal import IRealm
+from twisted.cred.credentials import UsernameHashedPassword
+
 
 from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer, timestamp
 
 from squeal import isqueal
 from squeal.event import EventReactor
+
+from user import UserDetails
+
+import hashlib
 
 class LoginEvent(object):
     pass
@@ -44,8 +50,21 @@ class AccountService(Item, service.Service):
     parent = inmemory()
     running = inmemory()
 
+    def hash_password(self, password):
+        h = hashlib.sha1()
+        h.update(password)
+        return unicode(h.hexdigest())
+
     def activate(self):
         self.sessions = []
+
+    def add_account(self, name, username, password):
+        """ Create the account, with a hashed password """
+        hashed = self.hash_password(password)
+        acct = self.realm.addAccount(username, "default", hashed)
+        avatar = acct.avatars.open()
+        u = UserDetails(store=avatar, username=username, name=name)
+        avatar.powerUp(u)
 
     def connected(self, page):
         """ Record that a user has connected, and store a reference to the
@@ -71,17 +90,26 @@ class AccountService(Item, service.Service):
         for s in self.store.powerupsFor(ICredentialsChecker):
             return s
 
-    def login(self, username, password):
+    @property
+    def realm(self):
+        for r in self.store.powerupsFor(IRealm):
+            return r
+
+    def hashed_login(self, username, hashed):
         """ Log in to squeal, returns the avatar and triggers appropriate events. """
         log.msg("Attempt to login as %s" % username, system="squeal.web.jukebox.Account")
         # we only ever use the domain "default" for real users
         username = "%s@default" % username.split("@", 1)[0]
-        credentials = UsernamePassword(username, password)
+        credentials = UsernameHashedPassword(username, hashed)
         avatarID = self.checker.requestAvatarId(credentials)
-        # Interface is a bit of a cheat here!
         iface, avatar, logout = self.checker.requestAvatar(avatarID, None, isqueal.ISquealAccount)
         self.evreactor.fireEvent(LoginEvent(), isqueal.ILogin)
         return avatar
+
+    def login(self, username, password):
+        """ Log in to squeal, returns the avatar and triggers appropriate events. """
+        hashed = self.hash_password(password)
+        return self.hashed_login(username, hashed)
 
     def users(self):
         """ Return a sorted list of the users connected. No matter how many
