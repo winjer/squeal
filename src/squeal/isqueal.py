@@ -56,6 +56,9 @@ class IDiscoveryService(Interface):
 class IEventReactor(Interface):
     """ Handles subscribers to events, so the different services can communicate easily. """
 
+class IAccountService(Interface):
+    """ Maintains records of who is currently connected to squeal """
+
 #### End of core services
 
 class ISquealAccount(Interface):
@@ -192,6 +195,20 @@ class IUserConfigurable(Interface):
     """ Indicates a service that is configurable by the user """
 
     setup_interface = Attribute(""" The Interface that specifies the form to display """)
+
+# Account events
+
+class ILogin(Interface):
+
+    """ A user has logged in """
+
+    avatar = Attribute(""" The avatar that has logged in """)
+
+class ILogout(Interface):
+
+    """ A user has logged out """
+
+    avatar = Attribute(""" The avatar that has logged out """)
 
 # Extension Points
 

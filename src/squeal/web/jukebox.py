@@ -124,6 +124,8 @@ class Header(base.BaseElement):
 
     @athena.expose
     def goingLive(self):
+        # bit evil calling this here, but it's the best of all the options
+        self.page.goingLive()
         self.subscribe()
         # need to work out what the logic is here if there
         # is more than one player - i guess the UI binds to
@@ -436,6 +438,15 @@ class Jukebox(base.BasePageContainer):
         super(Jukebox, self).__init__()
         self.service = service
         self.user_store = None
+
+    # this is called by Header.goingLive above
+    def goingLive(self):
+        self.account_service.connected(self)
+
+    @property
+    def account_service(self):
+        for s in self.service.store.powerupsFor(isqueal.IAccountService):
+            return s
 
     def render_sources(self, ctx, data):
         sources = []

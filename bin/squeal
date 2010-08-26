@@ -71,11 +71,13 @@ class SquealManager:
         from squeal.playlist.service import Playlist
         from squeal.event import EventReactor
         from squeal.extension import PluginManager
+        from squeal.account.service import AccountService
         from axiom.userbase import LoginSystem
 
         self.store = Store(self.database)
 
         services = (
+            AccountService,
             EventReactor,
             WebService,
             SlimService,

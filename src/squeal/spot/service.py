@@ -16,7 +16,6 @@
 
 __author__ = "Doug Winter <doug.winter@isotoma.com>"
 __docformat__ = "restructuredtext en"
-__version__ = "$Revision$"[11:-2]
 
 from zope.interface import implements
 from twisted.python import log

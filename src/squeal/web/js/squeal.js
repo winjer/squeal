@@ -34,7 +34,6 @@ Squeal.Widget.methods(
 );
 
 
-Squeal.Jukebox = Squeal.Widget.subclass("Squeal.Jukebox");
 Squeal.Source = Squeal.Widget.subclass("Squeal.Source");
 Squeal.Account = Squeal.Widget.subclass("Squeal.Account");
 Squeal.Main = Squeal.Widget.subclass("Squeal.Main");
