@@ -28,6 +28,10 @@ from axiom.item import Item
 from axiom.attributes import reference, inmemory, text, integer, timestamp
 
 from squeal import isqueal
+from squeal.event import EventReactor
+
+class LoginEvent(object):
+    pass
 
 class AccountService(Item, service.Service):
 
@@ -59,6 +63,10 @@ class AccountService(Item, service.Service):
         self.sessions.remove(page)
 
     @property
+    def evreactor(self):
+        return self.store.findFirst(EventReactor)
+
+    @property
     def checker(self):
         for s in self.store.powerupsFor(ICredentialsChecker):
             return s
@@ -71,6 +79,7 @@ class AccountService(Item, service.Service):
         avatarID = self.checker.requestAvatarId(credentials)
         # Interface is a bit of a cheat here!
         iface, avatar, logout = self.checker.requestAvatar(avatarID, None, isqueal.ISquealAccount)
+        self.evreactor.fireEvent(LoginEvent(), isqueal.ILogin)
         return avatar
 
     def users(self):

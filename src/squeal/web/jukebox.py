@@ -73,6 +73,10 @@ class Account(base.BaseElement):
     jsClass = u"Squeal.Account"
     docFactory = base.xmltemplate("account.html")
 
+    def subscribe(self):
+        self.evreactor.subscribe(self.update_users, isqueal.ILogin)
+        self.evreactor.subscribe(self.update_users, isqueal.ILogout)
+
     @page.renderer
     def users(self, request, tag):
         return tag[(T.li[x] for x in self.account_service.users())]
@@ -95,8 +99,10 @@ class Account(base.BaseElement):
     def logged_in(self, avatar):
         self.page.avatar = avatar
         log.msg("Logged in as %s" % avatar.username, system="squeal.web.jukebox.Account")
-        self.callRemote("updateUsers", list(self.account_service.users()))
         self.callRemote("loggedIn", avatar.name, avatar.username)
+
+    def update_users(self, ev):
+        self.callRemote("updateUsers", list(self.account_service.users()))
 
     @page.renderer
     def credentials(self, request, tag):
