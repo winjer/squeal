@@ -20,9 +20,13 @@ import optparse
 import subprocess
 from itertools import chain
 
+from squeal.account.user import UserDetails
+from twisted.cred.portal import IRealm
+
 class SquealManager:
 
     def __init__(self, database, logfile, user):
+        self.store = None
         self.database = database
         self.logfile = logfile
         self.uid = pwd.getpwnam(user).pw_uid
@@ -36,6 +40,7 @@ class SquealManager:
     def start(self, foreground=False):
         if not os.path.exists(self.database):
             self.create_db()
+            self.create_manager()
         if foreground:
             args = ["start", "-n"]
         else:
@@ -44,6 +49,19 @@ class SquealManager:
 
     def stop(self):
         self.axiomatic("stop")
+
+    @property
+    def realm(self):
+        for r in self.store.powerupsFor(IRealm):
+            return r
+
+    def create_manager(self):
+        # magic "default" domain, also used in jukebox.py
+        # TODO: this ought to be run within a transaction
+        la = self.realm.addAccount("manager", "default", "password")
+        ss = la.avatars.open()
+        ud = UserDetails(store=ss, username=u"manager", name=u"Manager")
+        ss.powerUp(ud)
 
     def create_db(self):
         from axiom.store import Store
@@ -55,7 +73,7 @@ class SquealManager:
         from squeal.extension import PluginManager
         from axiom.userbase import LoginSystem
 
-        store = Store(self.database)
+        self.store = Store(self.database)
 
         services = (
             EventReactor,
@@ -67,8 +85,8 @@ class SquealManager:
         )
 
         for srv in services:
-            s = srv(store=store)
-            store.powerUp(s)
+            s = srv(store=self.store)
+            self.store.powerUp(s)
 
         os.system("chown -R %s: %s" % (self.username, self.database))
 

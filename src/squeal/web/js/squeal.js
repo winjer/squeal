@@ -275,4 +275,3 @@ Squeal.Account.methods(
         self.displayMessage("Logged in as " + username);
     }
 );
-

@@ -91,15 +91,21 @@ class Account(base.BaseElement):
     @athena.expose
     def login(self, username, password):
         log.msg("Attempt to login as %s" % username, system="squeal.web.jukebox.Account")
-        username = "%s@domain" % username # funny domain thing userbase does
+        # we only ever use the domain "default" for real users
+        username = "%s@default" % username.split("@", 1)[0]
         credentials = UsernamePassword(username, password)
         try:
             avatarID = self.checker.requestAvatarId(credentials)
-            self.callRemote("login", username)
+            # Interface is a bit of a cheat here!
+            avatar = self.checker.requestAvatar(avatarID, None, isqueal.ISquealAccount)
+            self.logged_in(avatar)
         except NoSuchUser:
             self.callRemote("noSuchUser")
         except BadCredentials:
             self.callRemote("badCredentials")
+
+    def logged_in(self, avatar):
+        log.msg("Logged in as %s" % repr(avatar), system="squeal.web.jukebox.Account")
 
     @page.renderer
     def credentials(self, request, tag):

@@ -58,6 +58,9 @@ class IEventReactor(Interface):
 
 #### End of core services
 
+class ISquealAccount(Interface):
+    """ A user with an account in a squeal system """
+
 ################################################################################
 # Events
 ################################################################################
