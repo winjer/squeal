@@ -1,7 +1,6 @@
 #!/bin/bash
 
 sudo aptitude install \
-    python \
     python-crypto \
     python-tagpy \
     python-magic \
