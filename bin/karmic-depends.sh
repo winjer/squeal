@@ -5,7 +5,6 @@ sudo aptitude install \
     python-tagpy \
     python-magic \
     realpath \
-    python-setuptools \
     make \
     libsqlite3-dev \
     python-zopeinterface \
@@ -13,4 +12,3 @@ sudo aptitude install \
     python-imaging \
     python-spotify \
     python-virtualenv
-
