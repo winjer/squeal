@@ -8,7 +8,6 @@ sudo aptitude install \
     realpath \
     python-setuptools \
     make \
-    python-tagpy \
     libsqlite3-dev \
     python-zopeinterface \
     python-twisted \
