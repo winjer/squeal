@@ -1,3 +1,8 @@
+.. -*- mode: rst ; ispell-local-dictionary: "american" -*-
+
+================================================
+How-to Setup a `squeal` Development environment
+================================================
 
 We've been round the block a few times trying to get a good developer
 build of this.
