@@ -23,6 +23,7 @@ from itertools import chain
 # ignore some warnings from 3rd party modules
 import warnings
 warnings.filterwarnings('ignore', "the md5 module is deprecated")
+warnings.filterwarnings('ignore', "The popen2 module is deprecated.")
 
 from squeal import isqueal
 
