@@ -108,6 +108,13 @@ class SquealManager:
 
         chown(self.uid, self.gid, self.database)
 
+    def wipe(self):
+        if os.path.exists(self.database):
+            import shutil
+            shutil.rmtree(self.database, ignore_errors=True)
+        self.create_db()
+        self.create_manager()
+
 if __name__ == "__main__":
 
     p = optparse.OptionParser(usage=usage)
@@ -142,5 +149,3 @@ if __name__ == "__main__":
     else:
         p.print_help()
         raise SystemExit
-
-
