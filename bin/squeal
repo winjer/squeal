@@ -2,7 +2,7 @@
 
 """ Provide command line access to do stuff with the squealserver server. """
 
-usage = """%prog [options] [command]
+usage = """%prog [options] ["wipe"] [command]
 
 Command:
   start      Start the squeal server, if it is not already running
@@ -11,6 +11,9 @@ Command:
   wipe       Wipe the squealserver database completely, and reinitialise it
   debug      Start in debug mode, with a python prompt
   fg         Run in the foreground, writing the log to the screen
+
+  If the command `wipe` is given, a second command pay be passed which
+  is executed after `wipe`.
 """
 
 import pwd
@@ -124,7 +127,9 @@ if __name__ == "__main__":
     p.add_option("-u", "--user", help="user to run as (only used if started as root)", default="squeal")
     opts, args = p.parse_args()
 
-    if len(args) != 1:
+    if len(args) == 2 and args[0] == 'wipe':
+        pass
+    elif len(args) != 1:
         p.print_help()
         raise SystemExit
 
@@ -134,14 +139,18 @@ if __name__ == "__main__":
     mgr = SquealManager(database=opts.database, logfile=opts.logfile, user=opts.user)
 
     command = args[0]
+    if command == "wipe":
+        mgr.wipe()
+        if len(args) == 1:
+            # no more commands
+            raise SystemExit
+        command = args[1]
     if command == "start":
         mgr.start()
     elif command == "fg":
         mgr.start(foreground=True)
     elif command == "stop":
         mgr.stop()
-    elif command == "wipe":
-        mgr.wipe()
     elif command == "status":
         mgr.status()
     elif command == "debug":
