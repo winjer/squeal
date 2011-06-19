@@ -1,19 +1,19 @@
 
-We've been round the block a few times trying to get a good developer build of this.
+We've been round the block a few times trying to get a good developer
+build of this.
 
 I think this is so far the easiest.
 
-Install all the packages you need.  There's a script for that::
+Install all the packages you need. There's a script for that, select
+the one for your distribution::
 
-    ./bin/karmic-depends.sh
+    ./bin/karmic-depends.sh   # for Ubuntu 9.10
+    ./bin/mandriva-depends.sh # for Mandriva 2010.2
 
-Create a virtual environment somewhere.  Lets call it 'venv'::
+Create a virtual environment (including distribute) somewhere. Lets
+call it `venv`::
 
-    virtualenv ./venv
-
-Install distribute::
-
-    venv/bin/python distribute_setup.py
+    virtualenv --distribute ./venv
 
 Activate our environment::
 
@@ -25,5 +25,6 @@ Run the develop script::
 
 Start squeal::
 
-    bin/squeal -d db -L "" fg
+    bin/squeal --database db --libpath "" --user $USER fg
 
+Now point your browser to http://localhost:9000/ .
