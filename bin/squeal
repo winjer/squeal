@@ -25,6 +25,15 @@ warnings.filterwarnings('ignore', "The popen2 module is deprecated.")
 
 from squeal import isqueal
 
+def chown(uid, gid, path):
+    """Recursively change the owner and group id of path to
+    the numeric uid and gid."""
+    for root, dirs, files in os.walk(path):
+        for name in dirs:
+            os.chown(os.path.join(root, name), uid, gid)
+        for name in files:
+            os.chown(os.path.join(root, name), uid, gid)
+
 class SquealManager:
 
     def __init__(self, database, logfile, user):
@@ -97,7 +106,7 @@ class SquealManager:
             s = srv(store=self.store)
             self.store.powerUp(s)
 
-        os.system("chown -R %s: %s" % (self.username, self.database))
+        chown(self.uid, self.gid, self.database)
 
 if __name__ == "__main__":
 
