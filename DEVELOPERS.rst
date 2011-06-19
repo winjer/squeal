@@ -33,3 +33,20 @@ Start squeal::
     bin/squeal --database db --libpath "" fg
 
 Now point your browser to http://localhost:9000/ .
+
+Known problems
+=================
+
+twisted plugin cache
+~~~~~~~~~~~~~~~~~~~~~
+
+If `twisted` is not installed properly by you distribution, you will
+get errors like::
+
+  exceptions.IOError: [Errno 13] Permission denied: '/usr/lib/python2.6/site-packages/twisted/plugins/dropin.cache.new'
+
+In this case you need to (re-) build the twisted plugin cache by
+running as root::
+
+  python -c 'import twisted.plugin as P; list(P.getPlugins(P.IPlugin))'
+
