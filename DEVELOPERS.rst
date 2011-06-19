@@ -30,6 +30,6 @@ Run the develop script::
 
 Start squeal::
 
-    bin/squeal --database db --libpath "" --user $USER fg
+    bin/squeal --database db --libpath "" fg
 
 Now point your browser to http://localhost:9000/ .

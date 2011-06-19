@@ -28,9 +28,17 @@ class SquealManager:
         self.store = None
         self.database = database
         self.logfile = logfile
-        self.uid = pwd.getpwnam(user).pw_uid
-        self.gid = pwd.getpwnam(user).pw_gid
-        self.username = user
+        self.uid = os.getuid()
+        if self.uid == 0:
+            # only change user if running as root
+            pwdnam = pwd.getpwnam(user)
+            self.uid = pwdnam.pw_uid
+            self.gid = pwdnam.pw_gid
+            self.username = user
+        else:
+            self.gid = os.getgid()
+            self.username = pwd.getpwuid(self.uid).pw_name
+            
 
     def axiomatic(self, *args):
         from axiom.scripts import axiomatic
@@ -92,7 +100,7 @@ if __name__ == "__main__":
     p.add_option("-d", "--database", help="Specify database location", default="/var/lib/squeal/db")
     p.add_option("-l", "--logfile", help="Log file location", default="/var/log/squeal.log")
     p.add_option("-L", "--libpath", help="path to the squeal libs", default="/usr/share/squeal")
-    p.add_option("-u", "--user", help="user to run as", default="squeal")
+    p.add_option("-u", "--user", help="user to run as (only used if started as root)", default="squeal")
     opts, args = p.parse_args()
 
     if len(args) != 1:
