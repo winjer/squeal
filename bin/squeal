@@ -17,7 +17,6 @@ import pwd
 import os
 import sys
 import optparse
-import subprocess
 
 # ignore some warnings from 3rd party modules
 import warnings
