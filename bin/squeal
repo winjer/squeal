@@ -18,7 +18,6 @@ import os
 import sys
 import optparse
 import subprocess
-from itertools import chain
 
 # ignore some warnings from 3rd party modules
 import warnings
@@ -47,7 +46,9 @@ class SquealManager:
 
     def axiomatic(self, *args):
         from axiom.scripts import axiomatic
-        axiomatic.main(list(chain(["--dbdir", self.database], args)))
+        args = list(args)
+        args[:0] = ["--dbdir", self.database]
+        axiomatic.main(args)
 
     def start(self, foreground=False):
         if not os.path.exists(self.database):
