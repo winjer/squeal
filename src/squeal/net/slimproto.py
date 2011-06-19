@@ -46,12 +46,20 @@ from squeal.player.remote import Remote
 from squeal.player.visualisation import NoVisualisation, SpectrumAnalyser
 from squeal.isqueal import *
 
+# from http://wiki.slimdevices.com/index.php/SlimProtoTCPProtocol#HELO
 devices = {
     2: 'squeezebox',
     3: 'softsqueeze',
     4: 'squeezebox2',
     5: 'transporter',
-    6: 'softsqueeze3'}
+    6: 'softsqueeze3',
+    7: 'receiver',
+    8: 'squeezeslave',
+    9: 'controller',
+    10: 'boom',
+    11: 'softboom',
+    12: 'squeezeplay',
+    }
 
 class RemoteButtonPressed(object):
 
