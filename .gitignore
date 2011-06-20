@@ -6,7 +6,6 @@ db
 tmp
 Squeal.wpu
 pip-log.txt
-nevow/plugins/dropin.cache
 _trial_temp
 core
 setuptools*
@@ -14,11 +13,10 @@ wingdbstub.py
 build-stamp
 configure-stamp
 debian/squeal
-distribute-0.6.10.tar.gz
+distribute-*.tar.gz
 libspotify
-src/squeal.egg-info
+*.egg-info
 venv
 squeal.log
 src/squeal/spot/old-templates/
-src/twisted/plugins/dropin.cache
-
+dropin.cache

@@ -2,7 +2,7 @@
 
 """ Provide command line access to do stuff with the squealserver server. """
 
-usage = """%prog [options] [command]
+usage = """%prog [options] ["wipe"] [command]
 
 Command:
   start      Start the squeal server, if it is not already running
@@ -11,16 +11,31 @@ Command:
   wipe       Wipe the squealserver database completely, and reinitialise it
   debug      Start in debug mode, with a python prompt
   fg         Run in the foreground, writing the log to the screen
+
+  If the command `wipe` is given, a second command pay be passed which
+  is executed after `wipe`.
 """
 
 import pwd
 import os
 import sys
 import optparse
-import subprocess
-from itertools import chain
+
+# ignore some warnings from 3rd party modules
+import warnings
+warnings.filterwarnings('ignore', "the md5 module is deprecated")
+warnings.filterwarnings('ignore', "The popen2 module is deprecated.")
 
 from squeal import isqueal
+
+def chown(uid, gid, path):
+    """Recursively change the owner and group id of path to
+    the numeric uid and gid."""
+    for root, dirs, files in os.walk(path):
+        for name in dirs:
+            os.chown(os.path.join(root, name), uid, gid)
+        for name in files:
+            os.chown(os.path.join(root, name), uid, gid)
 
 class SquealManager:
 
@@ -28,13 +43,23 @@ class SquealManager:
         self.store = None
         self.database = database
         self.logfile = logfile
-        self.uid = pwd.getpwnam(user).pw_uid
-        self.gid = pwd.getpwnam(user).pw_gid
-        self.username = user
+        self.uid = os.getuid()
+        if self.uid == 0:
+            # only change user if running as root
+            pwdnam = pwd.getpwnam(user)
+            self.uid = pwdnam.pw_uid
+            self.gid = pwdnam.pw_gid
+            self.username = user
+        else:
+            self.gid = os.getgid()
+            self.username = pwd.getpwuid(self.uid).pw_name
+            
 
     def axiomatic(self, *args):
         from axiom.scripts import axiomatic
-        axiomatic.main(list(chain(["--dbdir", self.database], args)))
+        args = list(args)
+        args[:0] = ["--dbdir", self.database]
+        axiomatic.main(args)
 
     def start(self, foreground=False):
         if not os.path.exists(self.database):
@@ -62,6 +87,7 @@ class SquealManager:
         from twisted.application.service import IService
         from squeal.web.service import WebService
         from squeal.net.slimproto import SlimService
+        from squeal.net.discovery import DiscoveryService
         from squeal.playlist.service import Playlist
         from squeal.event import EventReactor
         from squeal.extension import PluginManager
@@ -75,6 +101,7 @@ class SquealManager:
             EventReactor,
             WebService,
             SlimService,
+            DiscoveryService,
             Playlist,
             PluginManager,
             LoginSystem
@@ -84,7 +111,14 @@ class SquealManager:
             s = srv(store=self.store)
             self.store.powerUp(s)
 
-        os.system("chown -R %s: %s" % (self.username, self.database))
+        chown(self.uid, self.gid, self.database)
+
+    def wipe(self):
+        if os.path.exists(self.database):
+            import shutil
+            shutil.rmtree(self.database, ignore_errors=True)
+        self.create_db()
+        self.create_manager()
 
 if __name__ == "__main__":
 
@@ -92,10 +126,12 @@ if __name__ == "__main__":
     p.add_option("-d", "--database", help="Specify database location", default="/var/lib/squeal/db")
     p.add_option("-l", "--logfile", help="Log file location", default="/var/log/squeal.log")
     p.add_option("-L", "--libpath", help="path to the squeal libs", default="/usr/share/squeal")
-    p.add_option("-u", "--user", help="user to run as", default="squeal")
+    p.add_option("-u", "--user", help="user to run as (only used if started as root)", default="squeal")
     opts, args = p.parse_args()
 
-    if len(args) != 1:
+    if len(args) == 2 and args[0] == 'wipe':
+        pass
+    elif len(args) != 1:
         p.print_help()
         raise SystemExit
 
@@ -105,14 +141,18 @@ if __name__ == "__main__":
     mgr = SquealManager(database=opts.database, logfile=opts.logfile, user=opts.user)
 
     command = args[0]
+    if command == "wipe":
+        mgr.wipe()
+        if len(args) == 1:
+            # no more commands
+            raise SystemExit
+        command = args[1]
     if command == "start":
         mgr.start()
     elif command == "fg":
         mgr.start(foreground=True)
     elif command == "stop":
         mgr.stop()
-    elif command == "wipe":
-        mgr.wipe()
     elif command == "status":
         mgr.status()
     elif command == "debug":
@@ -120,5 +160,3 @@ if __name__ == "__main__":
     else:
         p.print_help()
         raise SystemExit
-
-

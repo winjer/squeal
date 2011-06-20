@@ -117,7 +117,7 @@ class AccountService(Item, service.Service):
         u = set()
         for p in self.sessions:
             if p.avatar is None:
-                u.add("Anonymous")
+                u.add(u"Anonymous")
             else:
                 u.add(p.avatar.username)
         return sorted(u)

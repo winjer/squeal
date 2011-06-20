@@ -2,6 +2,30 @@ from setuptools import setup, find_packages
 
 version = '0.0.0'
 
+install_requires = [
+    'setuptools',
+    'isotoma.recipe.gocaptain',
+    'simplejson',
+    'netaddr',
+    'pysqlite',
+    'epsilon>=0.6.0',
+    'axiom',
+    #PIL and tagpy also, but they don't work in here
+    ]
+
+try:
+    # collections.OrderedDict is new in Python 2.7
+    from collections import OrderedDict
+except ImportError:
+    install_requires.append('ordereddict')
+
+try:
+    # uuid is new in Python 2.5
+    import uuid
+except ImportError:
+    install_requires.append('uuid')
+
+
 setup(
     name = 'squeal',
     version = version,
@@ -20,15 +44,5 @@ setup(
     },
     include_package_data = True,
     zip_safe = False,
-    install_requires = [
-        'setuptools',
-        'isotoma.recipe.gocaptain',
-        'simplejson',
-        'netaddr',
-        'pysqlite',
-        'epsilon',
-        'axiom'
-        #PIL and tagpy also, but they don't work in here
-    ],
+    install_requires = install_requires,
 )
-
